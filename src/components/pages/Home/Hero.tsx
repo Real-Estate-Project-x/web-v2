@@ -30,9 +30,9 @@ const Hero = () => {
     // In a real app, this would navigate to search results
   };
 
-  const focusSearch = () => {
-    if (searchRef.current) searchRef.current.focus();
-  };
+  // const focusSearch = () => {
+  //   if (searchRef.current) searchRef.current.focus();
+  // };
 
   return (
     <div className="relative h-[100vh] max-h-[850px] min-h-[670px] flex items-center overflow-hidden pt-0 md:pt-16">

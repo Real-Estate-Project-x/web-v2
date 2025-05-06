@@ -32,7 +32,7 @@ export const DashboardSchedule = () => {
           <Card>
             <CardHeader>
               <CardTitle>Past Viewings</CardTitle>
-              <CardDescription>Properties you've already visited</CardDescription>
+              <CardDescription>Properties you&apos;ve already visited</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

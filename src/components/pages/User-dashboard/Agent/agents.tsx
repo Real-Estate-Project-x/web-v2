@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Agent } from "../../../../../utils/interfaces";
+import Image from "next/image";
 
 
 
@@ -34,10 +35,12 @@ export const DashboardAgents = ({ onSelectAgent }: { onSelectAgent: (agent: Agen
           ].map((agent) => (
             <Card key={agent.name} className=" hover:shadow-lg transition-shadow h-96 p-4">
               <div className="flex justify-center">
-                <img
+                <Image
                   src={agent.image}
                   alt={agent.name}
                   className="w-44 h-44 object-cover rounded-full"
+                  width={0}
+                  height={0}
                 />
               </div>
               <CardHeader className="mb-0">

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {toast} from 'sonner';
-import { Mail, Key, Eye, EyeOff } from "lucide-react";
+import { Key, Eye, EyeOff } from "lucide-react";
 
 export default function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);

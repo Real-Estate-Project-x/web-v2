@@ -8,6 +8,7 @@ import Navbar from '../Home/Nav';
 import Footer from '../Home/Footer';
 import ContactAgentModal from './Dialogs/Contact-agent';
 import ScheduleViewingModal from './Dialogs/schedule-viewing';
+import Image from 'next/image';
 
 // This would typically come from an API, using static data for now
 const getPropertyById = (id: string) => {
@@ -84,10 +85,12 @@ const PropertyDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Image Section */}
                 <div className="relative">
-                    <img
-                    src={property.image}
-                    alt={property.title}
-                    className="w-full h-[500px] object-cover rounded-lg"
+                    <Image
+                      src={property.image}
+                      alt={property.title}
+                      className="w-full h-[500px] object-cover rounded-lg"
+                      width={0}
+                      height={0}
                     />
                     <Badge className="absolute top-4 left-4 bg-real-600">{property.type}</Badge>
                     <Badge className="absolute top-4 right-4 bg-white text-navy-900">{property.price}</Badge>

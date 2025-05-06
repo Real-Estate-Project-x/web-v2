@@ -16,10 +16,24 @@ import { Bed, Building, MapPin } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import MoreFiltersModal from "./Dialogs/more-filters";
+import Image from "next/image";
 
 
+type Property={
+    id : string | number;
+    image : string;
+    title : string;
+    type : string;
+    isNew : boolean;
+    location : string;
+    price: string;
+    beds: number;
+    baths: number;
+    status?: "Available" | "Pending" | "Sold";
+    sqft : string;
+}
 type Props = {
-    array : any[];
+    array : Property[];
 }
 
 export const PropertyFilter = () => {
@@ -87,10 +101,12 @@ export const PropertyList : FC<Props> = ({array}) => {
             {array.map((property) => (
                 <div key={property.id} className="property-card bg-white rounded-lg overflow-hidden shadow-md">
                     <div className="relative h-64">
-                        <img 
+                        <Image 
                         src={property.image} 
                         alt={property.title} 
                         className="w-full h-full object-cover"
+                        width={0}
+                        height={0}
                         />
                         <div className="absolute top-4 left-4 flex gap-2">
                         <Badge className="bg-[#0253CC] hover:bg-real-700">{property.type}</Badge>

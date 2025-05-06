@@ -4,6 +4,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const locations = [
   {
@@ -45,10 +46,12 @@ const PopularLocations = () => {
               onClick={() => router.push(`/properties?location=${location.name}`)}
             >
               <div className="aspect-w-16 aspect-h-9">
-                <img 
+                <Image 
                   src={location.image} 
                   alt={location.name}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  width={0}
+                  height={0}
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">

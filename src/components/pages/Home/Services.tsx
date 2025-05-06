@@ -1,5 +1,5 @@
 'use client';
-import { Home, Building, Users, MapPin } from "lucide-react";
+import { Home, Building, MapPin } from "lucide-react";
 
 const services = [
   {

@@ -4,11 +4,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { 
   NavigationMenu,
-  NavigationMenuContent,
+  //NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle
+  // NavigationMenuTrigger,
+  // navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
 import { Home, Settings, User, Heart, LayoutDashboard, Calendar } from "lucide-react";
 import Link from "next/link";

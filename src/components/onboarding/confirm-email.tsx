@@ -4,11 +4,11 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {toast} from 'sonner';
-import { Mail, Key, Eye, EyeOff } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export default function ConfirmEmailForm() {
 
-  const [showPassword, setShowPassword] = useState(false);
+  //const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {

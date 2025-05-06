@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 const testimonials = [
   {
@@ -54,17 +55,19 @@ const Testimonials = () => {
             Our Top Rated Agents
           </h2>
           <p className="text-navy-600 max-w-2xl mx-auto font-light">
-            We take pride in providing exceptional service to our clients. Here's a list of our top Agents.
+            We take pride in providing exceptional service to our clients. Here&apos;s a list of our top Agents.
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto relative">
           <div className="testimonial-card bg-white rounded-xl shadow-lg p-8 md:p-10 mb-8">
             <div className="flex flex-col md:flex-row md:items-center mb-6">
-              <img
+              <Image
                 src={testimonials[activeIndex].avatar}
                 alt={testimonials[activeIndex].name}
                 className="w-16 h-16 rounded-full object-cover mx-auto md:mx-0 mb-4 md:mb-0"
+                width={0}
+                height={0}
               />
               <div className="md:ml-4 text-center md:text-left">
                 <h4 className="text-xl font-semibold text-navy-900">
@@ -74,7 +77,7 @@ const Testimonials = () => {
               </div>
             </div>
             <p className="text-navy-800 text-lg italic font-light">
-              "{testimonials[activeIndex].content}"
+              &quot;{testimonials[activeIndex].content}&quot;
             </p>
           </div>
 

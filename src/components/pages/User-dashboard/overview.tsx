@@ -1,7 +1,7 @@
 'use client';
 
 import { ActivityItem, HeartFilled, StatCard } from "@/components/shared";
-import { Heart, Home, LayoutDashboard, Search, User } from "lucide-react";
+import { Home, Search, User } from "lucide-react";
 
 export const DashboardOverview = () => {
 

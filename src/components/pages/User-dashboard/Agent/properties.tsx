@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Agent, Property } from "../../../../../utils/interfaces";
+import { Property } from "../../../../../utils/interfaces";
 import { MessageSquare } from "lucide-react";
 import { 
   Pagination,
@@ -31,9 +31,9 @@ import { useState } from "react";
   
    
   // Get current properties
-  const indexOfLastProperty = currentPage * propertiesPerPage;
-  const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
-  const currentProperties = properties.slice(indexOfFirstProperty, indexOfLastProperty);
+  //const indexOfLastProperty = currentPage * propertiesPerPage;
+ // const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
+  //const currentProperties = properties.slice(indexOfFirstProperty, indexOfLastProperty);
   const totalPages = Math.ceil(properties.length / propertiesPerPage);
 
   const getStatusColor = (status: Property["status"]) => {

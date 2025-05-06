@@ -1,8 +1,8 @@
 'use client';
 
-import { ArrowRight, Bed, Building, MapPin } from "lucide-react";
+import { ArrowRight} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+//import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { PropertyList } from "../Properties";
 // Mock property data

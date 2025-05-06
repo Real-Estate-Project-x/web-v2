@@ -56,7 +56,7 @@ export const DashboardSettings = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Property Updates</p>
-                <p className="text-sm text-gray-500">Get updates about properties you've saved</p>
+                <p className="text-sm text-gray-500">Get updates about properties you&apos;ve saved</p>
               </div>
               <div>
                 <input type="checkbox" defaultChecked className="w-5 h-5" />
