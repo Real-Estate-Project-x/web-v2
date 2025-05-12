@@ -22,3 +22,39 @@ export interface Property {
   baths: number;
   status: "Available" | "Pending" | "Sold";
 }
+
+export interface TourFormData{
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  message: string;
+};
+
+export interface CommentFormData{
+  name: string;
+  email: string;
+  comment: string;
+  rating: number;
+};
+
+export interface Comment{
+  id: number;
+  userName: string;
+  date: string;
+  text: string;
+  rating: number;
+};
+
+export interface Amenity{
+  id: number;
+  name: string;
+  icon: "wifi" | "gym" | "washing-machine";
+};
+
+export interface ArchitecturalDrawing{
+  id: number;
+  title: string;
+  type: "image" | "document";
+  url: string;
+};
