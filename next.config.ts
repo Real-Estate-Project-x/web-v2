@@ -21,9 +21,20 @@ const nextConfig: NextConfig = {
         hostname: 'via.placeholder.com',
         port: '',         
         pathname: '/**', 
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.pixabay.com',
+        port: '',         
+        pathname: '/**', 
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        port: '',         
+        pathname: '/**',
       }
     ],
-    //domains : ["images.unsplash.com", "randomuser.me", "via.placeholder.com"]
   }
 };
 

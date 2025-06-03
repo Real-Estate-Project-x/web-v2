@@ -17,6 +17,7 @@ import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import MoreFiltersModal from "./Dialogs/more-filters";
 import Image from "next/image";
+import { PropertyInterface } from "../../../../utils/interfaces";
 
 
 type Property={
@@ -32,8 +33,9 @@ type Property={
     status?: "Available" | "Pending" | "Sold";
     sqft : string;
 }
+
 type Props = {
-    array : Property[];
+    array : PropertyInterface[];
 }
 
 export const PropertyFilter = () => {
@@ -102,15 +104,15 @@ export const PropertyList : FC<Props> = ({array}) => {
                 <div key={property.id} className="property-card bg-white rounded-lg overflow-hidden shadow-md">
                     <div className="relative h-64">
                         <Image 
-                        src={property.image} 
+                        src={property.photoUrls[0]} 
                         alt={property.title} 
                         className="w-full h-full object-cover"
                         width={0}
                         height={0}
                         />
                         <div className="absolute top-4 left-4 flex gap-2">
-                        <Badge className="bg-[#0253CC] hover:bg-real-700">{property.type}</Badge>
-                        {property.isNew && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>}
+                        <Badge className="bg-[#0253CC] hover:bg-real-700">{property.upFor}</Badge>
+                        {/* {property.isNew && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>} */}
                         </div>
                         <div className="absolute bottom-4 right-4">
                         <Badge className="bg-gray-100 text-navy-900">{property.price}</Badge>
@@ -120,20 +122,20 @@ export const PropertyList : FC<Props> = ({array}) => {
                         <h3 className="text-xl font-semibold mb-2 text-navy-900">{property.title}</h3>
                         <div className="flex items-center mb-3 text-navy-600">
                         <MapPin className="h-4 w-4 mr-1" />
-                        <span className="text-sm">{property.location}</span>
+                        <span className="text-sm">{property.address}</span>
                         </div>
                         <div className="flex justify-between text-navy-600 border-t pt-3">
-                        <div className="flex items-center">
-                            <Bed className="h-4 w-4 mr-1" />
-                            <span className="text-sm">{property.beds} beds</span>
-                        </div>
-                        <div className="flex items-center">
-                            <Building className="h-4 w-4 mr-1" />
-                            <span className="text-sm">{property.baths} baths</span>
-                        </div>
-                        <div className="flex items-center">
-                            <span className="text-sm">{property.sqft} sqft</span>
-                        </div>
+                            <div className="flex items-center">
+                                <Bed className="h-4 w-4 mr-1" />
+                                <span className="text-sm">{property.noOfBedrooms} beds</span>
+                            </div>
+                            <div className="flex items-center">
+                                <Building className="h-4 w-4 mr-1" />
+                                <span className="text-sm">{property.noOfToilets} toilets</span>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="text-sm">{property.sizeInSquareFeet} sqft</span>
+                            </div>
                         </div>
                         <Button 
                         variant="outline" 
@@ -150,7 +152,8 @@ export const PropertyList : FC<Props> = ({array}) => {
 }
 
 const Properties = () => {
-    
+    const router = useRouter();
+
   return (
     <React.Fragment>
         <Navbar/>
@@ -159,8 +162,9 @@ const Properties = () => {
 
             <PropertyFilter/>
 
-            <PropertyList array={properties}/>
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
+            {/* <PropertyList array={[]}/> */}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
                 {properties.map((property) => (
                     <div key={property.id} className="property-card bg-white rounded-lg overflow-hidden shadow-md">
                         <div className="relative h-64">
@@ -206,7 +210,7 @@ const Properties = () => {
                         </div>
                     </div>
                 ))}
-            </div> */}
+            </div>
         </div>
         
         <Footer/>

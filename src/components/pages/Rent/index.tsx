@@ -4,7 +4,6 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PropertyFilter, PropertyList } from "../Properties";
-import { properties } from "../Home/Featured-properties";
 import { Fragment } from "react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
@@ -42,7 +41,7 @@ const PropertiesForRent = () => {
                 </div>
                 </div>
 
-                <PropertyList array={properties} />
+                <PropertyList array={[]} />
             </div>
         </div>
 

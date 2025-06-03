@@ -58,3 +58,79 @@ export interface ArchitecturalDrawing{
   type: "image" | "document";
   url: string;
 };
+
+export interface AgentInterface {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  email: string;
+  logo: string;
+  rcNumber: string;
+  agencyCACDump: object;
+  agencyPhoneNumber: string;
+  whatsappNumber: string;
+  createdByUserId: string;
+  dateCreated: string;
+  dateUpdated: string;
+  dateOfIncorporation: string;
+  isRegistered: boolean;
+  status: boolean;
+  rating: number;
+  properties: any[]; // Replace 'any' with a more specific type if available
+}
+
+
+export interface PropertyInterface {
+  id: string;
+  title: string;
+  description: string;
+  address: string;
+  stateId: string;
+  agencyId: string;
+  postedByUserId: string;
+  propertyTypeId: string;
+  propertyCategory: string;
+  upFor: string;
+  price: number;
+  grandTotalPrice: number;
+  additionalCosts: { name: string; amount: number }[];
+  paymentCoverageDuration: string;
+  sizeInSquareFeet: number;
+  noOfBedrooms: number;
+  noOfToilets: number;
+  noOfKitchens: number;
+  hasCarParking: boolean;
+  hasLaundry: boolean;
+  hasWifi: boolean;
+  averageBroadbandSpeedInMegabytes: number;
+  bluepoddRating: number;
+  isPropertyBlocked: boolean;
+  isPropertyBoosted: boolean;
+  isPropertyTaken: boolean;
+  status: boolean;
+  dateCreated: string;
+  dateUpdated: string;
+  photoUrls: string[];
+  videoUrl: string;
+  architecturalPlanUrl: string;
+  threeDimensionalModelUrl: string;
+  geoCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
+export interface LocationsInterface {
+  propertyCount: number;
+  state : {
+    id: string;
+    name: string;
+    initials: string;
+    capital: string;
+    countryId: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+  }
+}

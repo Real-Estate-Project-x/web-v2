@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 //import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { PropertyList } from "../Properties";
+import { FC } from "react";
+import { PropertyInterface } from "../../../../utils/interfaces";
 // Mock property data
 export const properties = [
   {
@@ -45,7 +47,11 @@ export const properties = [
   }
 ];
 
-export const FeaturedProperties = () => {
+type Property = {
+  data : PropertyInterface[];
+}
+
+export const FeaturedProperties :FC<Property> = ({data}) => {
 
   const router = useRouter();
 
@@ -66,7 +72,7 @@ export const FeaturedProperties = () => {
         </div>
         
         {/* use component below as card */}
-        <PropertyList array={properties}/>
+        <PropertyList array={data}/>
       </div>
     </section>
   );
