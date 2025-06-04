@@ -6,45 +6,6 @@ import { ChevronLeft, ChevronRight, Mail, MapPin, Phone, Star,  } from "lucide-r
 import Image from "next/image";
 import { AgentInterface } from "../../../../utils/interfaces";
 
-// const topAgents = [
-//   {
-//     id: 1,
-//     name: "Sarah Johnson",
-//     title: "Senior Real Estate Agent",
-//     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-//     rating: 4.9,
-//     totalSales: 127,
-//     location: "Downtown District",
-//     phone: "+1 (555) 123-4567",
-//     email: "sarah.johnson@abode.com",
-//     specialties: ["Luxury Homes", "Commercial Properties"],
-//   },
-//   {
-//     id: 2,
-//     name: "David Martinez",
-//     title: "Property Investment Specialist",
-//     avatar: "https://randomuser.me/api/portraits/men/46.jpg",
-//     rating: 4.8,
-//     totalSales: 89,
-//     location: "Business District",
-//     phone: "+1 (555) 234-5678",
-//     email: "david.martinez@abode.com",
-//     specialties: ["Investment Properties", "Market Analysis"],
-//   },
-//   {
-//     id: 3,
-//     name: "Emily Thompson",
-//     title: "Residential Sales Expert",
-//     avatar: "https://randomuser.me/api/portraits/women/63.jpg",
-//     rating: 4.9,
-//     totalSales: 156,
-//     location: "Suburban Areas",
-//     phone: "+1 (555) 345-6789",
-//     email: "emily.thompson@abode.com",
-//     specialties: ["First-Time Buyers", "Family Homes"],
-//   },
-// ];
-
 type Props = {
   _data_for_TopAgents : AgentInterface[];
 }
@@ -83,36 +44,36 @@ const Testimonials :FC<Props> = ({_data_for_TopAgents}) => {
                 <Image
                   width={0}
                   height={0}
-                  src={_data_for_TopAgents[activeIndex].logo}
-                  alt={_data_for_TopAgents[activeIndex].name}
+                  src={_data_for_TopAgents[activeIndex].agency.logo}
+                  alt={_data_for_TopAgents[activeIndex].agency.name}
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-4"
                 />
                 <div className="flex items-center gap-1 mb-2">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-semibold text-navy-900">
-                    {_data_for_TopAgents[activeIndex].rating}
+                    {_data_for_TopAgents[activeIndex].agency.rating}
                   </span>
                 </div>
               </div>
               
               <div className="flex-1 text-center md:text-left">
                 <h4 className="text-xl md:text-2xl font-bold text-navy-900 mb-1 capitalize">
-                  {_data_for_TopAgents[activeIndex].name}
+                  {_data_for_TopAgents[activeIndex].agency.name}
                 </h4>
                 <p className="text-navy-600 mb-3 text-sm md:text-base">
-                  {_data_for_TopAgents[activeIndex].description}
+                  {_data_for_TopAgents[activeIndex].agency.description}
                 </p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <div className="flex items-center justify-center md:justify-start gap-2">
+                  <div className="flex items-center justify-center md:justify-start gap-2 capitalize">
                     <MapPin className="h-4 w-4 text-navy-500" />
                     <span className="text-navy-700 text-sm">
-                      {_data_for_TopAgents[activeIndex].address}
+                      {_data_for_TopAgents[activeIndex].agency.address}
                     </span>
                   </div>
                   <div className="text-navy-700 text-sm">
                     {/* {_data_for_TopAgents[activeIndex].properties.length} */}
-                    <strong>0</strong> properties sold
+                    <strong>{_data_for_TopAgents[activeIndex].propertyCount}</strong> Properties
                   </div>
                 </div>
 
@@ -120,27 +81,27 @@ const Testimonials :FC<Props> = ({_data_for_TopAgents}) => {
                   <div className="flex items-center justify-center md:justify-start gap-2">
                     <Phone className="h-4 w-4 text-navy-500" />
                     <span className="text-navy-700 text-sm">
-                      {_data_for_TopAgents[activeIndex].agencyPhoneNumber}
+                      {_data_for_TopAgents[activeIndex].agency.agencyPhoneNumber}
                     </span>
                   </div>
                   <div className="flex items-center justify-center md:justify-start gap-2">
                     <Mail className="h-4 w-4 text-navy-500" />
                     <span className="text-navy-700 text-sm">
-                      {_data_for_TopAgents[activeIndex].email}
+                      {_data_for_TopAgents[activeIndex].agency.email}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-2">
                   {/* add agent specialties in this section */}
-                  {/* {_data_for_TopAgents[activeIndex].specialties.map((specialty, index) => (
+                  {_data_for_TopAgents[activeIndex].tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="bg-real-100 text-real-700 px-3 py-1 rounded-full text-xs font-medium"
+                      className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium"
                     >
-                      {specialty}
+                      {tag}
                     </span>
-                  ))} */}
+                  ))}
                 </div>
               </div>
             </div>

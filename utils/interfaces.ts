@@ -60,24 +60,29 @@ export interface ArchitecturalDrawing{
 };
 
 export interface AgentInterface {
-  id: string;
-  name: string;
-  description: string;
-  address: string;
-  email: string;
-  logo: string;
-  rcNumber: string;
-  agencyCACDump: object;
-  agencyPhoneNumber: string;
-  whatsappNumber: string;
-  createdByUserId: string;
-  dateCreated: string;
-  dateUpdated: string;
-  dateOfIncorporation: string;
-  isRegistered: boolean;
-  status: boolean;
-  rating: number;
-  properties: any[]; // Replace 'any' with a more specific type if available
+  agency: {
+    id: string;
+    name: string;
+    description: string;
+    address: string;
+    email: string;
+    logo: string;
+    rcNumber: string;
+    dateOfIncorporation: string;
+    agencyPhoneNumber: string;
+    whatsappNumber: string;
+    isRegistered: boolean;
+    rating: number;
+    properties: any[]; // You can replace 'any' with a more specific type if available
+    agencyCACDump: Record<string, any>;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    createdByUserId: string;
+  };
+
+  propertyCount: number;
+  tags: string[];
 }
 
 
