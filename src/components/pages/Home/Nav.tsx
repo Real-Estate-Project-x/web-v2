@@ -1,12 +1,27 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavDataInterface } from "../../../../utils/interfaces";
 
-const Navbar = () => {
+type NavData = {
+  data ?: NavDataInterface[]
+  
+}
+
+  const defaultNavData =[
+    { href: "/", label: "Home" },
+    { href: "/properties", label: "All Properties" },
+    { href: "/buy", label: "Buy" },
+    { href: "/rent", label: "Rent" },
+    { href: "/agents", label: "Agents" },
+    { href: "/contact", label: "Contact" }
+  ]
+const Navbar :FC<NavData> = ({data = defaultNavData}) => {
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -27,6 +42,7 @@ const Navbar = () => {
     };
   }, []);
 
+
   return (
     <nav 
       className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
@@ -38,67 +54,30 @@ const Navbar = () => {
           :"bg-white border-gray-200 text-gray-800 shadow-md"
       }`}
     >
+      {/* container */}
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         <Link href="/" className="flex items-center">
           <Home className={`h-8 w-8 mr-2 ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}`} />
-          <h1 className={`text-2xl font-medium font-serif ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}`}>
+          <h1 className={`text-2xl font-medium hidden sm:inline-block font-serif ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}`}>
             Blupodd
           </h1>
         </Link>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link 
-            href="/" 
-            className={`hover:text-real-300 font-light transition-colors ${
-             pathname === "/" ? scrolled ? "text-[#1E3A8A] font-normal" : "text-gray-200" :"text-black"
-            }`}
-          >
-            Home
-          </Link>
-          <Link 
-            href="/properties" 
-            className={`hover:text-real-300 font-light transition-colors ${
-              pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" : pathname === "/properties" ? "text-[#1E3A8A] font-normal" : "text-black"
-            }`}
-          >
-            All Properties
-          </Link>
-          <Link 
-            href="/buy" 
-            className={`hover:text-real-300 font-light transition-colors ${
-              pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" : pathname === "/buy" ? "text-[#1E3A8A] font-normal" : "text-black"
-            }`}
-          >
-            Buy
-          </Link>
-          <a 
-            href="/rent" 
-            className={`hover:text-real-300 font-light transition-colors ${
-              pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" : pathname === "/rent" ? "text-[#1E3A8A] font-normal" : "text-black"
-            }`}
-          >
-            Rent
-          </a>
-          <a 
-            href="#" 
-            className={`hover:text-real-300 font-light transition-colors ${
-              pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" : pathname === "/agents" ? "text-[#1E3A8A] font-normal" : "text-black"
-            }`}
-          >
-            Agents
-          </a>
-
-          <a 
-            href="/contact" 
-            className={`hover:text-real-300 font-light transition-colors ${
-              pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" : pathname === "/contact" ? "text-[#1E3A8A] font-normal" : "text-black"
-            }`}
-          >
-            Contact
-          </a>
-          
-          <Link href="/login">
+          {/* Map through defaultNavData to create links */}
+          {data.map((navItem) => (
+            <Link 
+              key={navItem.href}
+              href={navItem.href} 
+              className={`hover:text-real-300 font-light transition-colors ${
+                pathname === "/" ? scrolled ? "text-[#1E3A8A] font-normal" : "text-gray-200" : pathname === navItem.href ? "text-[#1E3A8A] font-bold line-through" : "text-black"
+              }`}
+            >
+              {navItem.label}
+            </Link>
+          ))}
+          <Link href="/login" className={pathname.includes("/agent-dashboard") ? "hidden" : "inline-block"}>
             <Button variant="default" size="sm" className="ml-4 font-normal cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]">Sign&nbsp;In</Button>
           </Link>
         </div>
@@ -110,7 +89,7 @@ const Navbar = () => {
             size="icon" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
-            className={scrolled ? "text-gray-800" : "text-gray-200"}
+            className={scrolled ? "text-gray-800" : "text-gray-800"}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
@@ -127,49 +106,20 @@ const Navbar = () => {
           : "bg-white border-gray-200"
         }`}>
           <div className="container mx-auto px-4 py-3 space-y-3">
-            <Link 
-              href="/" 
-              className={`block py-2 hover:text-real-300 font-medium transition-colors ${
+            {data.map((navItem) => (
+              <Link 
+                key={navItem.href}
+                href={navItem.href} 
+                className={`block py-2 hover:text-real-300 transition-colors border-b border-slate-200 font-light ${
                 pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
               }`}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/properties" 
-              className={`block py-2 hover:text-real-300 font-medium transition-colors ${
-                pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
-              }`}
-            >
-              All Properties
-            </Link>
-            <Link 
-              href="/buy" 
-              className={`block py-2 hover:text-real-300 font-medium transition-colors ${
-                pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
-              }`}
-            >
-              Buy
-            </Link>
-            <a 
-              href="/rent" 
-              className={`block py-2 hover:text-real-300 font-medium transition-colors ${
-                pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
-              }`}
-            >
-              Rent
-            </a>
-            <a 
-              href="/contact" 
-              className={`block py-2 hover:text-real-300 font-medium transition-colors ${
-                pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
-              }`}
-            >
-              Contact
-            </a>
+              >
+                {navItem.label}
+              </Link>
+            ))}
            
             <Link href="/login">
-              <Button className="w-full mt-2 bg-blue-50 bg-[#1E3A8A] text-white">
+              <Button className="w-full mt-2 hover:bg-blue-800 bg-[#1E3A8A] text-white">
                 Sign&nbsp;In
               </Button>
             </Link>

@@ -49,12 +49,12 @@ const PopularLocations : FC<Location> = ({data}) => {
               onClick={() => router.push(`/properties?location=${location.state.name}`)}>
 
               <div className="aspect-w-16 aspect-h-9">
-                <Image 
+                <img 
                   src={"https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&q=80"} 
                   alt={location.state.name}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  width={0}
-                  height={0}
+                  // width={0}
+                  // height={0}
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">

@@ -139,3 +139,8 @@ export interface LocationsInterface {
     dateUpdated: string;
   }
 }
+
+export interface NavDataInterface{
+  href: string;
+  label: string | React.ReactNode;
+} 

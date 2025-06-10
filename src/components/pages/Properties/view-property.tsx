@@ -17,7 +17,6 @@ import React from "react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 
 type SimilarProperties = {
   id: number,
@@ -401,12 +400,12 @@ const PropertyDetails = () => {
                   {property.images.map((image, index) => (
                     <CarouselItem key={index}>
                       <div className="relative">
-                        <Image
+                        <img
                           src={image}
                           alt={`${property.title} - Image ${index + 1}`}
                           className="w-full h-[350px] sm:h-[400px] md:h-[500px] object-cover rounded-lg"
-                          width={0}
-                          height={0}
+                          // width={0}
+                          // height={0}
                         />
                         {index === 0 && (
                           <>
@@ -509,12 +508,12 @@ const PropertyDetails = () => {
                           .map(drawing => (
                             <Card key={drawing.id} className="overflow-hidden">
                               <div className="h-48 overflow-hidden">
-                                <Image 
+                                <img 
                                   src={drawing.url} 
                                   alt={drawing.title}
                                   className="w-full h-full object-cover"
-                                  width={0}
-                                  height={0}
+                                  // width={0}
+                                  // height={0}
                                 />
                               </div>
                               <CardContent className="p-3">
@@ -696,12 +695,12 @@ const PropertyDetails = () => {
               <Card>
                 <CardContent className="pt-6 text-sm md:text-base">
                   <div className="text-center mb-4">
-                    <Image 
+                    <img 
                       src={property.agency.logo} 
                       alt={property.agency.name} 
                       className="w-16 h-16 object-cover rounded-full mx-auto mb-2"
-                      width={0}
-                      height={0}
+                      // width={0}
+                      // height={0}
                     />
                     <h3 className="font-semibold text-sm">{property.agency.name}</h3>
                     <p className="text-gray-600 text-sm">{property.agentName} - Listing Agent</p>
@@ -804,12 +803,12 @@ const PropertyDetails = () => {
                     <CarouselItem key={similarProperty.id} className="md:basis-1/2 lg:basis-1/3">
                       <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full py-0">
                         <div className="relative h-48">
-                          <Image
+                          <img
                             src={similarProperty.image ? similarProperty.image : "https://via.placeholder.com/150"}
                             alt={similarProperty.title}
                             className="w-full h-full object-cover"
-                            width={0}
-                            height={0}
+                            // width={0}
+                            // height={0}
                           />
                           <Badge className="absolute top-4 left-4 bg-[#0253CC]">{similarProperty.type}</Badge>
                           <Badge className="absolute top-4 right-4 bg-white text-[#102A43]">{similarProperty.price}</Badge>
