@@ -44,7 +44,7 @@ import RecentActivities from "./components/Dashboard/recent-activities";
 
 export const agentDashboardData = [
     { href: "/agent-dashboard", label: "Dashboard" },
-    { href: "/agent-dashboard/properties", label: "Agent Properties" },
+    { href: "/agent-dashboard/properties", label: "Properties" },
     { href: "/agent-dashboard/users", label: "Users" },
     { href: "/agent-dashboard/viewings", label: "Viewings" },
     {href : "/agent-dashboard/notifications", label: <Bell className="h-4 w-4"/>},
