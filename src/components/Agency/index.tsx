@@ -47,6 +47,7 @@ export const agentDashboardData = [
     { href: "/agent-dashboard/properties", label: "Properties" },
     { href: "/agent-dashboard/users", label: "Users" },
     { href: "/agent-dashboard/viewings", label: "Viewings" },
+    { href: "/agent-dashboard/payment", label: "Payouts" },
     {href : "/agent-dashboard/notifications", label: <Bell className="h-4 w-4"/>},
     {href : "/agent-dashboard/settings", label: <Settings className="h-4 w-4"/>},
     { href: "/agent-dashboard/profile", label: <Avatar className="h-10 w-10">

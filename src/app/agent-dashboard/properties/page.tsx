@@ -1,4 +1,4 @@
-import AgentPropertiesManager from "@/components/Agent/components/Properties";
+import AgentPropertiesManager from "@/components/Agency/components/Properties";
 
 
 export default function Agent() {

@@ -1,5 +1,5 @@
 
-import AgentProfile from "@/components/Agent/components/Agent-profile/profile";
+import AgentProfile from "@/components/Agency/components/Agent-profile/profile";
 import { Suspense } from "react";
 
 

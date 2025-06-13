@@ -28,7 +28,6 @@ import {
   Calendar,
   //DollarSign
 } from "lucide-react";
-import Image from "next/image";
 
 interface Property {
   id: number;
@@ -98,7 +97,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{property.title}</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold">{property.title}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -157,7 +156,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
               </div>
 
               {/* Property Features */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Bed className="h-5 w-5 text-muted-foreground" />
                   <div>
@@ -185,10 +184,10 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
             {/* Statistics */}
             <div className="space-y-4">
               <h4 className="text-lg font-semibold">Property Statistics</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4">
                 <Card className="h-fit p-0">
                   <CardContent className="p-3">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-4">
                       <Eye className="h-5 w-5 text-blue-500" />
                       <div>
                         <div className="font-medium text-sm">{property.views}</div>
@@ -199,7 +198,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                 </Card>
                 <Card className="h-fit p-0">
                   <CardContent className="p-3">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-4">
                       <Calendar className="h-5 w-5 text-green-500" />
                       <div>
                         <div className="font-semibold text-sm">{property.daysOnMarket}</div>
@@ -219,7 +218,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
           {/* Property Description */}
           <div>
             <h4 className="text-lg font-semibold mb-2">Property Description</h4>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               This beautiful {property.type.toLowerCase()} offers {property.bedrooms} bedrooms and {property.bathrooms} bathrooms 
               in a prime location. With {property.sqft} square feet of living space, this property provides excellent value 
               and has been attracting significant interest from potential buyers. The property features modern amenities 
@@ -227,27 +226,34 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
             </p>
           </div>
 
+          <section className="my-4">
+            {!property.isBoosted && (
+              <Button onClick={handleBoost} className="bg-yellow-500 hover:bg-yellow-600">
+                <Zap className="h-4 w-4 mr-2" />
+                Boost Property
+              </Button>
+            )}
+            {property.isBoosted && (
+              <Button disabled className="bg-green-600 text-white">
+                <Zap className="h-4 w-4 mr-2" />
+                Already Boosted
+              </Button>
+            )}
+          </section>
+
           {/* Action Buttons */}
           <div className="flex justify-between items-center pt-4 border-t">
             <div className="text-sm text-muted-foreground">
               Property ID: #{property.id}
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant={"outline"} onClick={onClose}>
                 Close
               </Button>
-              {!property.isBoosted && (
-                <Button onClick={handleBoost} className="bg-yellow-500 hover:bg-yellow-600">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Boost Property
-                </Button>
-              )}
-              {property.isBoosted && (
-                <Button variant="secondary" disabled>
-                  <Zap className="h-4 w-4 mr-2" />
-                  Already Boosted
-                </Button>
-              )}
+              <Button variant="destructive" onClick={onClose}>
+                Delete&nbsp;Property
+              </Button>
+              
             </div>
           </div>
         </div>

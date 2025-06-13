@@ -70,7 +70,7 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
             <Link 
               key={navItem.href}
               href={navItem.href} 
-              className={`hover:text-real-300 font-light transition-colors ${
+              className={`hover:text-real-300 transition-colors ${
                 pathname === "/" ? scrolled ? "text-[#1E3A8A] font-normal" : "text-gray-200" : pathname === navItem.href ? "text-[#1E3A8A] font-bold line-through" : "text-black"
               }`}
             >

@@ -1,4 +1,4 @@
-import AgentDashboard from "@/components/Agent";
+import AgentDashboard from "@/components/Agency";
 
 
 export default function Agent() {

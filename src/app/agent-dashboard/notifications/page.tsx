@@ -1,4 +1,4 @@
-import AgentNotifications from "@/components/Agent/components/Notifications";
+import AgentNotifications from "@/components/Agency/components/Notifications";
 
 
 export default function Agent() {
