@@ -41,7 +41,7 @@ const LandingPage = () => {
           { headers }
         ),
         axios.get(
-          `${API_BASE_URL}property/list/featured-properties?longitude=010.02020&latitude=029.92920`,
+          `${API_BASE_URL}property/list/featured-properties?pageSize=3&pageNumber=1&longitude=010.02020&latitude=029.92920`,
           { headers }
         ),
         axios.get(
