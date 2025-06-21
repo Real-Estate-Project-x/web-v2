@@ -41,11 +41,11 @@ const LandingPage = () => {
           { headers }
         ),
         axios.get(
-          `${API_BASE_URL}property/list/featured-properties?pageSize=3&pageNumber=1&longitude=010.02020&latitude=029.92920`,
+          `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1&longitude=010.02020&latitude=029.92920`,
           { headers }
         ),
         axios.get(
-          `${API_BASE_URL}property/list/popular-locations?longitude=7.520633&latitude=6.412773`,
+          `${API_BASE_URL}property/customer-listings/popular-locations?longitude=7.520633&latitude=6.412773`,
           { headers }
         ),
         // Add more API calls as needed {/property/list/popular-locations}
