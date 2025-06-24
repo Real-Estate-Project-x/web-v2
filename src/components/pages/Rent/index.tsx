@@ -19,7 +19,7 @@ const PropertiesForRent = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}property?upFor=RENT`)
+        axios.get(`${API_BASE_URL}property/customer-listings/by-property-action/RENT`)
         .then((response) => { 
             if(response.data.success) {
                 setRentProperties(response.data.data);
@@ -77,7 +77,7 @@ const PropertiesForRent = () => {
                     )}
                     {/* <PropertyList array={[]} /> */}
                 </div>
-                
+
                 {rentProperties.length > 6 && (<Pagination _data={rentProperties} />)}
             </div>
 

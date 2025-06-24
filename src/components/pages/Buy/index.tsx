@@ -19,7 +19,7 @@ const PropertiesForSale = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}property?upFor=SALE`)
+        axios.get(`${API_BASE_URL}property/customer-listings/by-property-action/SALE`)
         .then((response) => { 
             if(response.data.success) {
                 setBuyProperties(response.data.data);
