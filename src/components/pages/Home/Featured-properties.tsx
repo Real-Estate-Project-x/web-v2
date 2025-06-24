@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { PropertyList } from "../Properties";
 import { FC } from "react";
 import { PropertyInterface } from "../../../../utils/interfaces";
+import LoadingCard from "@/components/shared/loader-cards";
 // Mock property data
 export const properties = [
   {
@@ -72,7 +73,13 @@ export const FeaturedProperties :FC<Property> = ({data}) => {
         </div>
         
         {/* use component below as card */}
-        <PropertyList array={data}/>
+        {
+          !data || data.length === 0 ? 
+            <LoadingCard/>
+          :
+           <PropertyList array={data}/>
+        }
+       
       </div>
     </section>
   );

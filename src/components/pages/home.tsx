@@ -9,8 +9,9 @@ import PopularLocations from "./Home/Popular-locations";
 import Services from "./Home/Services";
 import Testimonials from "./Home/Testimonials";
 import axios from "axios";
+import LoadingCard, { LoaderCardPopularLocations, TestimonialsLoaderCard } from "../shared/loader-cards";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!API_BASE_URL) {
   throw new Error(
@@ -66,22 +67,20 @@ const LandingPage = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <Hero />
-      {!featured_properties || featured_properties.length === 0 ? (
-        "...Loading properties..."
-      ) : (
-        <FeaturedProperties data={featured_properties} />
-      )}
-      {!popular_locations || popular_locations.length === 0 ? (
-        "...Loading locations..."
+      <FeaturedProperties data={featured_properties} />
+      <PopularLocations data={popular_locations} />
+      {/* {!popular_locations || popular_locations.length === 0 ? (
+        <LoaderCardPopularLocations/>
       ) : (
         <PopularLocations data={popular_locations} />
-      )}
+      )} */}
       <Services />
-      {!top_agents || top_agents.length === 0 ? (
-        "...Loading agents..."
+      <Testimonials _data_for_TopAgents={top_agents} />
+      {/* {!top_agents || top_agents.length === 0 ? (
+      <TestimonialsLoaderCard/>
       ) : (
         <Testimonials _data_for_TopAgents={top_agents} />
-      )}
+      )} */}
       {/* <CTA /> */}
       <Footer />
     </div>

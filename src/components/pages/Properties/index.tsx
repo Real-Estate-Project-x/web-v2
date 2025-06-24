@@ -9,30 +9,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Navbar from "../Home/Nav";
-import React, { FC, useState } from "react";
-import { properties } from "../Home/Featured-properties";
+import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Building, MapPin } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import MoreFiltersModal from "./Dialogs/more-filters";
-import Image from "next/image";
 import { PropertyInterface } from "../../../../utils/interfaces";
-
-
-type Property={
-    id : string | number;
-    image : string;
-    title : string;
-    type : string;
-    isNew : boolean;
-    location : string;
-    price: string;
-    beds: number;
-    baths: number;
-    status?: "Available" | "Pending" | "Sold";
-    sqft : string;
-}
+import axios from "axios";
+import { API_BASE_URL } from "../home";
+import { formatPrice } from "../../../../utils/helpers";
+import { Pagination } from "@/components/shared/pagination";
+import LoadingCard from "@/components/shared/loader-cards";
 
 type Props = {
     array : PropertyInterface[];
@@ -107,24 +95,22 @@ export const PropertyList : FC<Props> = ({array}) => {
                             src={property.photoUrls[0]} 
                             alt={property.title} 
                             className="w-full h-full object-cover"
-                        // width={0}
-                        // height={0}
                         />
                         <div className="absolute top-4 left-4 flex gap-2">
                         <Badge className="bg-[#0253CC] hover:bg-real-700">{property.upFor}</Badge>
                         {/* {property.isNew && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>} */}
                         </div>
                         <div className="absolute bottom-4 right-4">
-                        <Badge className="bg-gray-100 text-navy-900">{property.price}</Badge>
+                        <Badge className="bg-gray-100 text-navy-900">{formatPrice(property.price)}</Badge>
                         </div>
                     </div>
-                    <div className="p-5">
+                    <div className="p-5 capitalize">
                         <h3 className="text-xl font-semibold mb-2 text-navy-900">{property.title}</h3>
                         <div className="flex items-center mb-3 text-navy-600">
                         <MapPin className="h-4 w-4 mr-1" />
                         <span className="text-sm">{property.address}</span>
                         </div>
-                        <div className="flex justify-between text-navy-600 border-t pt-3">
+                        <div className="flex justify-between text-navy-600 pt-3">
                             <div className="flex items-center">
                                 <Bed className="h-4 w-4 mr-1" />
                                 <span className="text-sm">{property.noOfBedrooms} beds</span>
@@ -139,7 +125,7 @@ export const PropertyList : FC<Props> = ({array}) => {
                         </div>
                         <Button 
                         variant="outline" 
-                        className="w-full mt-4 border-real-500 text-real-600 hover:bg-real-50"
+                        className="w-full mt-4 border-real-500 text-real-600 hover:bg-real-50 cursor-pointer"
                         onClick={() => router.push(`/properties/view?id=${property.id}`)}
                         >
                         View Details
@@ -152,7 +138,25 @@ export const PropertyList : FC<Props> = ({array}) => {
 }
 
 const Properties = () => {
-    const router = useRouter();
+    const [properties, setProperties] = useState<PropertyInterface[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        axios.get(`${API_BASE_URL}property`)
+        .then((response) => { 
+            if(response.data.success) {
+                setProperties(response.data.data);
+
+            }
+            setIsLoading(false);
+        })
+        .catch((error) => {
+            setIsLoading(false);
+            console.error("Error fetching properties:", error);
+        });
+    },[]);
+
+   
 
   return (
     <React.Fragment>
@@ -162,55 +166,20 @@ const Properties = () => {
 
             <PropertyFilter/>
 
-            {/* <PropertyList array={[]}/> */}
+            {isLoading ? (
+                <div className="flex justify-start">
+                    <LoadingCard />
+                </div>) 
+                :
+                (
+                    <PropertyList array={properties}/>
+                )
+            }
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
-                {properties.map((property) => (
-                    <div key={property.id} className="property-card bg-white rounded-lg overflow-hidden shadow-md">
-                        <div className="relative h-64">
-                            <img 
-                            src={property.image} 
-                            alt={property.title} 
-                            className="w-full h-full object-cover"
-                            />
-                            <div className="absolute top-4 left-4 flex gap-2">
-                            <Badge className="bg-real-600 hover:bg-real-700">{property.type}</Badge>
-                            {property.isNew && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>}
-                            </div>
-                            <div className="absolute bottom-4 right-4">
-                            <Badge className="bg-white text-navy-900">{property.price}</Badge>
-                            </div>
-                        </div>
-                        <div className="p-5">
-                            <h3 className="text-xl font-semibold mb-2 text-navy-900">{property.title}</h3>
-                            <div className="flex items-center mb-3 text-navy-600">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            <span className="text-sm">{property.location}</span>
-                            </div>
-                            <div className="flex justify-between text-navy-600 border-t pt-3">
-                            <div className="flex items-center">
-                                <Bed className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{property.beds} beds</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Building className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{property.baths} baths</span>
-                            </div>
-                            <div className="flex items-center">
-                                <span className="text-sm">{property.sqft} sqft</span>
-                            </div>
-                            </div>
-                            <Button 
-                            variant="outline" 
-                            className="w-full mt-4 border-real-500 text-real-600 hover:bg-real-50"
-                            onClick={() => router.push(`/properties/view?id=${property.id}`)}
-                            >
-                            View Details
-                            </Button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {properties.length > 6 && (<Pagination _data={properties} />)}
+            
+
+           
         </div>
         
         <Footer/>
