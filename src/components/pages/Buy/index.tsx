@@ -1,14 +1,38 @@
 'use client';
 
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PropertyFilter, PropertyList } from "../Properties";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
+import { PropertyInterface } from "../../../../utils/interfaces";
+import axios from "axios";
+import { API_BASE_URL } from "../home";
+import LoadingCard from "@/components/shared/loader-cards";
+import { Pagination } from "@/components/shared/pagination";
 
 const PropertiesForSale = () => {
+    
+    const [buyProperties, setBuyProperties] = useState<PropertyInterface[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        axios.get(`${API_BASE_URL}property/customer-listings/by-property-action/SALE`)
+        .then((response) => { 
+            if(response.data.success) {
+                setBuyProperties(response.data.data);
+
+            }
+            setIsLoading(false);
+        })
+        .catch((error) => {
+            setIsLoading(false);
+            console.error("Error fetching properties:", error);
+        });
+    },[]);
+
   return (
     <Fragment>
         <Navbar/>
@@ -40,9 +64,18 @@ const PropertiesForSale = () => {
                     <PropertyFilter />
                 </div>
                 </div>
-
-                <PropertyList array={[]} />
+                {isLoading ? (
+                    <LoadingCard/>
+                ) : buyProperties?.length === 0 ? 
+                    <div className="text-center text-gray-500">
+                        <p className="text-lg">No properties available for sale at the moment.</p>
+                    </div>
+                :(
+                    <PropertyList array={buyProperties} />
+                )}
             </div>
+
+            {buyProperties.length > 6 && (<Pagination _data={buyProperties} />)}
         </div>
 
         <Footer/>
