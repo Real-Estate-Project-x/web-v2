@@ -15,7 +15,7 @@ type NavData = {
   const defaultNavData =[
     { href: "/", label: "Home" },
     { href: "/properties", label: "All Properties" },
-    { href: "/buy", label: "Buy" },
+    { href: "/buy", label: "Sale" },
     { href: "/rent", label: "Rent" },
     { href: "/agents", label: "Agents" },
     { href: "/contact", label: "Contact" }

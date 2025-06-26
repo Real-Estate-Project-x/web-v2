@@ -172,6 +172,11 @@ const Properties = () => {
                 </div>) 
                 :
                 (
+                    properties?.length === 0 ? 
+                        <div className="text-center text-gray-500">
+                            <p className="text-lg">No properties available at the moment.</p>
+                        </div>
+                    :
                     <PropertyList array={properties}/>
                 )
             }
