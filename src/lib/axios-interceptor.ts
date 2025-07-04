@@ -2,15 +2,20 @@
 import axios from 'axios';
 import { getCookie, handleLoggingOff, setCookie } from './helpers';
 
-const apiBaseURL = process.env.NEXT_PUBLIC_BACKEND_HOST;
+const apiBaseURL = process.env.NEXT_PUBLIC_API_URL;
 
 export const axiosInstance = axios.create({
   withCredentials : true,
   baseURL: apiBaseURL,
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers : {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "x-user-ip" : "104.28.204.233",
+    "x-longitude": "010.02020",
+    "x-latitude": "029.92920",
+  }
   
 });
 
@@ -36,7 +41,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // Check if the error is a 403 and the request hasn't already been retried
-    if (error.status === 403 && !originalRequest._retry) {
+    if (error.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true; // Mark the request as retried to avoid loops
 
       try {
@@ -60,9 +65,8 @@ axiosInstance.interceptors.response.use(
         console.error('Refresh token failed', refreshError);
 
         // Handle 403 response from refresh token endpoint
-        if (refreshError?.response?.status === 498) {
+        if (refreshError?.response?.status === 403) {
           handleLoggingOff();
-          //window.location.replace("https://admin.emporium.africa/");
         }
 
         // Throw other errors to stop further processing
@@ -76,71 +80,4 @@ axiosInstance.interceptors.response.use(
 );
 
 
-// export const axiosInstance = axios.create({
-//   withCredentials : true,
-//   baseURL: process.env.NEXT_PUBLIC_BACKEND_HOST,
-//   timeout: 10000,
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// });
-
-// // Add a request interceptor
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     const token = getCookie('access_token');
-//     if (token) {
-//       config.headers['Authorization'] = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
-// // axios interceptor
-// axiosInstance.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   async function (error) {
-//     const originalRequest = error.config;
-
-//     if (error.status === 403 && !originalRequest._retry) {
-//         originalRequest._retry = true;
-
-//       // Refresh token logic
-//       const refreshToken = getCookie('access_token');
-//       try {
-//         const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_HOST}auth/refresh`, {
-//             withCredentials : true,
-//             headers :{
-//             'Authorization' : `Bearer ${refreshToken}`
-//             }
-//         });
-//         const newAccessToken = response.data?.data?.accessToken;
-        
-//         setCookie('access_token', newAccessToken);
-
-//         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-//         return axiosInstance(originalRequest);
-
-//       } catch (error : any) {
-//         console.log('Refresh token failed', error);
-
-//         //if(error?.response?.status === 403){
-//           logout();
-//           window.location.replace("https://admin.emporium.africa/");
-//         //}
-        
-//       }
-//     }else{
-//       logout();
-//       window.location.replace("https://admin.emporium.africa/");
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-// //export default axiosInstance;
 

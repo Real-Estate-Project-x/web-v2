@@ -9,7 +9,9 @@ import PopularLocations from "./Home/Popular-locations";
 import Services from "./Home/Services";
 import Testimonials from "./Home/Testimonials";
 import axios from "axios";
-import LoadingCard, { LoaderCardPopularLocations, TestimonialsLoaderCard } from "../shared/loader-cards";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import { getUserIp, returnHeaders } from "@/lib/utils";
+import { setCookie } from "@/lib/helpers";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,11 +21,18 @@ if (!API_BASE_URL) {
   );
 }
 
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-};
+const setAlert = () => {
+  alert("Please Turn on Geolocation in your Browser Settings for better Access to Properties.");
+}
+
+const getUserIpAddress = async (setState : Function) => {
+  await getUserIp().then((ip) => {
+    setState(ip);
+  }).catch((error) => {
+    console.error("Error fetching user IP address:", error);
+  })
+}
+
 
 const LandingPage = () => {
   // This component serves as the main landing page for the application.
@@ -33,21 +42,25 @@ const LandingPage = () => {
   const [top_agents, setTopAgents] = React.useState<any>([]);
   const [featured_properties, setFeaturedProperties] = React.useState<any>([]);
   const [popular_locations, setPopularLocations] = React.useState<any>([]);
+  const [userIp, setUserIp] = React.useState<string>("");
 
   useEffect(() => {
+
+    getUserIpAddress(setUserIp);
+
     axios
       .all([
         axios.get(
-          `${API_BASE_URL}agency/list/top-agents?longitude=010.02020&latitude=029.92920`,
-          { headers }
+          `${API_BASE_URL}agency/list/top-agents?longitude=010.02020&latitude=029.92920&ipAddress=104.28.204.233`,
+          {headers : returnHeaders(userIp) }
         ),
         axios.get(
-          `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1&longitude=010.02020&latitude=029.92920`,
-          { headers }
+          `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1`,
+          {headers : returnHeaders(userIp) }
         ),
         axios.get(
-          `${API_BASE_URL}property/customer-listings/popular-locations?longitude=7.520633&latitude=6.412773`,
-          { headers }
+          `${API_BASE_URL}property/customer-listings/popular-locations`,
+          {headers : returnHeaders(userIp) }
         ),
         // Add more API calls as needed {/property/list/popular-locations}
       ])
@@ -63,24 +76,20 @@ const LandingPage = () => {
       });
   }, []);
 
+  setCookie('user_ip', userIp,);
+
+  setInterval(() => {  
+    setAlert();
+  }, 100000);
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <Hero />
       <FeaturedProperties data={featured_properties} />
       <PopularLocations data={popular_locations} />
-      {/* {!popular_locations || popular_locations.length === 0 ? (
-        <LoaderCardPopularLocations/>
-      ) : (
-        <PopularLocations data={popular_locations} />
-      )} */}
       <Services />
       <Testimonials _data_for_TopAgents={top_agents} />
-      {/* {!top_agents || top_agents.length === 0 ? (
-      <TestimonialsLoaderCard/>
-      ) : (
-        <Testimonials _data_for_TopAgents={top_agents} />
-      )} */}
       {/* <CTA /> */}
       <Footer />
     </div>

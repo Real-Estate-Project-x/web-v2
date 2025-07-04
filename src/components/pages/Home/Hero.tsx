@@ -174,13 +174,17 @@ const Hero = () => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
     }, 6000);
     return () => clearInterval(interval);
+
   }, []);
+
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching for:", searchText, "in:", location, "with filter:", activeFilter);
   };
 
+  
   const quickSearchOptions = [
     { icon: Home, label: "Homes for Sale", count: "2,847" },
     { icon: Building2, label: "New Construction", count: "523" },

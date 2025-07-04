@@ -55,6 +55,10 @@ type Property = {
 export const FeaturedProperties :FC<Property> = ({data}) => {
 
   const router = useRouter();
+  // using js prompt ask the user to turn on geolocation for better access to properties
+  if (typeof window !== 'undefined' && !navigator.geolocation) {  
+    alert("Please enable geolocation in your browser settings for better access to properties.");
+  }
 
   return (
     <section className="py-16 bg-gray-50">

@@ -108,6 +108,9 @@ export interface PropertyInterface {
   hasCarParking: boolean;
   hasLaundry: boolean;
   hasWifi: boolean;
+  hasCctv:boolean;
+  hasGym: boolean;
+  hasKidsPlayArea:boolean;
   averageBroadbandSpeedInMegabytes: number;
   bluepoddRating: number;
   isPropertyBlocked: boolean;
@@ -118,7 +121,8 @@ export interface PropertyInterface {
   dateUpdated: string;
   photoUrls: string[];
   videoUrl: string;
-  architecturalPlanUrl: string;
+  architecturalPlanUrl: string[];
+  isNewBuilding : boolean;
   threeDimensionalModelUrl: string;
   geoCoordinates: {
     latitude: number;
@@ -144,3 +148,13 @@ export interface NavDataInterface{
   href: string;
   label: string | React.ReactNode;
 } 
+
+export interface PaginationDataInterface {
+  currentPage: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  success: boolean;
+}

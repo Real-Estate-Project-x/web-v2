@@ -97,8 +97,8 @@ export const PropertyList : FC<Props> = ({array}) => {
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute top-4 left-4 flex gap-2">
-                        <Badge className="bg-[#0253CC] hover:bg-real-700">{property.upFor}</Badge>
-                        {/* {property.isNew && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>} */}
+                        <Badge className="bg-[#0253CC] hover:bg-real-700 capitalize">{new String(property.upFor).toLowerCase()}</Badge>
+                        {property.isNewBuilding && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>}
                         </div>
                         <div className="absolute bottom-4 right-4">
                         <Badge className="bg-gray-100 text-navy-900">{formatPrice(property.price)}</Badge>
