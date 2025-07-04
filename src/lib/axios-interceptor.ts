@@ -1,21 +1,15 @@
 
 import axios from 'axios';
 import { getCookie, handleLoggingOff, setCookie } from './helpers';
+import { returnHeaders } from './utils';
 
 const apiBaseURL = process.env.NEXT_PUBLIC_API_URL;
 
 export const axiosInstance = axios.create({
-  withCredentials : true,
+  withCredentials : false,
   baseURL: apiBaseURL,
   timeout: 10000,
-  headers : {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "x-user-ip" : "104.28.204.233",
-    "x-longitude": "010.02020",
-    "x-latitude": "029.92920",
-  }
+  headers : returnHeaders(getCookie('user_ip')),
   
 });
 

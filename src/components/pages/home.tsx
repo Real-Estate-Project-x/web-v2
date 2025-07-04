@@ -9,7 +9,6 @@ import PopularLocations from "./Home/Popular-locations";
 import Services from "./Home/Services";
 import Testimonials from "./Home/Testimonials";
 import axios from "axios";
-import { axiosInstance } from "@/lib/axios-interceptor";
 import { getUserIp, returnHeaders } from "@/lib/utils";
 import { setCookie } from "@/lib/helpers";
 
@@ -78,9 +77,9 @@ const LandingPage = () => {
 
   setCookie('user_ip', userIp,);
 
-  setInterval(() => {  
-    setAlert();
-  }, 100000);
+  // setInterval(() => {  
+  //   setAlert();
+  // }, 10000000);
 
   return (
     <div className="flex flex-col min-h-screen">

@@ -116,3 +116,21 @@ export const TestimonialsLoaderCard :FC = () => {
     </div>
   );
 }
+
+export const LoaderViewProperty : FC = () => {
+  return (
+    <div className="container mx-auto p-6">
+      <div className="animate-pulse bg-gray-200 rounded-lg shadow-md p-6">
+        <div className="flex flex-col gap-6">
+          <div className="w-full h-[350px] sm:h-[400px] md:h-[500px] bg-gray-300 rounded-lg mb-4"></div>
+          <div className="w-full space-y-4">
+            <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+            <div className="h-6 bg-gray-200 rounded w-full"></div>
+            <div className="h-6 bg-gray-200 rounded w-full"></div>
+            <div className="h-6 bg-gray-200 rounded w-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

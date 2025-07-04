@@ -126,8 +126,7 @@ export const PropertyList : FC<Props> = ({array}) => {
                         <Button 
                         variant="outline" 
                         className="w-full mt-4 border-real-500 text-real-600 hover:bg-real-50 cursor-pointer"
-                        onClick={() => router.push(`/properties/view?id=${property.id}`)}
-                        >
+                        onClick={() => router.push(`/properties/view?id=${property.id}`)}>
                         View Details
                         </Button>
                     </div>

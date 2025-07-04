@@ -51,7 +51,7 @@ export const StatePropertyList: FC = () => {
                 (
                     properties?.length === 0 ? 
                         <div className="text-center text-gray-500">
-                            <p className="text-lg">No properties for state available at the moment.</p>
+                            <p className="text-lg">No properties for {stateName} available at the moment.</p>
                         </div>
                     :
                     <PropertyList array={properties}/>

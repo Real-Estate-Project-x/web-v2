@@ -95,6 +95,13 @@ export interface PropertyInterface {
   agencyId: string;
   postedByUserId: string;
   propertyTypeId: string;
+  propertyType : {
+    id: string;
+    name: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+  };
   propertyCategory: string;
   upFor: string;
   price: number;
@@ -121,7 +128,7 @@ export interface PropertyInterface {
   dateUpdated: string;
   photoUrls: string[];
   videoUrl: string;
-  architecturalPlanUrl: string[];
+  architecturalPlanUrls: string[];
   isNewBuilding : boolean;
   threeDimensionalModelUrl: string;
   geoCoordinates: {

@@ -1,6 +1,6 @@
 'use client';
-import { Bed, Heart, MapPin, Mail, Phone, Calendar, Star, StarHalf, Wifi, Dumbbell, WashingMachine, MessageCircle, FileImage, FileText } from "lucide-react";
-import { useState } from 'react';
+import { Bed, Heart, MapPin, Mail, Phone, Calendar, Star, StarHalf, Wifi, Dumbbell, WashingMachine, MessageCircle, FileImage, FileText, Car, Video, Users } from "lucide-react";
+import { useEffect, useState } from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import {FormControl, FormItem, FormLabel } from "@/components/ui/form";
@@ -17,20 +17,14 @@ import React from "react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
 import { Badge } from "@/components/ui/badge";
+import axios from "axios";
+import { API_BASE_URL } from "../home";
+import { returnHeaders } from "@/lib/utils";
+import { getCookie } from "@/lib/helpers";
+import { PropertyInterface } from "../../../../utils/interfaces";
+import { formatPrice } from "../../../../utils/helpers";
+import { LoaderViewProperty } from "@/components/shared/loader-cards";
 
-type SimilarProperties = {
-  id: number,
-  title: string,
-  price: string,
-  image: string,
-  location: string,
-  beds: number,
-  baths: number,
-  sqft: string,
-  type: string,
-  lat: number,
-  lng: number
-}
 
 // This would typically come from an API, using static data for now
 const getPropertyById = (id: string) => {
@@ -296,7 +290,9 @@ const PropertyDetails = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [showAgencyDetails, setShowAgencyDetails] = useState(false);
   const [rating, setRating] = useState(0);
+  const [propertyData, setProperty] = useState<PropertyInterface>({} as PropertyInterface);
   const [comments, setComments] = useState(property?.comments || []);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Form for tour request
   const tourForm = useForm<TourFormData>({
@@ -352,9 +348,6 @@ const PropertyDetails = () => {
     }
   };
 
-  if (!property) {
-    return <div className="container mx-auto px-4 py-8">Property not found</div>;
-  }
 
   // Helper function to render star rating
   const renderRating = (rating: number) => {
@@ -373,495 +366,533 @@ const PropertyDetails = () => {
     return stars;
   };
 
+  useEffect(() => { 
+    axios.get(`${API_BASE_URL}property/customer-listings/detail/${searchParams.get('id')}`, {headers : returnHeaders(getCookie('user_ip'))})
+      .then((response) => { 
+          if(response.data.success) {
+            setProperty(response.data.data?.property || {} as PropertyInterface);
+          }
+          setIsLoading(false);
+      })
+      .catch((error) => {
+          setIsLoading(false);
+          console.error("Error fetching properties:", error);
+      });
+   }, []);
+
+   console.log({propertyData});
   return (
     <React.Fragment>
       <Navbar/>
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8 mt-16">
-          <div className="mb-8">
-            <div className="flex justify-between items-start mb-2">
-              <h1 className="text-2xl md:text-3xl font-semibold text-navy-900">{property.title}</h1>
-              <div className="flex items-center">
-                <div className="flex mr-2">
-                  {renderRating(property.rating)}
-                  <span className="ml-2 text-gray-600">({property.rating})</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center text-gray-600 mb-4">
-              <MapPin className="h-5 w-5 mr-2" />
-              <span className="text-base">{property.location}</span>
-            </div>
-            
-            {/* Property Image Slider */}
-            <div className="relative">
-              <Carousel className="w-full">
-                <CarouselContent>
-                  {property.images.map((image, index) => (
-                    <CarouselItem key={index}>
-                      <div className="relative">
-                        <img
-                          src={image}
-                          alt={`${property.title} - Image ${index + 1}`}
-                          className="w-full h-[350px] sm:h-[400px] md:h-[500px] object-cover rounded-lg"
-                          // width={0}
-                          // height={0}
-                        />
-                        {index === 0 && (
-                          <>
-                            <Badge className="absolute top-4 left-4 bg-[#0253CC]">{property.type}</Badge>
-                            <Badge className="absolute top-4 right-4 bg-white text-[#102A43]">{property.price}</Badge>
-                          </>
-                        )}
+       {isLoading ? (<LoaderViewProperty />)
+          :
+          (
+            <div className="min-h-screen bg-gray-50">
+              <div className="container mx-auto px-4 py-8 mt-16">
+                <div className="mb-8">
+                  <div className="flex justify-between items-start mb-2">
+                    <h1 className="text-2xl md:text-3xl font-semibold text-navy-900">{propertyData.title}</h1>
+                    <div className="flex items-center">
+                      <div className="flex mr-2">
+                        {renderRating(propertyData.bluepoddRating)}
+                        <span className="ml-2 text-gray-600">({propertyData.bluepoddRating})</span>
                       </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-4" />
-                <CarouselNext className="right-4" />
-              </Carousel>
-              
-              {/* Save Property Button */}
-              <Button 
-                variant={isSaved ? "default" : "outline"}
-                size="icon"
-                className={`absolute bottom-4 right-4 rounded-full z-10 ${
-                  isSaved ? "bg-real-600 hover:bg-real-700" : "bg-white hover:bg-gray-100"
-                }`}
-                onClick={handleSaveProperty}
-                title={isSaved ? "Remove from saved" : "Save property"}
-              >
-                <Heart className={`h-5 w-5 ${isSaved ? "fill-white text-white" : "text-real-600"}`} />
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Property Details */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="grid grid-cols-3 gap-4 py-4 border-y">
-                <div className="text-center">
-                  <div className="flex items-center justify-center">
-                    <Bed className="h-5 w-5 mr-2" />
-                    <span className="text-lg font-semibold">{property.beds}</span>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600">Bedrooms</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-semibold">{property.baths}</div>
-                  <p className="text-sm text-gray-600">Bathrooms</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-semibold">{property.sqft}</div>
-                  <p className="text-sm text-gray-600">Square Feet</p>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold mb-3">Description</h2>
-                <p className="text-gray-600 leading-relaxed text-sm md:text-base">{property.description}</p>
-              </div>
-
-              {/* Amenities Section */}
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold mb-3">Amenities</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {property.amenities.map((amenity) => (
-                    <div key={amenity.id} className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
-                      {amenity.icon === "wifi" && <Wifi className="h-5 w-5 mr-2 text-real-600" />}
-                      {amenity.icon === "gym" && <Dumbbell className="h-5 w-5 mr-2 text-real-600" />}
-                      {amenity.icon === "washing-machine" && <WashingMachine className="h-5 w-5 mr-2 text-real-600" />}
-                      <span>{amenity.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Features */}
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold mb-3">Features</h2>
-                <div className="grid grid-cols-2 gap-2">
-                  {property.features.map((feature, index) => (
-                    <div key={index} className="flex items-center text-gray-600 text-sm md:text-base">
-                      <span className="mr-2">•</span>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Architectural Drawings Section */}
-              {property.architecturalDrawings && property.architecturalDrawings.length > 0 && (
-                <div className="text-sm md:text-base">
-                  <h2 className="text-xl md:text-2xl font-semibold mb-3">Architectural Drawings</h2>
-                  <Tabs defaultValue="images">
-                    <TabsList className="mb-4">
-                      <TabsTrigger value="images">Floor Plans</TabsTrigger>
-                      <TabsTrigger value="documents">Documents</TabsTrigger>
-                    </TabsList>
+                  <div className="flex items-center text-gray-600 mb-4">
+                    <MapPin className="h-5 w-5 mr-2" />
+                    <p className="text-base capitalize">{new String(propertyData.address).toLowerCase()}</p>
+                  </div>
+                  
+                  {/* Property Image Slider */}
+                  <div className="relative">
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        {propertyData?.photoUrls?.map((image, index) => (
+                          <CarouselItem key={index}>
+                            <div className="relative">
+                              <img
+                                src={image}
+                                alt={`${propertyData.title} - Image ${index + 1}`}
+                                className="w-full h-[350px] sm:h-[400px] md:h-[500px] object-cover rounded-lg"
+                              />
+                              {index === 0 && (
+                                <>
+                                  <Badge className="absolute top-4 left-4 bg-[#0253CC]">{propertyData.propertyType.name}</Badge>
+                                  {/* <Badge className="absolute bottom-4 left-4 bg-[#0253CC]">{propertyData.propertyType.name}</Badge> */}
+                                  <Badge className="absolute top-4 right-4 bg-white text-[#102A43]">{formatPrice(propertyData.price)}</Badge>
+                                </>
+                              )}
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-4" />
+                      <CarouselNext className="right-4" />
+                    </Carousel>
                     
-                    <TabsContent value="images">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {property.architecturalDrawings
-                          .filter(drawing => drawing.type === "image")
-                          .map(drawing => (
-                            <Card key={drawing.id} className="overflow-hidden">
-                              <div className="h-48 overflow-hidden">
-                                <img 
-                                  src={drawing.url} 
-                                  alt={drawing.title}
-                                  className="w-full h-full object-cover"
-                                  // width={0}
-                                  // height={0}
-                                />
-                              </div>
-                              <CardContent className="p-3">
-                                <div className="flex items-center">
-                                  <FileImage className="h-4 w-4 mr-2 text-gray-500" />
-                                  <p className="text-sm font-medium">{drawing.title}</p>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))
-                        }
+                    {/* Save Property Button */}
+                    <Button 
+                      variant={isSaved ? "default" : "outline"}
+                      size="icon"
+                      className={`absolute bottom-4 right-4 rounded-full z-10 ${
+                        isSaved ? "bg-real-600 hover:bg-real-700" : "bg-white hover:bg-gray-100"
+                      }`}
+                      onClick={handleSaveProperty}
+                      title={isSaved ? "Remove from saved" : "Save property"}
+                    >
+                      <Heart className={`h-5 w-5 ${isSaved ? "fill-white text-white" : "text-real-600"}`} />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Main Property Details */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="grid grid-cols-3 gap-4 py-4 border-y">
+                      <div className="text-center">
+                        <div className="flex items-center justify-center">
+                          <Bed className="h-5 w-5 mr-2" />
+                          <span className="text-lg font-semibold">{propertyData.noOfBedrooms}</span>
+                        </div>
+                        <p className="text-sm text-gray-600">Bedrooms</p>
                       </div>
-                    </TabsContent>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold">{propertyData.noOfToilets}</div>
+                        <p className="text-sm text-gray-600">Bath/Toilet(s)</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold">{propertyData.sizeInSquareFeet}</div>
+                        <p className="text-sm text-gray-600">Square Feet</p>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-semibold mb-3">Description</h2>
+                      <p className="text-gray-600 leading-relaxed text-sm md:text-base capitalize">{propertyData.description}</p>
+                    </div>
+
+                    {/* Amenities Section */}
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-semibold mb-3">Amenities</h2>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {propertyData.hasWifi && (
+                          <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                            <Wifi className="h-5 w-5 mr-2 text-real-600" />
+                            <span className="text-sm md:text-base">Wi-Fi</span>
+                          </div>
+                        )}
+                        {propertyData.hasGym && (
+                          <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                            <Dumbbell className="h-5 w-5 mr-2 text-real-600" />
+                            <span className="text-sm md:text-base">Gym</span>
+                          </div>
+                        )}
+                        {propertyData.hasLaundry && (
+                          <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                            <WashingMachine className="h-5 w-5 mr-2 text-real-600" />
+                            <span className="text-sm md:text-base">Laundry&nbsp;services</span>
+                          </div>
+                        )}
                     
-                    <TabsContent value="documents">
-                      <div className="space-y-2">
-                        {property.architecturalDrawings
-                          .filter(drawing => drawing.type === "document")
-                          .map(drawing => (
-                            <Card key={drawing.id}>
-                              <CardContent className="p-3 flex items-center">
-                                <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                                <p className="text-sm font-medium">{drawing.title}</p>
-                                <Button
-                                  className="ml-auto"
+                        {propertyData.hasCctv && (
+                          <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                            <Video className="h-5 w-5 mr-2 text-real-600" />
+                            <span className="text-sm md:text-base">CCtv</span>
+                          </div>
+                        )}
+                        
+                      </div>
+                    </div>
+
+                    {/* Features */}
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-semibold mb-3">Features</h2>
+                      <div className="grid grid-cols-2 gap-2">
+                        {propertyData.hasCarParking&& (
+                          <div className="flex items-center text-gray-600 text-sm md:text-base">
+                            <span className="mr-2">•</span>
+                            {"Car Parking"}
+                          </div>
+                        )}
+                        {propertyData.hasKidsPlayArea && (
+                          <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                            <span className="mr-2">•</span>
+                            <span className="text-sm md:text-base">{"Kids Play Area"}</span>
+                          </div>
+                        )}
+                      
+                      </div>
+                    </div>
+
+                    {/* Architectural Drawings Section */}
+                    {propertyData.architecturalPlanUrls && (
+                      <div className="text-sm md:text-base">
+                        <h2 className="text-xl md:text-2xl font-semibold mb-3">Architectural Drawings</h2>
+                        <Tabs defaultValue="images">
+                          <TabsList className="mb-4">
+                            <TabsTrigger value="images">Floor Plans</TabsTrigger>
+                            {/* <TabsTrigger value="documents">Documents</TabsTrigger> */}
+                          </TabsList>
+                          
+                          <TabsContent value="images">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {propertyData.architecturalPlanUrls
+                                //.filter(drawing => drawing.type === "image")
+                                .map((drawing : string, i:number) => (
+                                  <Card key={i} className="overflow-hidden">
+                                    <div className="h-48 overflow-hidden">
+                                      <img 
+                                        src={drawing} 
+                                        alt={"Arch Plan-1"}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    {/* <CardContent className="p-3">
+                                      <div className="flex items-center">
+                                        <FileImage className="h-4 w-4 mr-2 text-gray-500" />
+                                        <p className="text-sm font-medium">{drawing.title}</p>
+                                      </div>
+                                    </CardContent> */}
+                                  </Card>
+                                ))
+                              }
+                            </div>
+                          </TabsContent>
+                          
+                          {/* <TabsContent value="documents">
+                            <div className="space-y-2">
+                              {property.architecturalDrawings
+                                .filter(drawing => drawing.type === "document")
+                                .map(drawing => (
+                                  <Card key={drawing.id}>
+                                    <CardContent className="p-3 flex items-center">
+                                      <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                                      <p className="text-sm font-medium">{drawing.title}</p>
+                                      <Button
+                                        className="ml-auto"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.open(drawing.url, '_blank')}
+                                      >
+                                        View
+                                      </Button>
+                                    </CardContent>
+                                  </Card>
+                                ))
+                              }
+                            </div>
+                          </TabsContent> */}
+                        </Tabs>
+                      </div>
+                    )}
+
+                    {/* Comments Section */}
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-semibold mb-3">Reviews & Comments</h2>
+                      
+                      {/* Display existing comments */}
+                      {/* <div className="space-y-4 mb-6">
+                        {comments.map((comment) => (
+                          <Card key={comment.id}>
+                            <CardContent className="px-4 py-1">
+                              <div className="flex justify-between mb-2">
+                                <h4 className="font-normal">{comment.userName}</h4>
+                                <span className="text-sm text-gray-500">{comment.date}</span>
+                              </div>
+                              <div className="flex mb-2">
+                                {renderRating(comment.rating)}
+                              </div>
+                              <p className="text-gray-600">{comment.text}</p>
+                            </CardContent>
+                          </Card>
+                        ))}
+                        
+                        {comments.length === 0 && (
+                          <p className="text-gray-500 italic">No reviews yet. Be the first to leave a review!</p>
+                        )}
+                      </div> */}
+                      
+                      {/* Add new comment form */}
+                      {/* <Card>
+                        <CardContent className="px-6">
+                          <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
+                          <FormProvider {...commentForm}>
+                            <form onSubmit={commentForm.handleSubmit(onSubmitComment)} className="space-y-4">
+                                <div className="flex items-center mb-4">
+                                <span className="mr-2 text-sm">Your Rating:</span>
+                                <div className="flex">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                    <button 
+                                        key={star} 
+                                        type="button" 
+                                        onClick={() => setRating(star)}
+                                        className="focus:outline-none"
+                                    >
+                                        <Star 
+                                        className={`h-6 w-6 ${rating >= star ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} 
+                                        />
+                                    </button>
+                                    ))}
+                                </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <FormItem>
+                                      <FormLabel>Name</FormLabel>
+                                      <FormControl>
+                                      <Input {...commentForm.register("name")} placeholder="Your name" required />
+                                      </FormControl>
+                                  </FormItem>
+                                  <FormItem>
+                                      <FormLabel>Email</FormLabel>
+                                      <FormControl>
+                                      <Input {...commentForm.register("email")} type="email" placeholder="Your email" required />
+                                      </FormControl>
+                                  </FormItem>
+                                </div>
+                                
+                                <FormItem>
+                                <FormLabel>Comment</FormLabel>
+                                <FormControl>
+                                    <Textarea 
+                                    {...commentForm.register("comment")} 
+                                    placeholder="Share your experience with this property..."
+                                    className="min-h-[100px]"
+                                    required
+                                    />
+                                </FormControl>
+                                </FormItem>
+                                
+                                <Button type="submit" className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8]">
+                                <MessageCircle className="mr-2 h-4 w-4" />
+                                  Submit Review
+                                </Button>
+                            </form>
+                          </FormProvider>
+                        </CardContent>
+                      </Card> */}
+                    </div>
+
+                    {/* Request Tour Section */}
+                    {/* <div className="bg-white h-[32rem] md:h-96 p-6 rounded-lg shadow-sm border mt-8">
+                      <h2 className="text-xl font-semibold mb-4">Request a Tour</h2>
+                      <FormProvider {...tourForm}>
+                        <form onSubmit={tourForm.handleSubmit(onSubmitTourRequest)} className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormItem>
+                              <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input {...tourForm.register("name")} placeholder="Your name" required />
+                            </FormControl>
+                            </FormItem>
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input {...tourForm.register("email")} type="email" placeholder="Your email" required />
+                            </FormControl>
+                            </FormItem>
+                            <FormItem>
+                              <FormLabel>Phone</FormLabel>
+                            <FormControl>
+                                <Input {...tourForm.register("phone")} placeholder="Your phone number" />
+                            </FormControl>
+                            </FormItem>
+                            <FormItem>
+                            <FormLabel>Preferred Date</FormLabel>
+                            <FormControl>
+                                <Input {...tourForm.register("date")} type="date" required />
+                            </FormControl>
+                            </FormItem>
+                          </div>
+                          <FormItem>
+                              <FormLabel>Message (Optional)</FormLabel>
+                              <FormControl>
+                              <Input {...tourForm.register("message")} placeholder="Any special requests or questions?" />
+                              </FormControl>
+                          </FormItem>
+                          
+                          <Button type="submit" className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8] mb-4">
+                            <Calendar className="mr-2 h-4 w-4" />
+                            Schedule Tour
+                          </Button>
+                        </form>
+                      </FormProvider>
+                    </div> */}
+                  </div>
+
+                  {/* Sidebar */}
+                  <div className="space-y-6">
+                    {/* Agency Details Card */}
+                    {/* <Card>
+                      <CardContent className="pt-6 text-sm md:text-base">
+                        <div className="text-center mb-4">
+                          <img 
+                            src={property.agency.logo} 
+                            alt={property.agency.name} 
+                            className="w-16 h-16 object-cover rounded-full mx-auto mb-2"
+                          />
+                          <h3 className="font-semibold text-sm">{property.agency.name}</h3>
+                          <p className="text-gray-600 text-sm">{property.agentName} - Listing Agent</p>
+                        </div>
+                        
+                        <div className={`space-y-4 ${showAgencyDetails ? 'block' : 'hidden'}`}>
+                          <div className="flex items-center justify-between border-t pt-3">
+                            <span className="text-gray-600">Phone</span>
+                            <a 
+                              href={`tel:${property.agency.phone}`} 
+                              className="flex items-center text-real-600 hover:underline"
+                            >
+                              <Phone className="h-4 w-4 mr-1" />
+                              {property.agency.phone}
+                            </a>
+                          </div>
+                          
+                          <div className="flex items-center justify-between border-t pt-3">
+                            <span className="text-gray-600">Email</span>
+                            <a 
+                              href={`mailto:${property.agency.email}`} 
+                              className="flex items-center text-real-600 hover:underline"
+                            >
+                              <Mail className="h-4 w-4 mr-1" />
+                              {property.agency.email}
+                            </a>
+                          </div>
+                          
+                          <div className="flex items-center justify-between border-t pt-3">
+                            <span className="text-gray-600">WhatsApp</span>
+                            <a 
+                              href={`https://wa.me/${property.agency.whatsapp.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer" 
+                              className="flex items-center text-real-600 hover:underline"
+                            >
+                              {property.agency.whatsapp}
+                            </a>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          variant="outline" 
+                          className="w-full mt-4"
+                          onClick={() => setShowAgencyDetails(!showAgencyDetails)}
+                        >
+                          {showAgencyDetails ? "Hide Agency Details" : "View Agency Details"}
+                        </Button>
+                        
+                        <div className="flex gap-4 mt-4">
+                          <Button 
+                            className="flex-1 bg-real-600 hover:bg-real-700" 
+                            size="lg"
+                            onClick={() => setShowContactModal(true)}
+                          >
+                            Contact Agent
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            className="flex-1" 
+                            size="lg"
+                            onClick={() => setShowScheduleModal(true)}
+                          >
+                            Schedule Viewing
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card> */}
+                    
+                    {/* Property Details */}
+                    {/* <Card>
+                      <CardContent className="py-1 text-sm md:text-base">
+                        <h3 className="font-semibold text-lg mb-4">Property Details</h3>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Type</span>
+                            <span>{property.type}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Year Built</span>
+                            <span>{property.yearBuilt}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Parking</span>
+                            <span>{property.parkingSpaces} spaces</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card> */}
+                  </div>
+                </div>
+                
+                {/* Similar Properties Section */}
+                {/* <div className="mt-16">
+                  <h2 className="text-2xl font-semibold mb-6">Similar Properties</h2>
+                  <div className="relative overflow-hidden">
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        {property.similarProperties?.slice(0, 10).map((similarProperty : any) => (
+                          <CarouselItem key={similarProperty.id} className="md:basis-1/2 lg:basis-1/3">
+                            <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full py-0">
+                              <div className="relative h-48">
+                                <img
+                                  src={similarProperty.image ? similarProperty.image : "https://via.placeholder.com/150"}
+                                  alt={similarProperty.title}
+                                  className="w-full h-full object-cover"
+                                />
+                                <Badge className="absolute top-4 left-4 bg-[#0253CC]">{similarProperty.type}</Badge>
+                                <Badge className="absolute top-4 right-4 bg-white text-[#102A43]">{similarProperty.price}</Badge>
+                              </div>
+                              <CardContent className="p-4">
+                                <h3 className="text-lg font-semibold mb-2">{similarProperty.title}</h3>
+                                <div className="flex items-center text-gray-600 mb-3">
+                                  <MapPin className="h-4 w-4 mr-1" />
+                                  <span className="text-sm">{similarProperty.location}</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600 border-t pt-3">
+                                  <div className="flex items-center">
+                                    <Bed className="h-4 w-4 mr-1" />
+                                    <span className="text-sm">{similarProperty.beds} beds</span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <span className="text-sm">{similarProperty.baths} baths</span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <span className="text-sm">{similarProperty.sqft} sqft</span>
+                                  </div>
+                                </div>
+                                <Button 
+                                  className="w-full mt-4" 
                                   variant="outline"
-                                  size="sm"
-                                  onClick={() => window.open(drawing.url, '_blank')}
+                                  onClick={() => window.location.href = `/properties/${similarProperty.id}`}
                                 >
-                                  View
+                                  View Details
                                 </Button>
                               </CardContent>
                             </Card>
-                          ))
-                        }
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              )}
-
-              {/* Comments Section */}
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold mb-3">Reviews & Comments</h2>
-                
-                {/* Display existing comments */}
-                <div className="space-y-4 mb-6">
-                  {comments.map((comment) => (
-                    <Card key={comment.id}>
-                      <CardContent className="px-4 py-1">
-                        <div className="flex justify-between mb-2">
-                          <h4 className="font-normal">{comment.userName}</h4>
-                          <span className="text-sm text-gray-500">{comment.date}</span>
-                        </div>
-                        <div className="flex mb-2">
-                          {renderRating(comment.rating)}
-                        </div>
-                        <p className="text-gray-600">{comment.text}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  
-                  {comments.length === 0 && (
-                    <p className="text-gray-500 italic">No reviews yet. Be the first to leave a review!</p>
-                  )}
-                </div>
-                
-                {/* Add new comment form */}
-                <Card>
-                  <CardContent className="px-6">
-                    <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
-                    <FormProvider {...commentForm}>
-                      <form onSubmit={commentForm.handleSubmit(onSubmitComment)} className="space-y-4">
-                          <div className="flex items-center mb-4">
-                          <span className="mr-2 text-sm">Your Rating:</span>
-                          <div className="flex">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                              <button 
-                                  key={star} 
-                                  type="button" 
-                                  onClick={() => setRating(star)}
-                                  className="focus:outline-none"
-                              >
-                                  <Star 
-                                  className={`h-6 w-6 ${rating >= star ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} 
-                                  />
-                              </button>
-                              ))}
-                          </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                <Input {...commentForm.register("name")} placeholder="Your name" required />
-                                </FormControl>
-                            </FormItem>
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                <Input {...commentForm.register("email")} type="email" placeholder="Your email" required />
-                                </FormControl>
-                            </FormItem>
-                          </div>
-                          
-                          <FormItem>
-                          <FormLabel>Comment</FormLabel>
-                          <FormControl>
-                              <Textarea 
-                              {...commentForm.register("comment")} 
-                              placeholder="Share your experience with this property..."
-                              className="min-h-[100px]"
-                              required
-                              />
-                          </FormControl>
-                          </FormItem>
-                          
-                          <Button type="submit" className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8]">
-                          <MessageCircle className="mr-2 h-4 w-4" />
-                            Submit Review
-                          </Button>
-                      </form>
-                    </FormProvider>
-                  </CardContent>
-                </Card>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-0 -translate-y-1/2 top-1/2" />
+                      <CarouselNext className="right-0 -translate-y-1/2 top-1/2" />
+                    </Carousel>
+                  </div>
+                </div> */}
               </div>
-
-              {/* Request Tour Section */}
-              <div className="bg-white h-[32rem] md:h-96 p-6 rounded-lg shadow-sm border mt-8">
-                <h2 className="text-xl font-semibold mb-4">Request a Tour</h2>
-                <FormProvider {...tourForm}>
-                  <form onSubmit={tourForm.handleSubmit(onSubmitTourRequest)} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                      <FormControl>
-                          <Input {...tourForm.register("name")} placeholder="Your name" required />
-                      </FormControl>
-                      </FormItem>
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                      <FormControl>
-                          <Input {...tourForm.register("email")} type="email" placeholder="Your email" required />
-                      </FormControl>
-                      </FormItem>
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                      <FormControl>
-                          <Input {...tourForm.register("phone")} placeholder="Your phone number" />
-                      </FormControl>
-                      </FormItem>
-                      <FormItem>
-                      <FormLabel>Preferred Date</FormLabel>
-                      <FormControl>
-                          <Input {...tourForm.register("date")} type="date" required />
-                      </FormControl>
-                      </FormItem>
-                    </div>
-                    <FormItem>
-                        <FormLabel>Message (Optional)</FormLabel>
-                        <FormControl>
-                        <Input {...tourForm.register("message")} placeholder="Any special requests or questions?" />
-                        </FormControl>
-                    </FormItem>
-                    
-                    <Button type="submit" className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8] mb-4">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Schedule Tour
-                    </Button>
-                  </form>
-                </FormProvider>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Agency Details Card */}
-              <Card>
-                <CardContent className="pt-6 text-sm md:text-base">
-                  <div className="text-center mb-4">
-                    <img 
-                      src={property.agency.logo} 
-                      alt={property.agency.name} 
-                      className="w-16 h-16 object-cover rounded-full mx-auto mb-2"
-                      // width={0}
-                      // height={0}
-                    />
-                    <h3 className="font-semibold text-sm">{property.agency.name}</h3>
-                    <p className="text-gray-600 text-sm">{property.agentName} - Listing Agent</p>
-                  </div>
-                  
-                  <div className={`space-y-4 ${showAgencyDetails ? 'block' : 'hidden'}`}>
-                    <div className="flex items-center justify-between border-t pt-3">
-                      <span className="text-gray-600">Phone</span>
-                      <a 
-                        href={`tel:${property.agency.phone}`} 
-                        className="flex items-center text-real-600 hover:underline"
-                      >
-                        <Phone className="h-4 w-4 mr-1" />
-                        {property.agency.phone}
-                      </a>
-                    </div>
-                    
-                    <div className="flex items-center justify-between border-t pt-3">
-                      <span className="text-gray-600">Email</span>
-                      <a 
-                        href={`mailto:${property.agency.email}`} 
-                        className="flex items-center text-real-600 hover:underline"
-                      >
-                        <Mail className="h-4 w-4 mr-1" />
-                        {property.agency.email}
-                      </a>
-                    </div>
-                    
-                    <div className="flex items-center justify-between border-t pt-3">
-                      <span className="text-gray-600">WhatsApp</span>
-                      <a 
-                        href={`https://wa.me/${property.agency.whatsapp.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer" 
-                        className="flex items-center text-real-600 hover:underline"
-                      >
-                        {property.agency.whatsapp}
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-4"
-                    onClick={() => setShowAgencyDetails(!showAgencyDetails)}
-                  >
-                    {showAgencyDetails ? "Hide Agency Details" : "View Agency Details"}
-                  </Button>
-                  
-                  <div className="flex gap-4 mt-4">
-                    <Button 
-                      className="flex-1 bg-real-600 hover:bg-real-700" 
-                      size="lg"
-                      onClick={() => setShowContactModal(true)}
-                    >
-                      Contact Agent
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="flex-1" 
-                      size="lg"
-                      onClick={() => setShowScheduleModal(true)}
-                    >
-                      Schedule Viewing
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
               
-              {/* Property Details */}
-              <Card>
-                <CardContent className="py-1 text-sm md:text-base">
-                  <h3 className="font-semibold text-lg mb-4">Property Details</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Type</span>
-                      <span>{property.type}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Year Built</span>
-                      <span>{property.yearBuilt}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Parking</span>
-                      <span>{property.parkingSpaces} spaces</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <ContactAgentModal 
+                isOpen={showContactModal} 
+                onClose={() => setShowContactModal(false)}
+                propertyTitle={"property.agentName"}
+              />
+              
+              <ScheduleViewingModal 
+                isOpen={showScheduleModal} 
+                onClose={() => setShowScheduleModal(false)}
+                propertyTitle={"property.title"}
+              />
             </div>
-          </div>
-          
-          {/* Similar Properties Section */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-semibold mb-6">Similar Properties</h2>
-            <div className="relative overflow-hidden">
-              <Carousel className="w-full">
-                <CarouselContent>
-                  {property.similarProperties?.slice(0, 10).map((similarProperty : any) => (
-                    <CarouselItem key={similarProperty.id} className="md:basis-1/2 lg:basis-1/3">
-                      <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full py-0">
-                        <div className="relative h-48">
-                          <img
-                            src={similarProperty.image ? similarProperty.image : "https://via.placeholder.com/150"}
-                            alt={similarProperty.title}
-                            className="w-full h-full object-cover"
-                            // width={0}
-                            // height={0}
-                          />
-                          <Badge className="absolute top-4 left-4 bg-[#0253CC]">{similarProperty.type}</Badge>
-                          <Badge className="absolute top-4 right-4 bg-white text-[#102A43]">{similarProperty.price}</Badge>
-                        </div>
-                        <CardContent className="p-4">
-                          <h3 className="text-lg font-semibold mb-2">{similarProperty.title}</h3>
-                          <div className="flex items-center text-gray-600 mb-3">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            <span className="text-sm">{similarProperty.location}</span>
-                          </div>
-                          <div className="flex justify-between text-gray-600 border-t pt-3">
-                            <div className="flex items-center">
-                              <Bed className="h-4 w-4 mr-1" />
-                              <span className="text-sm">{similarProperty.beds} beds</span>
-                            </div>
-                            <div className="flex items-center">
-                              <span className="text-sm">{similarProperty.baths} baths</span>
-                            </div>
-                            <div className="flex items-center">
-                              <span className="text-sm">{similarProperty.sqft} sqft</span>
-                            </div>
-                          </div>
-                          <Button 
-                            className="w-full mt-4" 
-                            variant="outline"
-                            onClick={() => window.location.href = `/properties/${similarProperty.id}`}
-                          >
-                            View Details
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0 -translate-y-1/2 top-1/2" />
-                <CarouselNext className="right-0 -translate-y-1/2 top-1/2" />
-              </Carousel>
-            </div>
-          </div>
-        </div>
-        
-        <ContactAgentModal 
-          isOpen={showContactModal} 
-          onClose={() => setShowContactModal(false)}
-          propertyTitle={property.agentName}
-        />
-        
-        <ScheduleViewingModal 
-          isOpen={showScheduleModal} 
-          onClose={() => setShowScheduleModal(false)}
-          propertyTitle={property.title}
-        />
-      </div>
+          )
+      }
       <Footer/>
     </React.Fragment>
   );
