@@ -371,6 +371,18 @@ const PropertyDetails = () => {
       .then((response) => { 
           if(response.data.success) {
             setProperty(response.data.data?.property || {} as PropertyInterface);
+            // get comments
+            axios.get(`${API_BASE_URL}agent-property-viewing/user-ratings/${response.data.data?.property?.id}`, {headers : returnHeaders(getCookie('user_ip'))})
+            .then((response) => { 
+                if(response.data.success) {
+                  //setProperty(response.data.data?.property || {} as PropertyInterface);
+                }
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                console.error("Error fetching properties:", error);
+            });
           }
           setIsLoading(false);
       })
@@ -378,9 +390,9 @@ const PropertyDetails = () => {
           setIsLoading(false);
           console.error("Error fetching properties:", error);
       });
+      
    }, []);
 
-   console.log({propertyData});
   return (
     <React.Fragment>
       <Navbar/>
@@ -419,7 +431,7 @@ const PropertyDetails = () => {
                               {index === 0 && (
                                 <>
                                   <Badge className="absolute top-4 left-4 bg-[#0253CC]">{propertyData.propertyType.name}</Badge>
-                                  {/* <Badge className="absolute bottom-4 left-4 bg-[#0253CC]">{propertyData.propertyType.name}</Badge> */}
+                                  {propertyData.isNewBuilding && <Badge className="absolute top-4 left-16 bg-green-500 hover:bg-green-600">New</Badge>}
                                   <Badge className="absolute top-4 right-4 bg-white text-[#102A43]">{formatPrice(propertyData.price)}</Badge>
                                 </>
                               )}
@@ -525,7 +537,24 @@ const PropertyDetails = () => {
                       
                       </div>
                     </div>
-
+                    {/* Video tag section*/}
+                    {propertyData.videoUrl && 
+                      <div className="my-4">
+                        <p className="py-2 font-medium">Watch Property Video</p>
+                        <video width="600" height="360" controls>
+                          <source src={propertyData.videoUrl} type="video/mp4"/>
+                        </video>
+                        {/* <iframe 
+                        width="640" 
+                        height="360" 
+                        src="https://www.jw.org/en/library/videos/#en/mediaitems/VODMovies/docid-502100006_1_VIDEO" 
+                        frameborder="0" 
+                        allowfullscreen
+                        >
+                      </iframe> */}
+                      </div>
+                    }
+                    
                     {/* Architectural Drawings Section */}
                     {propertyData.architecturalPlanUrls && (
                       <div className="text-sm md:text-base">
@@ -587,13 +616,14 @@ const PropertyDetails = () => {
                         </Tabs>
                       </div>
                     )}
+                    
 
                     {/* Comments Section */}
                     <div>
                       <h2 className="text-xl md:text-2xl font-semibold mb-3">Reviews & Comments</h2>
                       
                       {/* Display existing comments */}
-                      {/* <div className="space-y-4 mb-6">
+                      <div className="space-y-4 mb-6">
                         {comments.map((comment) => (
                           <Card key={comment.id}>
                             <CardContent className="px-4 py-1">
@@ -612,10 +642,10 @@ const PropertyDetails = () => {
                         {comments.length === 0 && (
                           <p className="text-gray-500 italic">No reviews yet. Be the first to leave a review!</p>
                         )}
-                      </div> */}
+                      </div>
                       
                       {/* Add new comment form */}
-                      {/* <Card>
+                      <Card>
                         <CardContent className="px-6">
                           <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
                           <FormProvider {...commentForm}>
@@ -672,11 +702,11 @@ const PropertyDetails = () => {
                             </form>
                           </FormProvider>
                         </CardContent>
-                      </Card> */}
+                      </Card>
                     </div>
 
                     {/* Request Tour Section */}
-                    {/* <div className="bg-white h-[32rem] md:h-96 p-6 rounded-lg shadow-sm border mt-8">
+                    <div className="bg-white h-[32rem] md:h-96 p-6 rounded-lg shadow-sm border mt-8">
                       <h2 className="text-xl font-semibold mb-4">Request a Tour</h2>
                       <FormProvider {...tourForm}>
                         <form onSubmit={tourForm.handleSubmit(onSubmitTourRequest)} className="space-y-4">
@@ -719,7 +749,7 @@ const PropertyDetails = () => {
                           </Button>
                         </form>
                       </FormProvider>
-                    </div> */}
+                    </div>
                   </div>
 
                   {/* Sidebar */}

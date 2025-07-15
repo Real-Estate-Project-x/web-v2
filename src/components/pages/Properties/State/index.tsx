@@ -18,6 +18,7 @@ export const StatePropertyList: FC = () => {
     const searchParams = useSearchParams();
     const stateId = searchParams.get("stateId") || "1"; // Default to 1 if not provided
     const stateName = searchParams.get("name") || "State";
+    const [type, setType] = useState<string>("");
 
     useEffect(() => {
         axios.get(`${API_BASE_URL}property/customer-listings/by-state/${stateId}`, {headers : returnHeaders(getCookie('user_ip'))})
@@ -41,7 +42,7 @@ export const StatePropertyList: FC = () => {
         <div className="container mx-auto mt-24 mb-10">
             <h2 className="text-3xl font-normal text-navy-900 pb-5 pb-4 capitalize">Properties In {stateName}</h2>
 
-            <PropertyFilter/>
+            <PropertyFilter setLoader={setIsLoading} setData={setStateProperties} setType={setType}/>
 
             {isLoading ? (
                 <div className="flex justify-start">

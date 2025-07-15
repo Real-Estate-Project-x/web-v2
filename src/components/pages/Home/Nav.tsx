@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FC } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, X } from "lucide-react";
+import { Home, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavDataInterface } from "../../../../utils/interfaces";
@@ -14,11 +14,12 @@ type NavData = {
 
   const defaultNavData =[
     { href: "/", label: "Home" },
-    { href: "/properties", label: "All Properties" },
-    { href: "/buy", label: "Sale" },
-    { href: "/rent", label: "Rent" },
+    { href: "/properties", label: "Properties" },
+    // { href: "/buy", label: "Sale" },
+    // { href: "/rent", label: "Rent" },
     { href: "/agents", label: "Agents" },
-    { href: "/contact", label: "Contact" }
+    { href: "/contact", label: "Contact" },
+    { href: "/properties/search", label: <Search size={18}/> }
   ]
 const Navbar :FC<NavData> = ({data = defaultNavData}) => {
 
@@ -45,13 +46,13 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
 
   return (
     <nav 
-      className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
+      className={`fixed top-0 w-full z-50 transition-all duration-300 shadow-sm ${
         pathname === "/" ?
         scrolled 
-          ? "bg-white border-gray-200 text-gray-800 shadow-md" 
+          ? "bg-white border-gray-200 text-gray-800 " 
           : "bg-transparent border-transparent text-white"
 
-          :"bg-white border-gray-200 text-gray-800 shadow-md"
+          :"bg-white border-gray-200 text-gray-800"
       }`}
     >
       {/* container */}
