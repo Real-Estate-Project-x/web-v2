@@ -1,15 +1,77 @@
 'use client';
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../Home/Nav";
 import { ContactRound, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Footer from "../Home/Footer";
+import axios from "axios";
+import { API_BASE_URL } from "../home";
+import { returnHeaders } from "@/lib/utils";
+import { ErrorDialog } from "@/components/shared/error-dialog";
+import { SuccessDialog } from "@/components/shared/success-dialog";
 
 const ContactUsComponent = () => {
 
+    const [state, setState] = useState({
+        name : "", email : "", phone : "", message : ""
+    });
+    const formRef = useRef<HTMLFormElement>(null);
+    const [errorMsg, setErrorObj] = useState<{msg : string, flag : boolean}>({msg : "", flag :false});
+    const [success, setSuccessObj] = useState<{msg : string, flag : boolean}>({msg : "", flag :false});
+    const [loading, setLoader] = useState<boolean>(false);
+
+    const {name, email, phone, message} = state;
+
+    const onChangeNameHandler = (value : string) => {
+        setState({...state, name : value});
+    }
+
+    const onChangeEmailHandler = (value : string) => {
+        setState({...state, email : value});
+    }
+
+    const onChangePhoneNumberHandler = (value : string) => {
+        setState({...state, phone : value});
+    }
+
+    const onChangeMessageHandler = (value : string) => {
+        setState({...state, message : value});
+    }
+
+    const submitHandler = (e : React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoader(true);
+        axios.post(`${API_BASE_URL}contact-message`,{
+            name,
+            //userId: "string",
+            email,
+            message,
+            phoneNumber : phone
+        }, {headers : returnHeaders()})
+        .then((response) => {
+            if(response?.data?.success){
+                setSuccessObj({...success, msg : response?.data?.message, flag :true});
+                setState({...state, name : "", email : "", phone : "", message : ""});
+            }else{
+                setErrorObj({...errorMsg, flag : true, msg : response?.data?.message});
+            }
+            formRef.current?.reset();
+            setLoader(false);
+        }).catch((err) => {
+            setErrorObj({...errorMsg, flag : true, msg : err?.response?.data?.message});
+            setLoader(false);
+        });
+
+    }
+
+    // useEffect(() => {
+    //     setState({...state, name : "", email : "", phone : "", message : ""});
+    // },[success.flag]);
+    //reset form
+    
     return(
         <React.Fragment>
             <Navbar/>
@@ -24,28 +86,46 @@ const ContactUsComponent = () => {
                     <p className="text-gray-600 text-center mb-8">
                     Have questions or want to get in touch? Fill out the form below and our team will get back to you soon.
                     </p>
-                    <form className="space-y-4">
+                    <form className="space-y-4" ref={formRef} onSubmit={submitHandler}>
                     <div>
                         <label htmlFor="name" className="block text-navy-800 mb-1 font-medium">
                         Name
                         </label>
-                        <Input id="name" name="name" type="text" placeholder="Your Name" required />
+                        <Input id="name" name="name" type="text" placeholder={"Your Name"} defaultValue={name} required 
+                            onChange={(e : React.ChangeEvent<HTMLInputElement>) => onChangeNameHandler(e.target.value)}
+                        />
                     </div>
                     <div>
                         <label htmlFor="email" className="block text-navy-800 mb-1 font-medium">
                         Email
                         </label>
-                        <Input id="email" name="email" type="email" placeholder="you@email.com" required />
+                        <Input id="email" name="email" type="email" placeholder={"you@email.com"} defaultValue={email} required 
+                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onChangeEmailHandler(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="email" className="block text-navy-800 mb-1 font-medium">
+                        Phone&nbsp;Number
+                        </label>
+                        <Input id="email" name="email" type="text" placeholder={"07097230988"} defaultValue={phone} required  maxLength={11}
+                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onChangePhoneNumberHandler(e.target.value)}
+                        />
                     </div>
                     <div>
                         <label htmlFor="message" className="block text-navy-800 mb-1 font-medium">
                         Message
                         </label>
-                        <Textarea id="message" name="message" placeholder="How can we help you?" required />
+                        <Textarea id="message" name="message" placeholder={"How can we help you?"} defaultValue={message} className="h-24" required 
+                            onChange={(e : React.ChangeEvent<HTMLTextAreaElement>) => onChangeMessageHandler(e.target.value)}
+                        />
                     </div>
-                    <Button className="bg-real-600 hover:bg-real-700 text-white w-full mt-2" type="submit">
+                    {/* <div className="flex items-stretch"> */}
+                    <Button className="bg-[#1D4ED8] hover:bg-[#2563EB] text-white w-full sm:w-1/2 mx-auto mt-2 float-right disabled:cursor-default disabled:bg-gray-500" 
+                    type="submit"
+                    disabled={loading}>
                         Send Message
                     </Button>
+                    {/* </div> */}
+                   
                     </form>
                 </div>
 
@@ -54,7 +134,7 @@ const ContactUsComponent = () => {
                     <Mail className="text-real-600" />
                     <div>
                         <h3 className="text-sm font-semibold text-navy-900">Email</h3>
-                        <span className="text-gray-600">contact@abode.com</span>
+                        <span className="text-gray-600">contact@blupodd.com</span>
                     </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -68,7 +148,16 @@ const ContactUsComponent = () => {
             </div>
             
             <Footer/>
-
+            <SuccessDialog
+                open={success?.flag}
+                onOpenChange={() => setSuccessObj({...success, flag : false})}
+                description={success.msg}
+            />
+            <ErrorDialog
+                open={errorMsg?.flag}
+                onOpenChange={() => setErrorObj({...errorMsg, flag : false})}
+                description={errorMsg.msg}
+            />
         </React.Fragment>
     );
 }

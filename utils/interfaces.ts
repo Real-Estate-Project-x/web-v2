@@ -59,7 +59,7 @@ export interface ArchitecturalDrawing{
   url: string;
 };
 
-export interface AgentInterface {
+export interface TopAgentInterface {
   agency: {
     id: string;
     name: string;
@@ -165,3 +165,69 @@ export interface PaginationDataInterface {
   totalPages: number;
   success: boolean;
 }
+
+export interface AgentInterface {
+  agency : {
+  address: string;
+  agencyCACDump: Record<string, any>;
+  agencyPhoneNumber: string;
+  createdByUserId: string;
+  dateCreated: string;
+  dateOfIncorporation: string;
+  dateUpdated: string;
+  description: string;
+  email: string;
+  id: string;
+  isRegistered: boolean;
+  logo: string;
+  name: string;
+  rating: number;
+  rcNumber: string;
+  status: boolean;
+  whatsappNumber: string;
+  };
+  propertyTypes : [{
+    dateCreated:string;
+    dateUpdated:string;
+    id:string;
+    name:string;
+    status:boolean;
+  }];
+  timeSinceJoined:string;
+  totalReviewCount:number;
+  viewingsCount:number;
+
+}
+
+export const AgentInitialObject = {
+  agency : {
+  address: "no. 50 alatunji road",
+  agencyCACDump: {},
+  agencyPhoneNumber: "08034567890",
+  createdByUserId: "64e06d75-61cb-4069-bf8d-c59b3552d95e",
+  dateCreated: "2025-07-21T13:36:28.318Z",
+  dateOfIncorporation: "2025-07-21",
+  dateUpdated: "2025-07-21T13:36:28.318Z",
+  description: "This is a test description",
+  email: "j.oluwa@example.com",
+  id: "8b6c7c37-72b5-4db8-9184-214f32b8b68d",
+  isRegistered: true,
+  logo: "https://cdn.pixabay.com/photo/2025/03/06/17/45/duck-9451249_1280.jpg",
+  name: "oluwafemi's agency",
+  rating: 0,
+  rcNumber: "1234567",
+  status: true,
+  whatsappNumber: "08034567890"
+  },
+  propertyTypes : [{
+    dateCreated:"string",
+    dateUpdated:"string",
+    id:"",
+    name:"string",
+    status: true
+  }],
+  timeSinceJoined:"string",
+  totalReviewCount:0,
+  viewingsCount:0
+
+};

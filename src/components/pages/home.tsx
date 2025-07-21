@@ -11,6 +11,7 @@ import Testimonials from "./Home/Testimonials";
 import axios from "axios";
 import { getUserIp, returnHeaders } from "@/lib/utils";
 import { setCookie } from "@/lib/helpers";
+import { CTA } from "./Home/CTA";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -89,7 +90,7 @@ const LandingPage = () => {
       <PopularLocations data={popular_locations} />
       <Services />
       <Testimonials _data_for_TopAgents={top_agents} />
-      {/* <CTA /> */}
+      <CTA />
       <Footer />
     </div>
   );

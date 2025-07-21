@@ -1,9 +1,14 @@
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const CTA = () => {
+
+  //const router = useRouter();
+
   return (
-    <section className="py-16 bg-navy-800 text-white">
+    <section className="py-16 bg-[#243B53] text-white">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-8 md:mb-0 md:w-2/3">
@@ -13,12 +18,16 @@ export const CTA = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-real-600 hover:bg-real-700 text-white">
-              Contact an Agent
-            </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-navy-800">
-              Browse Properties
-            </Button>
+            <Link href={"/agents"}>
+              <Button className="bg-[#1D4ED8] hover:bg-[#2563EB] text-white">
+                Contact an Agent
+              </Button>
+            </Link>
+            <Link href={"/properties"}>
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-[#243B53]">
+                Browse Properties
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

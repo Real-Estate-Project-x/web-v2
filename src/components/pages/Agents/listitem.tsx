@@ -9,32 +9,20 @@ import {
   MapPin,
   Award,
   Home,
-  DollarSign,
   TrendingUp
 } from "lucide-react";
-
-interface Agent {
-  id: number;
-  firstName: string;
-  lastName: string;
-  title: string;
-  avatar: string;
-  rating: number;
-  reviewCount: number;
-  totalSales: number;
-  propertiesSold: number;
-  yearsExperience: number;
-  location: string;
-  specialties: string[];
-  available: boolean;
-  responseTime: string;
-}
+import { AgentInterface } from "../../../../utils/interfaces";
 
 interface AgentListItemProps {
-  agent: Agent;
+  agent: AgentInterface;
 }
 
-const AgentListItem = ({ agent }: AgentListItemProps) => {
+const AgentListItem = ({ agent : data }: AgentListItemProps) => {
+
+  const agent = data?.agency;
+  const firstNameInitials = agent?.name?.split(' ')[0];
+  const lastNameInitials = agent?.name?.split(' ')[1];
+
   return (
     <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
       <CardContent className="p-4">
@@ -42,13 +30,13 @@ const AgentListItem = ({ agent }: AgentListItemProps) => {
           {/* Avatar */}
           <div className="relative flex-shrink-0">
             <Avatar className="h-14 w-14 ring-2 ring-white shadow-md">
-              <AvatarImage src={agent.avatar} alt={`${agent.firstName} ${agent.lastName}`} />
-              <AvatarFallback className="font-semibold bg-gradient-to-br from-primary to-blue-600 text-white">
-                {agent.firstName[0]}{agent.lastName[0]}
+              <AvatarImage src={agent.logo} alt={`${agent.name}`} />
+              <AvatarFallback className="text-lg font-semibold bg-gradient-to-br from-primary to-blue-600 text-white">
+                {firstNameInitials[0]} {lastNameInitials[0]}
               </AvatarFallback>
             </Avatar>
             <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-              agent.available ? 'bg-green-500' : 'bg-gray-400'
+              agent.status ? 'bg-green-500' : 'bg-gray-400'
             }`} />
           </div>
           
@@ -57,14 +45,14 @@ const AgentListItem = ({ agent }: AgentListItemProps) => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Basic Info */}
               <div>
-                <h3 className="font-bold text-gray-900 text-lg mb-1">
-                  {agent.firstName} {agent.lastName}
+                <h3 className="font-bold text-gray-900 text-lg mb-1 capitalize">
+                  {agent.name}
                 </h3>
-                <p className="text-sm text-gray-600 mb-2">{agent.title}</p>
+                <p className="text-sm text-gray-600 mb-2 normal-case">{agent.description}</p>
                 <div className="flex items-center gap-1">
                   <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-medium">{agent.rating}</span>
-                  <span className="text-xs text-gray-500">({agent.reviewCount})</span>
+                  {/* <span className="text-xs text-gray-500">({agent.reviewCount})</span> */}
                 </div>
               </div>
               
@@ -72,11 +60,11 @@ const AgentListItem = ({ agent }: AgentListItemProps) => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="h-3 w-3 text-gray-400" />
-                  <span className="text-gray-700">{agent.location}</span>
+                  <span className="text-gray-700 capitalize">{agent.address}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Award className="h-3 w-3 text-gray-400" />
-                  <span className="text-gray-700">{agent.yearsExperience} years</span>
+                  {/* <span className="text-gray-700">{agent.yearsExperience} years</span> */}
                 </div>
               </div>
               
@@ -84,11 +72,11 @@ const AgentListItem = ({ agent }: AgentListItemProps) => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Home className="h-3 w-3 text-gray-400" />
-                  <span className="text-gray-700">{agent.propertiesSold} sold</span>
+                  {/* <span className="text-gray-700">{agent.propertiesSold} sold</span> */}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <DollarSign className="h-3 w-3 text-gray-400" />
-                  <span className="text-gray-700">${(agent.totalSales / 1000000).toFixed(1)}M</span>
+                  {/* <DollarSign className="h-3 w-3 text-gray-400" />  use formatPrice instead*/}
+                  {/* <span className="text-gray-700">${(agent.totalSales / 1000000).toFixed(1)}M</span> */}
                 </div>
               </div>
               
@@ -96,10 +84,10 @@ const AgentListItem = ({ agent }: AgentListItemProps) => {
               <div className="flex items-center justify-end gap-2">
                 <div className="flex flex-col items-end gap-2">
                   <Badge 
-                    variant={agent.available ? "default" : "secondary"}
+                    variant={agent.status ? "default" : "secondary"}
                     className="text-xs"
                   >
-                    {agent.available ? "Available" : "Busy"}
+                    {agent.status ? "Available" : "Busy"}
                   </Badge>
                   <div className="flex gap-2">
                     <Button 

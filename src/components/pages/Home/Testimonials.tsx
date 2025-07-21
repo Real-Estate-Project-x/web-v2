@@ -3,12 +3,11 @@
 import { FC, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Mail, MapPin, Phone, Star,  } from "lucide-react";
-import Image from "next/image";
-import { AgentInterface } from "../../../../utils/interfaces";
+import { TopAgentInterface } from "../../../../utils/interfaces";
 import { TestimonialsLoaderCard } from "@/components/shared/loader-cards";
 
 type Props = {
-  _data_for_TopAgents : AgentInterface[];
+  _data_for_TopAgents : TopAgentInterface[];
 }
 
 const Testimonials :FC<Props> = ({_data_for_TopAgents}) => {
