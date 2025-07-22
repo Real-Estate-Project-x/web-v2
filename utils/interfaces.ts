@@ -156,6 +156,16 @@ export interface NavDataInterface{
   label: string | React.ReactNode;
 } 
 
+export interface CommentInterface{
+  id:string;
+  dateCreated :string;
+  text :string;
+  name: string;
+  email: string;
+  comment: string;
+  rating: number;
+}
+
 export interface PaginationDataInterface {
   currentPage: number;
   hasNext: boolean;
