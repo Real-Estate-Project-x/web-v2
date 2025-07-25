@@ -73,12 +73,12 @@ const AgentCard = ({ agent : data }: AgentCardProps) => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="text-center">
-            {/* <div className="text-lg font-bold text-gray-900">{agent.propertiesSold}</div> */}
+            <div className="text-lg font-bold text-gray-900">{0}</div>
             <div className="text-xs text-gray-500">Properties</div>
           </div>
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900">
-              ${data.viewingsCount}
+              {data.viewingsCount}
             </div>
             <div className="text-xs text-gray-500">Scheduled Viewings</div>
           </div>
@@ -96,7 +96,7 @@ const AgentCard = ({ agent : data }: AgentCardProps) => {
 
         {/* Specialties */}
         <div className="mb-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1">
             {data?.propertyTypes.slice(0, 5).map((specialty, index) => (
               <Badge key={index} variant="outline" className="text-xs px-2 py-1">
                 {specialty.name}
@@ -111,12 +111,14 @@ const AgentCard = ({ agent : data }: AgentCardProps) => {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between  gap-2">
-          <div className="flex items-center gap-1 text-base">
+        <div className="flex items-center gap-2 text-sm">
             <PhoneCall className="h-6 w-6 text-[#25D366]"/>
             <p>{agent.whatsappNumber}</p>
           </div>
-          <div className="flex items-center gap-1 text-base">
+
+        <div className="flex justify-between  gap-2">
+          
+          <div className="flex items-center gap-2 text-sm">
             <Mail className="h-6 w-6 text-gray-400"/>
             <p>{agent.email}</p>
           </div>

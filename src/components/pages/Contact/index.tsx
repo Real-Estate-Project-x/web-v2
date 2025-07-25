@@ -53,7 +53,7 @@ const ContactUsComponent = () => {
         }, {headers : returnHeaders()})
         .then((response) => {
             if(response?.data?.success){
-                setSuccessObj({...success, msg : response?.data?.message, flag :true});
+                setSuccessObj({...success, msg : "Your Request Has Been Sent Successfully.", flag :true});
                 setState({...state, name : "", email : "", phone : "", message : ""});
             }else{
                 setErrorObj({...errorMsg, flag : true, msg : response?.data?.message});
