@@ -134,3 +134,41 @@ export const LoaderViewProperty : FC = () => {
     </div>
   );
 }
+
+export const AgentLoaderCard  : FC = () => {
+  return (
+    <div className="w-full container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 m-8">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="animate-pulse bg-slate-200 rounded-lg group relative overflow-hidden rounded-lg cursor-pointer h-[70vh]">
+
+          <div className="w-full flex justify-center py-8">
+            <img 
+                src={"https://via.placeholder.com/600x400"} 
+                alt={""}
+                className="w-40 h-40 bg-gray-200 object-cover transition-transform duration-300 group-hover:scale-110 rounded-full"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">
+             <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center">
+                  <div className="text-lg font-bold bg-white"/>
+                  <div className="text-xs bg-gray-500"/>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold bg-white"/>
+                  <div className="text-xs bg-gray-500"/>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold bg-white"></div>
+                  <div className="text-xs bg-gray-500"></div>
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="w-full items-center gap-2 mb-4 bg-white"/>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

@@ -7,10 +7,9 @@ import AgentFilters from "./filters";
 import AgentCard from "./Agent-Card";
 import AgentListItem from "./listitem";
 import Footer from "../Home/Footer";
-import axios from "axios";
-import { API_BASE_URL } from "../home";
-import { returnHeaders } from "@/lib/utils";
 import { AgentInitialObject, AgentInterface } from "../../../../utils/interfaces";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import { AgentLoaderCard } from "@/components/shared/loader-cards";
 
 const Agents = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -19,6 +18,7 @@ const Agents = () => {
   const [filterBy, setFilterBy] = useState("all");
   const [data, setData] = useState<AgentInterface[]>([{...AgentInitialObject}] as AgentInterface[]);
   const [errorMsg, setErrorObj] = useState<{msg : string, flag : boolean}>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // const agents = [
   //   {
@@ -201,16 +201,21 @@ const Agents = () => {
   });
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}agency/customer-listings/agents-list`, {headers : returnHeaders()})
+    setIsLoading(true);
+
+    axiosInstance.get(`agency/customer-listings/agents-list`)
     .then((response) => {
       if(response.data.success){
         setData(response.data.data);
       }else{
         setErrorObj({...errorMsg, flag : true, msg : response.data.message});
       }
+      setIsLoading(false);
+
     }).catch((err) => {
-        setErrorObj({...errorMsg, flag : true, msg : err?.response?.data?.message});
-      console.log({err});
+      setErrorObj({...errorMsg, flag : true, msg : err?.response?.data?.message});
+      //throw
+      setIsLoading(false);
     })
   },[]);
 
@@ -237,18 +242,6 @@ const Agents = () => {
                   <div className="text-3xl font-bold text-white">{data.length}</div>
                   <div className="text-sm text-white/80">Expert Agents</div>
                 </div>
-                {/* <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold text-white">
-                    {data.reduce((sum, agent) => sum + agent.propertiesSold, 0)}
-                  </div>
-                  <div className="text-sm text-white/80">Properties Sold</div>
-                </div> */}
-                {/* <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold text-white">
-                    ${(data.reduce((sum, agent) => sum + agent.totalSales, 0) / 1000000).toFixed(0)}M
-                  </div>
-                  <div className="text-sm text-white/80">Total Sales</div>
-                </div> */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                   <div className="text-3xl font-bold text-white">
                     {(data.reduce((sum, agent) => sum + agent?.agency?.rating, 0) / data.length).toFixed(1)}
@@ -261,48 +254,59 @@ const Agents = () => {
         </section>
 
         {/* Filters */}
-        <AgentFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          filterBy={filterBy}
-          setFilterBy={setFilterBy}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          totalAgents={data.length}
-          filteredCount={sortedAgents.length}
-          availableCount={data.filter(a => a?.agency?.status).length}
-        />
+        {isLoading  ?
+        (<AgentLoaderCard/>) 
+        : 
+          <>
+            <AgentFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              filterBy={filterBy}
+              setFilterBy={setFilterBy}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              totalAgents={data.length}
+              filteredCount={sortedAgents.length}
+              availableCount={data.filter(a => a?.agency?.status).length}
+            />
 
-        {/* Agents Grid/List */}
-        <section className="py-8">
-          <div className="container mx-auto px-4">
-            {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {sortedAgents.map((agent) => (
-                  <AgentCard key={agent?.agency.id} agent={agent} />
-                ))}
+            {/* Agents Grid/List */}
+            <section className="py-8">
+              <div className="container mx-auto px-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {sortedAgents.map((agent) => (
+                      <AgentCard key={agent?.agency.id} agent={agent} />
+                    ))}
+                  </div>
+                {/* {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {sortedAgents.map((agent) => (
+                      <AgentCard key={agent?.agency.id} agent={agent} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-w-6xl mx-auto">
+                    {sortedAgents.map((agent) => (
+                      <AgentListItem key={agent?.agency.id} agent={agent} />
+                    ))}
+                  </div>
+                )} */}
+                
+                {sortedAgents.length === 0 && (
+                  <div className="text-center py-16">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto">
+                      <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-2xl font-bold text-gray-600 mb-2">No agents found</h3>
+                      <p className="text-gray-500">Try adjusting your search criteria or filters.</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="space-y-4 max-w-6xl mx-auto">
-                {sortedAgents.map((agent) => (
-                  <AgentListItem key={agent?.agency.id} agent={agent} />
-                ))}
-              </div>
-            )}
-            
-            {sortedAgents.length === 0 && (
-              <div className="text-center py-16">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto">
-                  <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-600 mb-2">No agents found</h3>
-                  <p className="text-gray-500">Try adjusting your search criteria or filters.</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
+            </section>
+          </>
+        }
       </main>
       
       <Footer />

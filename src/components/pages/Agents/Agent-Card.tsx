@@ -8,12 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Star,
   MapPin,
-  Phone,
   Mail,
-  Award,
   TrendingUp,
-  MessageCircle,
-  Circle,
   PhoneCall
 } from "lucide-react";
 import { AgentInterface } from "../../../../utils/interfaces";

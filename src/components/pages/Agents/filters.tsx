@@ -57,9 +57,9 @@ const AgentFilters = ({
                 />
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Select value={filterBy} onValueChange={setFilterBy}>
-                  <SelectTrigger className="w-36 border-0 bg-gray-50/80">
+                  <SelectTrigger className="w-full sm:w-56 md:w-36 border bg-gray-50/80">
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
@@ -73,7 +73,7 @@ const AgentFilters = ({
                 </Select>
                 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-36 border-0 bg-gray-50/80">
+                  <SelectTrigger className="w-full sm:w-56 md:w-36 border bg-gray-50/80">
                     <TrendingUp className="h-4 w-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
@@ -85,7 +85,7 @@ const AgentFilters = ({
                   </SelectContent>
                 </Select>
                 
-                <div className="flex rounded-lg border bg-gray-50/80 p-1">
+                {/* <div className="w-fit flex rounded-lg border bg-gray-50/80 p-1">
                   <Button
                     variant={viewMode === "grid" ? "default" : "ghost"}
                     size="sm"
@@ -102,7 +102,7 @@ const AgentFilters = ({
                   >
                     <List className="h-4 w-4" />
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
             

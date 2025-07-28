@@ -135,6 +135,7 @@ export interface PropertyInterface {
     latitude: number;
     longitude: number;
   };
+  similarProperties :  any[];
 }
 
 export interface LocationsInterface {

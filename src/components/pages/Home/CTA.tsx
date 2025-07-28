@@ -1,11 +1,9 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export const CTA = () => {
 
-  //const router = useRouter();
 
   return (
     <section className="py-16 bg-[#243B53] text-white">

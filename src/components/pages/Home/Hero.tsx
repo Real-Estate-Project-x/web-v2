@@ -3,9 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Home, Building2, TrendingUp } from "lucide-react";
-import { cn, returnHeaders } from "@/lib/utils";
-import { axiosInstance } from "@/lib/axios-interceptor";
-import { getCookie } from "@/lib/helpers";
+import { cn } from "@/lib/utils";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&q=80",
@@ -28,21 +26,6 @@ const Hero = () => {
 
   }, []);
 
-
-  // useEffect(() => {
-  //   axiosInstance.get("properties/customer-listings/popular-locations", {headers : returnHeaders(getCookie("user_ip"))})
-  //   .then((response) => {
-  //     if (response.data.success) {
-  //       // Assuming response.data.data is the array of popular locations
-  //       console.log("Popular Locations:", response.data.data);
-  //     } else {
-  //       console.error("Failed to fetch popular locations:", response.data.message);
-  //     }
-  //   })
-  //   .catch((error) => { 
-  //     console.error("Error fetching popular locations:", error);
-  //   })
-  // }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +82,7 @@ const Hero = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="flex flex-wrap gap-8 text-white/90">
+            {/* <div className="flex flex-wrap gap-8 text-white/90">
               <div className="text-center">
                 <div className="text-3xl font-bold text-real-300">15K+</div>
                 <div className="text-sm uppercase tracking-wider">Properties</div>
@@ -112,7 +95,7 @@ const Hero = () => {
                 <div className="text-3xl font-bold text-real-300">500+</div>
                 <div className="text-sm uppercase tracking-wider">Agents</div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Right Column - Search Form */}

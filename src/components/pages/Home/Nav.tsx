@@ -15,8 +15,6 @@ type NavData = {
   const defaultNavData =[
     { href: "/", label: "Home" },
     { href: "/properties", label: "Properties" },
-    // { href: "/buy", label: "Sale" },
-    // { href: "/rent", label: "Rent" },
     { href: "/agents", label: "Agents" },
     { href: "/contact", label: "Contact" },
     { href: "/properties/search", label: <Search size={18}/> }
@@ -72,7 +70,7 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
               key={navItem.href}
               href={navItem.href} 
               className={`hover:text-real-300 transition-colors ${
-                pathname === "/" ? scrolled ? "text-[#1E3A8A] font-normal" : "text-gray-200" : pathname === navItem.href ? "text-[#1E3A8A] font-bold line-through" : "text-black"
+                pathname === "/" ? scrolled ? "text-[#1E3A8A] font-normal" : "text-gray-200" : pathname === navItem.href ? "text-[#1E3A8A] font-semibold text-shadow-lg" : "text-black"
               }`}
             >
               {navItem.label}
@@ -90,7 +88,7 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
             size="icon" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
-            className={scrolled ? "text-gray-800" : "text-gray-800"}
+            className={scrolled ? "text-gray-800" : "text-slate-200"}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>

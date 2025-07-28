@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Navbar from "../Home/Nav";
 import { ContactRound, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Footer from "../Home/Footer";
-import axios from "axios";
-import { API_BASE_URL } from "../home";
-import { returnHeaders } from "@/lib/utils";
 import { ErrorDialog } from "@/components/shared/error-dialog";
 import { SuccessDialog } from "@/components/shared/success-dialog";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 const ContactUsComponent = () => {
 
@@ -44,13 +42,13 @@ const ContactUsComponent = () => {
     const submitHandler = (e : React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoader(true);
-        axios.post(`${API_BASE_URL}contact-message`,{
+        axiosInstance.post(`contact-message`,{
             name,
             //userId: "string",
             email,
             message,
             phoneNumber : phone
-        }, {headers : returnHeaders()})
+        })
         .then((response) => {
             if(response?.data?.success){
                 setSuccessObj({...success, msg : "Your Request Has Been Sent Successfully.", flag :true});
@@ -66,11 +64,6 @@ const ContactUsComponent = () => {
         });
 
     }
-
-    // useEffect(() => {
-    //     setState({...state, name : "", email : "", phone : "", message : ""});
-    // },[success.flag]);
-    //reset form
     
     return(
         <React.Fragment>

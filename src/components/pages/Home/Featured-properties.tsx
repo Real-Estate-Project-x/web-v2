@@ -9,44 +9,44 @@ import { FC } from "react";
 import { PropertyInterface } from "../../../../utils/interfaces";
 import LoadingCard from "@/components/shared/loader-cards";
 // Mock property data
-export const properties = [
-  {
-    id: 1,
-    title: "Modern Luxury Villa",
-    price: "$1,250,000",
-    image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&q=80",
-    location: "Beverly Hills, CA",
-    beds: 4,
-    baths: 3,
-    sqft: "3,500",
-    type: "For Sale",
-    isNew: true,
-  },
-  {
-    id: 2,
-    title: "Downtown Apartment",
-    price: "$450,000",
-    image: "https://images.unsplash.com/photo-1524230572899-a752b3835840?auto=format&fit=crop&q=80",
-    location: "Downtown Seattle, WA",
-    beds: 2,
-    baths: 2,
-    sqft: "1,200",
-    type: "For Sale",
-    isNew: false,
-  },
-  {
-    id: 3,
-    title: "Suburban Family Home",
-    price: "$750,000",
-    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&q=80",
-    location: "Bellevue, WA",
-    beds: 4,
-    baths: 2.5,
-    sqft: "2,800",
-    type: "For Sale",
-    isNew: false,
-  }
-];
+// export const properties = [
+//   {
+//     id: 1,
+//     title: "Modern Luxury Villa",
+//     price: "$1,250,000",
+//     image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&q=80",
+//     location: "Beverly Hills, CA",
+//     beds: 4,
+//     baths: 3,
+//     sqft: "3,500",
+//     type: "For Sale",
+//     isNew: true,
+//   },
+//   {
+//     id: 2,
+//     title: "Downtown Apartment",
+//     price: "$450,000",
+//     image: "https://images.unsplash.com/photo-1524230572899-a752b3835840?auto=format&fit=crop&q=80",
+//     location: "Downtown Seattle, WA",
+//     beds: 2,
+//     baths: 2,
+//     sqft: "1,200",
+//     type: "For Sale",
+//     isNew: false,
+//   },
+//   {
+//     id: 3,
+//     title: "Suburban Family Home",
+//     price: "$750,000",
+//     image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&q=80",
+//     location: "Bellevue, WA",
+//     beds: 4,
+//     baths: 2.5,
+//     sqft: "2,800",
+//     type: "For Sale",
+//     isNew: false,
+//   }
+// ];
 
 type Property = {
   data : PropertyInterface[];

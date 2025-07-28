@@ -12,6 +12,7 @@ import axios from "axios";
 import { getUserIp, returnHeaders } from "@/lib/utils";
 import { setCookie } from "@/lib/helpers";
 import { CTA } from "./Home/CTA";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -45,22 +46,18 @@ const LandingPage = () => {
   const [userIp, setUserIp] = React.useState<string>("");
 
   useEffect(() => {
-
+    // setAlert();
     getUserIpAddress(setUserIp);
 
-    axios
-      .all([
-        axios.get(
-          `${API_BASE_URL}agency/list/top-agents?longitude=010.02020&latitude=029.92920&ipAddress=104.28.204.233`,
-          {headers : returnHeaders(userIp) }
+    axios.all([
+        axiosInstance.get(
+          `${API_BASE_URL}agency/list/top-agents`,
         ),
-        axios.get(
+        axiosInstance.get(
           `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1`,
-          {headers : returnHeaders(userIp) }
         ),
-        axios.get(
+        axiosInstance.get(
           `${API_BASE_URL}property/customer-listings/popular-locations`,
-          {headers : returnHeaders(userIp) }
         ),
         // Add more API calls as needed {/property/list/popular-locations}
       ])
@@ -76,11 +73,9 @@ const LandingPage = () => {
       });
   }, []);
 
-  setCookie('user_ip', userIp,);
-
-  // setInterval(() => {  
-  //   setAlert();
-  // }, 10000000);
+  useEffect(() => {
+    setCookie('user_ip', userIp,);
+  },[userIp]);
 
   return (
     <div className="flex flex-col min-h-screen">

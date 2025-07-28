@@ -7,10 +7,7 @@ import LoadingCard from "@/components/shared/loader-cards";
 import { Pagination } from "@/components/shared/pagination";
 import { PropertyInterface } from "../../../../../utils/interfaces";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
-import { API_BASE_URL } from "../../home";
-import { returnHeaders } from "@/lib/utils";
-import { getCookie } from "@/lib/helpers";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 export const StatePropertyList: FC = () => {
     const [properties, setStateProperties] = useState<PropertyInterface[]>([]);
@@ -21,7 +18,7 @@ export const StatePropertyList: FC = () => {
     const [type, setType] = useState<string>("");
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}property/customer-listings/by-state/${stateId}`, {headers : returnHeaders(getCookie('user_ip'))})
+        axiosInstance.get(`property/customer-listings/by-state/${stateId}`)
         .then((response) => { 
             if(response.data.success) {
                 setStateProperties(response.data.data);
@@ -39,7 +36,7 @@ export const StatePropertyList: FC = () => {
     return (
     <Fragment>
         <Navbar/>
-        <div className="container mx-auto mt-24 mb-10">
+        <div className="p-4 sm:p-0 container mx-auto mt-24 mb-10">
             <h2 className="text-3xl font-normal text-navy-900 pb-5 pb-4 capitalize">Properties In {stateName}</h2>
 
             <PropertyFilter setLoader={setIsLoading} setData={setStateProperties} setType={setType}/>

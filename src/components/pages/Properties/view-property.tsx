@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import {FormControl, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from 'sonner';
 import { Textarea } from "@/components/ui/textarea";
@@ -17,14 +16,11 @@ import React from "react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
 import { Badge } from "@/components/ui/badge";
-import axios from "axios";
-import { API_BASE_URL } from "../home";
-import { returnHeaders } from "@/lib/utils";
-import { getCookie } from "@/lib/helpers";
 import { CommentInterface, PropertyInterface } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
 import { ErrorDialog } from "@/components/shared/error-dialog";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 
 // This would typically come from an API, using static data for now
@@ -274,11 +270,8 @@ type TourFormData = {
   message: string;
 };
 
-
-const token = `U2FsdGVkX18b/X7yzwKyikKqVX3i0kwJiHV7Te7aYTqyIitK9o7ag8tG7Ok0pezIsGDPanXsv9SibfJ0lGGfqH0sOCB1dBVJNowf18q6lmz1TBCuc4CzSr2KQBqpSQpmVcjUP7gXD7nTb0Ygima+QqIlFzpN3RMPlJg9P9LSgIyNQ5BT4SQ3llcXfAqIUL3EmP87F/JlkEBImOujf4APeh0DBK71MAI/15PNBpDBzecz1ECRWoi8Ob8nMzTrHhSCRizF7oPJeQilBTEGgHJAemqarTuUqyTiVVPIzN2kq9C2Audsnp+Ccia3dB4MK+2dUVtR6OCJ/zYgbz7J9GLlqm1ncnwgt5mobV3qaseEl2OsTjv+Hx/yyDtKZ9lzv0JuGUzDyjW8wXqWtL6xntNshQmV4F/sseqvwKtFTx3QRyuKBg9Tuu6w+rCCtnaT1oKQPL+uWwkDBo+2/B2iOsIp/RGbYrszZepYZ5zoI5XIlAqAf2JXfPgUlT8xKCOgurwcKxuoJZbShMfZBrG8D5uXpg9OqkXAQg6a0gEvw4jHdUALPhWS8cTZdYLF//U4HXA/qufOIFOiKhKzmqGfDDPI4uESIT2J896pGeyF7U0+j4Ey4xcWmtpe4q13GE+S0/3BYrPnMjWAqwBLBdVW093xK0CgmxV4lF0XFoZVb0m0/C8nlvLLfIoMxLmnl/W/PnEJjqFIz+rC9fkVV5mTxx9CK58b+cttnDT15q7LJ4nPW1+xJD/Lv11uT1RX8FEED/zzotbbcIe2boEyXUwzbRRUQC8c+BuYkQuhc3o02874MbQZg4myc/XdWJgvLT9SL5ZZRK6hqbTC8QzQco45b+wY/9VWGLIkrylE7fohlnNDWlvB7CVbwUT9HppTQLEI0axkP0yv/LZdbPBwealpjK7kDaAWvaRZdBR4k7chhW1lHaVGhHYzo8SnVvYV4JzZAu2HYli4p39okCtOmYrtyD0Pye3CLh2QYAkm98yTGEQYcXmaOXdr/Lze+RYVJssSAhloxGR6g5c+h1w3w2UZfYpynzrIOy+jE8MmKTrzgXctwTlwECtbwjPbaYxI5eK6mqYzic5iykjmQZJszgaST7tPNHnv6S9SfDWbpp+LcmUYIOGlWfV37ynJilcQlP2n4va51kuCBvRae3PyaAKibDPW2DbqYx58Z+N7wgHs33SHfH2N+w3ReWhb/kQSORHQ1zuRKau6y7+4uAoRcRwKkjTcaqbz1uYVMFCgfj96XvKXluJ9A43TIXsV3Fikjmzkch6b8xDCMmsifsS5u+FMhwEtp5BlxG7dufs4rqd/ihi2S1I6dj4tISv5fjtZ6m7FkVx3sQHBr1tyY2QkOW5f500zo5gIw7EWwHpnIEwRBGJ/xabuS9XOARuTyMl28aGjFR0WIwTzIuCj8KAHcyvL7My3TEbtXgs2WdAdHIxm98RsFKLDiEaRDZKqvZVPDZHAmv/x0f0g0v3jvuxicvKRzQT5UG23yojMMvytzED+wEI4pg/XvmACjyeX9uUyb3qptC2Y36sn4VEDXLSq08rbEDP+c+3MgARvlZI3vY20c0eQtpNQm6PyFe5kpEGHfsGSp+08f8KEvGoCVyDHxp8JOYBSgLntM6vRlC7cfmMkjE7/ZLsvEv8P9XeSCtkQoPgFzZ5OjfIy91qINjadgNLMyUZrHSiW/BRnSeDhGB8w1ToRVYHA6H4kcCM+K9SUMSDnqbagda9pB24PHHk+M12tD+Ccfk5xsA/tjxSqn8Y8qX64SSzwYnCQE6YwSA3T+IhRv8zRTe7JBWPpRDmZKyx8S0LptQ==`
 const PropertyDetails = () => {
   const searchParams = useSearchParams();
-//const router = useRouter();
   const [showContactModal, setShowContactModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -317,14 +310,11 @@ const PropertyDetails = () => {
   const onSubmitComment = (data: {comment : string, rating : number}) => {
     // if a user is not logged in and has not viewed the apartment, user cannot make a comment
     setIsLoading(true);
-    axios.post(`${API_BASE_URL}agent-property-viewing/rate-viewing`,{
+    axiosInstance.post(`agent-property-viewing/rate-viewing`,{
       propertyViewingId: propertyData.id,
       rating,
       comment:data.comment
-    }, {headers : {
-        "Authorization" : `Bearer ${token}`,
-        ...returnHeaders()
-    }})
+    })
     .then((response) => {
         if(response?.data?.success){
           toast.success("Thank you for your review!");
@@ -370,12 +360,12 @@ const PropertyDetails = () => {
   };
 
   useEffect(() => { 
-    axios.get(`${API_BASE_URL}property/customer-listings/detail/${searchParams.get('id')}`, {headers : returnHeaders(getCookie('user_ip'))})
+    axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id')}`)
       .then((response) => { 
           if(response.data.success) {
             setProperty(response.data.data?.property || {} as PropertyInterface);
             // get comments
-            axios.get(`${API_BASE_URL}agent-property-viewing/user-ratings/${response.data.data?.property?.id}`, {headers : returnHeaders(getCookie('user_ip'))})
+            axiosInstance.get(`agent-property-viewing/user-ratings/${response.data.data?.property?.id}`)
             .then((response) => { 
                 if(response.data.success) {
                   setComments(response.data.data);
@@ -844,12 +834,12 @@ const PropertyDetails = () => {
                 </div>
                 
                 {/* Similar Properties Section */}
-                {/* <div className="mt-16">
+                <div className="mt-16">
                   <h2 className="text-2xl font-semibold mb-6">Similar Properties</h2>
                   <div className="relative overflow-hidden">
                     <Carousel className="w-full">
                       <CarouselContent>
-                        {property.similarProperties?.slice(0, 10).map((similarProperty : any) => (
+                        {propertyData.similarProperties?.slice(0, 10).map((similarProperty : any) => (
                           <CarouselItem key={similarProperty.id} className="md:basis-1/2 lg:basis-1/3">
                             <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full py-0">
                               <div className="relative h-48">
@@ -895,7 +885,7 @@ const PropertyDetails = () => {
                       <CarouselNext className="right-0 -translate-y-1/2 top-1/2" />
                     </Carousel>
                   </div>
-                </div> */}
+                </div>
               </div>
               
               <ContactAgentModal 

@@ -14,9 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bed, Building, MapPin, Search } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
-import MoreFiltersModal from "./Dialogs/more-filters";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PropertyInterface } from "../../../../utils/interfaces";
 import axios from "axios";
 import { API_BASE_URL } from "../home";
@@ -24,6 +22,7 @@ import { formatPrice } from "../../../../utils/helpers";
 import { Pagination } from "@/components/shared/pagination";
 import LoadingCard from "@/components/shared/loader-cards";
 import { returnHeaders } from "@/lib/utils";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 type Props = {
     array : PropertyInterface[];
@@ -44,9 +43,7 @@ export const PropertyFilter :FC<FilterProps> = ({setData, setLoader, setType}) =
     }
 
     const filterProperties = async(type : string) => {
-        await axios.get(`${API_BASE_URL}property/customer-listings/by-property-action/${type}`, {
-            headers : returnHeaders()
-        })
+        await axiosInstance.get(`property/customer-listings/by-property-action/${type}`)
         .then((response) => { 
             if(response.data.success) {
                 setData(response.data.data);
@@ -139,7 +136,7 @@ export const PropertyList : FC<Props> = ({array}) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
             {array.map((property) => (
                 <div key={property.id} className="property-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:duration-200">
-                    <div className="relative h-60">
+                    <div className="relative h-68">
                         <img 
                             src={property.photoUrls[0]} 
                             alt={property.title} 
@@ -150,7 +147,7 @@ export const PropertyList : FC<Props> = ({array}) => {
                             {property.isNewBuilding && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>}
                         </div>
                         <div className="absolute bottom-4 right-4">
-                        <Badge className="bg-gray-100 text-navy-900">{formatPrice(property.price)}</Badge>
+                            <Badge className="bg-gray-100 text-navy-900">{formatPrice(property.price)}</Badge>
                         </div>
                     </div>
                     <div className="p-5 capitalize">
@@ -191,9 +188,7 @@ const Properties = () => {
     const [type, setType] = useState<string>("");
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}property`, {
-            headers : returnHeaders()
-        })
+        axiosInstance.get(`property`)
         .then((response) => { 
             if(response.data.success) {
                 setProperties(response.data.data);
