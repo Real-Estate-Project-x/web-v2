@@ -143,9 +143,9 @@ export const AgentLoaderCard  : FC = () => {
 
           <div className="w-full flex justify-center py-8">
             <img 
-                src={"https://via.placeholder.com/600x400"} 
-                alt={""}
-                className="w-40 h-40 bg-gray-200 object-cover transition-transform duration-300 group-hover:scale-110 rounded-full"
+              src={"https://via.placeholder.com/600x400"} 
+              alt={""}
+              className="w-40 h-40 bg-gray-200 object-cover transition-transform duration-300 group-hover:scale-110 rounded-full"
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">

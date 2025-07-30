@@ -17,7 +17,6 @@ type NavData = {
     { href: "/properties", label: "Properties" },
     { href: "/agents", label: "Agents" },
     { href: "/contact", label: "Contact" },
-    { href: "/properties/search", label: <Search size={18}/> }
   ]
 const Navbar :FC<NavData> = ({data = defaultNavData}) => {
 
@@ -76,6 +75,9 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
               {navItem.label}
             </Link>
           ))}
+          <Link href={"/properties/search"}>
+            <Search size={18} className={`${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-[#1E3A8A]"}`}/>
+          </Link>
           <Link href="/login" className={pathname.includes("/agent-dashboard") ? "hidden" : "inline-block"}>
             <Button variant="default" size="sm" className="ml-4 font-normal cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]">Sign&nbsp;In</Button>
           </Link>
@@ -116,7 +118,11 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
                 {navItem.label}
               </Link>
             ))}
-           
+
+           <Link href={"/properties/search"}>
+              <Search size={18} className="text-black"/>
+           </Link>
+
             <Link href="/login">
               <Button className="w-full mt-2 hover:bg-blue-800 bg-[#1E3A8A] text-white">
                 Sign&nbsp;In

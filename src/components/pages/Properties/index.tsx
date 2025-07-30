@@ -16,12 +16,9 @@ import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { PropertyInterface } from "../../../../utils/interfaces";
-import axios from "axios";
-import { API_BASE_URL } from "../home";
 import { formatPrice } from "../../../../utils/helpers";
 import { Pagination } from "@/components/shared/pagination";
 import LoadingCard from "@/components/shared/loader-cards";
-import { returnHeaders } from "@/lib/utils";
 import { axiosInstance } from "@/lib/axios-interceptor";
 
 type Props = {
@@ -69,7 +66,7 @@ export const PropertyFilter :FC<FilterProps> = ({setData, setLoader, setType}) =
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 </div>
                 <Select>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
                     <SelectValue placeholder="Price Range" />
                     </SelectTrigger>
                     <SelectContent>
@@ -80,7 +77,7 @@ export const PropertyFilter :FC<FilterProps> = ({setData, setLoader, setType}) =
                     </SelectContent>
                 </Select>
                 <Select onValueChange={(value : string) => onChangeHandler(value)}>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
                     <SelectValue placeholder="Property For?" />
                     </SelectTrigger>
                     <SelectContent>
@@ -90,7 +87,7 @@ export const PropertyFilter :FC<FilterProps> = ({setData, setLoader, setType}) =
                 </Select>
 
                 <Select>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
                     <SelectValue placeholder="Property Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -102,7 +99,7 @@ export const PropertyFilter :FC<FilterProps> = ({setData, setLoader, setType}) =
                 </Select>
 
                 <Select>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
                     <SelectValue placeholder="Bedrooms" />
                     </SelectTrigger>
                     <SelectContent>
@@ -228,8 +225,6 @@ const Properties = () => {
             }
 
             {properties.length > 6 && (<Pagination _data={properties} />)}
-            
-
            
         </div>
         
