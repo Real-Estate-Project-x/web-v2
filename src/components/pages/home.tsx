@@ -23,17 +23,20 @@ if (!API_BASE_URL) {
 }
 
 const setAlert = () => {
-  alert("Please Turn on Geolocation in your Browser Settings for better Access to Properties.");
-}
+  alert(
+    "Please Turn on Geolocation in your Browser Settings for better Access to Properties."
+  );
+};
 
-const getUserIpAddress = async (setState : Function) => {
-  await getUserIp().then((ip) => {
-    setState(ip);
-  }).catch((error) => {
-    console.error("Error fetching user IP address:", error);
-  })
-}
-
+const getUserIpAddress = async (setState: Function) => {
+  await getUserIp()
+    .then((ip) => {
+      setState(ip);
+    })
+    .catch((error) => {
+      console.error("Error fetching user IP address:", error);
+    });
+};
 
 const LandingPage = () => {
   // This component serves as the main landing page for the application.
@@ -49,15 +52,14 @@ const LandingPage = () => {
     // setAlert();
     getUserIpAddress(setUserIp);
 
-    axios.all([
+    axios
+      .all([
+        axiosInstance.get(`${API_BASE_URL}agency/list/top-agents`),
         axiosInstance.get(
-          `${API_BASE_URL}agency/list/top-agents`,
+          `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1`
         ),
         axiosInstance.get(
-          `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1`,
-        ),
-        axiosInstance.get(
-          `${API_BASE_URL}property/customer-listings/popular-locations`,
+          `${API_BASE_URL}property/customer-listings/popular-locations`
         ),
         // Add more API calls as needed {/property/list/popular-locations}
       ])
@@ -74,8 +76,8 @@ const LandingPage = () => {
   }, []);
 
   useEffect(() => {
-    setCookie('user_ip', userIp,);
-  },[userIp]);
+    setCookie("user_ip", userIp);
+  }, [userIp]);
 
   return (
     <div className="flex flex-col min-h-screen">
