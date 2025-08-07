@@ -10,19 +10,19 @@ type props = {
     children : ReactNode;
 }
 const AuthLayout : FC<props> = ({children}) => {
+  //bg-[#0253CC] bg-gradient-to-br from-purple-light to-white
+  
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#0253CC] bg-gradient-to-br from-purple-light to-white md:p-8">
+    <div className="min-h-screen w-full flex items-center justify-center  md:p-8">
       <div className="flex flex-col md:flex-row items-stretch rounded-2xl shadow-2xl overflow-hidden bg-white/70 backdrop-blur-sm border border-gray-100 max-w-4xl w-full">
         {/* Left: Image - hidden on mobile */}
         <div className="hidden md:block md:w-1/2 relative">
-          <Image
+          <img
             src={HERO_IMG}
             alt="Stylish modern building"
             className="object-cover w-full h-full min-h-[490px] transition-all duration-700"
             loading="eager"
             style={{ minHeight: 490, borderRight: "1px solid #F1F0FB" }}
-            width={0}
-            height={0}
           />
           {/* Add a colored lavender overlay */}
           <div
