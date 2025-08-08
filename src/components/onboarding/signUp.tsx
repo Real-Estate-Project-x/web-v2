@@ -13,7 +13,8 @@ import {
   validatePhoneNumber,
 } from "../../../utils/helpers";
 import { useRouter } from "next/navigation";
-import { set } from "react-hook-form";
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
+import 'react-phone-number-input/style.css';
 
 const SignUpForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -32,60 +33,6 @@ const SignUpForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form is submitting:...");
-    //setSubmitting(true);
-
-    // Basic validation (customize as needed)
-    // if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.password || !form.confirm) {
-    //   toast("Please fill out all fields.");
-    //   setSubmitting(false);
-    //   return;
-    // }
-    // if(!validateEmail(form.email)) {
-    //   toast("Please enter a valid email address.");
-    //   setSubmitting(false);
-    //   return;
-    // }
-
-    // if(!validatePhoneNumber(form.phone)) {
-    //   toast("Please enter a valid phone number.");
-    //   setSubmitting(false);
-    //   return;
-    // }
-
-    // if (form.password !== form.confirm) {
-    //   toast("Passwords do not match.");
-    //   setSubmitting(false);
-    //   return;
-    // }
-
-    // Here you would typically send the form data to your backend API
-    // await axiosInstance.post('user/sign-up', {
-
-    //   firstName: form.firstName,
-    //   lastName: form.lastName,
-    //   phoneNumber: form.phone,
-    //   email: form.email,
-    //   password: form.password,
-
-    // }).then((response) => {
-    //   console.log("Sign Up Response:", response.data);
-    //   if (response.data.success) {
-    //     setTimeout(() => {
-    //       toast("Sign Up successful!");
-    //       setSubmitting(false);
-    //     }, 2000);
-    //   } else {
-    //     toast("Sign Up failed. Please try again.");
-    //   }
-    // }).catch((error) => {
-    //   console.error("Error during sign up:", error);
-    //   toast("An error occurred. Please try again.");
-    // });
   };
 
   const handleSubmitWithDelay = async (
@@ -112,7 +59,7 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    if (!validatePhoneNumber(form.phone)) {
+    if (!validatePhoneNumber(form.phone) && isValidPhoneNumber(form.phone)) {
       toast.error("Please enter a valid phone number.");
       setSubmitting(false);
       return;
@@ -229,7 +176,14 @@ const SignUpForm: React.FC = () => {
         <Label htmlFor="email" className="text-gray-700 font-medium">
           Phone&nbsp;Number
         </Label>
-        <div className="relative mt-1">
+         <PhoneInput
+            placeholder="Enter phone number"
+            value={form.phone}
+            onChange={(value : any) => setForm({ ...form, phone:value  })}
+            className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg mt-1"
+            defaultCountry="NG" // You can set a default country
+          />
+        {/* <div className="relative mt-1">
           <Input
             id="phone"
             name="phone"
@@ -246,7 +200,8 @@ const SignUpForm: React.FC = () => {
             size={20}
             className="absolute left-3 top-[10px] text-purple-400"
           />
-        </div>
+        </div> */}
+
       </div>
       <div>
         <Label htmlFor="email" className="text-gray-700 font-medium">
@@ -284,6 +239,8 @@ const SignUpForm: React.FC = () => {
             type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={handleChange}
+            onCopy={(e) => e.preventDefault()} // Prevent copy
+            onPaste={(e) => e.preventDefault()} // Prevent paste
             className="pl-10 pr-10"
             autoComplete="new-password"
             required
@@ -317,6 +274,8 @@ const SignUpForm: React.FC = () => {
             type={showConfirm ? "text" : "password"}
             value={form.confirm}
             onChange={handleChange}
+            onCopy={(e) => e.preventDefault()} // Prevent copy
+            onPaste={(e) => e.preventDefault()} // Prevent paste
             className="pl-10 pr-10"
             autoComplete="new-password"
             required

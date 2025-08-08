@@ -9,6 +9,7 @@ import { Mail, Key, Eye, EyeOff } from "lucide-react";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { useRouter } from "next/navigation";
 import { encryptData } from "../../../utils/helpers";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -86,12 +87,12 @@ export default function LoginForm() {
             </button>
         </div>
         <div className="flex items-center justify-between mt-2">
-            <a
+            <Link
             href="/confirm-email"
             className="text-sm text-gray-500 hover:text-primary transition font-medium"
             >
             Forgot password?
-            </a>
+            </Link>
         </div>
         <Button
             type="submit"
