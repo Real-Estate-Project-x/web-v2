@@ -1,28 +1,34 @@
 'use client';
 
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Props = {
   _data: any[];
+  currentPage: number;
+  setCurrentPage?: (page: number) => void;
 }
 
-export const Pagination :FC<Props> = ({_data}) => {
+export const Pagination :FC<Props> = ({_data, currentPage, setCurrentPage}) => {
 
-    const [activeIndex, setActiveIndex] = useState(0);
 
     const handlePrev = () => {
-        setActiveIndex((prevIndex) =>
-        prevIndex === 0 ? _data.length - 1 : prevIndex - 1
-        );
-    };
-
-    const handleNext = () => {
-        setActiveIndex((prevIndex) =>
-        prevIndex === activeIndex - 1 ? 0 : prevIndex + 1
-        );
+        if(currentPage !== 1 && setCurrentPage) {
+            setCurrentPage(currentPage - 1);
+        }
     }
+    const handleNext = () => {
+        if(setCurrentPage && currentPage !== _data.length) {
+            setCurrentPage(currentPage + 1);
+        }
+    }
+   
+    const moveToPage = (id : number) => {
+        if(setCurrentPage)
+        setCurrentPage(id);
+    }
+
 
   return (
     <div className="flex justify-center gap-3 flex-wrap">
@@ -36,14 +42,13 @@ export const Pagination :FC<Props> = ({_data}) => {
             <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
         </Button>
             
-        {_data.map((_, index : number) => (
+        {_data.slice(0,10).map((_, index : number) => (
             <Button
             key={index}
-            variant={index === activeIndex ? "default" : "outline"}
+            variant={index + 1 === currentPage ? "default" : "outline"}
             size="sm"
             className="w-8 h-8 md:w-10 md:h-10 rounded-full text-xs md:text-sm"
-            onClick={() => setActiveIndex(index)}
-            aria-label={`Go to agent ${index + 1}`}
+            onClick={() => moveToPage(index + 1)}
             >
             {index + 1}
             </Button>

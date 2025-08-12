@@ -5,11 +5,12 @@ import { Users } from "lucide-react";
 import Navbar from "../Home/Nav";
 import AgentFilters from "./filters";
 import AgentCard from "./Agent-Card";
-import AgentListItem from "./listitem";
 import Footer from "../Home/Footer";
 import { AgentInitialObject, AgentInterface } from "../../../../utils/interfaces";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { AgentLoaderCard } from "@/components/shared/loader-cards";
+import { getCookie } from "@/lib/helpers";
+import { Pagination } from "@/components/shared/pagination";
 
 const Agents = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -19,186 +20,17 @@ const Agents = () => {
   const [data, setData] = useState<AgentInterface[]>([{...AgentInitialObject}] as AgentInterface[]);
   const [errorMsg, setErrorObj] = useState<{msg : string, flag : boolean}>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // const agents = [
-  //   {
-  //     id: 1,
-  //     firstName: "Sarah",
-  //     lastName: "Johnson",
-  //     title: "Senior Real Estate Agent",
-  //     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  //     rating: 4.9,
-  //     reviewCount: 127,
-  //     totalSales: 2500000,
-  //     propertiesSold: 45,
-  //     activeListings: 12,
-  //     yearsExperience: 8,
-  //     location: "Downtown District",
-  //     phone: "+1 (555) 123-4567",
-  //     email: "sarah.johnson@abode.com",
-  //     specialties: ["Luxury Homes", "Commercial Properties", "Investment Properties"],
-  //     languages: ["English", "Spanish"],
-  //     certifications: ["CRS", "GRI", "ABR"],
-  //     bio: "Sarah is a dedicated real estate professional with over 8 years of experience in luxury and commercial properties. She has helped hundreds of clients find their dream homes.",
-  //     achievements: ["Top Agent 2023", "Million Dollar Club", "Client Choice Award"],
-  //     responseTime: "< 1 hour",
-  //     commission: "2.5%",
-  //     available: true
-  //   },
-  //   {
-  //     id: 2,
-  //     firstName: "David",
-  //     lastName: "Martinez",
-  //     title: "Property Investment Specialist",
-  //     avatar: "https://randomuser.me/api/portraits/men/46.jpg",
-  //     rating: 4.8,
-  //     reviewCount: 89,
-  //     totalSales: 1800000,
-  //     propertiesSold: 32,
-  //     activeListings: 8,
-  //     yearsExperience: 6,
-  //     location: "Business District",
-  //     phone: "+1 (555) 234-5678",
-  //     email: "david.martinez@abode.com",
-  //     specialties: ["Investment Properties", "Market Analysis", "First-Time Buyers"],
-  //     languages: ["English", "Portuguese"],
-  //     certifications: ["CCIM", "CRS"],
-  //     bio: "David specializes in investment properties and helps clients build their real estate portfolios with strategic market analysis and expert guidance.",
-  //     achievements: ["Rising Star 2023", "Investment Expert Award"],
-  //     responseTime: "< 2 hours",
-  //     commission: "2.75%",
-  //     available: true
-  //   },
-  //   {
-  //     id: 3,
-  //     firstName: "Emily",
-  //     lastName: "Thompson",
-  //     title: "Residential Sales Expert",
-  //     avatar: "https://randomuser.me/api/portraits/women/63.jpg",
-  //     rating: 4.9,
-  //     reviewCount: 156,
-  //     totalSales: 3200000,
-  //     propertiesSold: 67,
-  //     activeListings: 15,
-  //     yearsExperience: 10,
-  //     location: "Suburban Areas",
-  //     phone: "+1 (555) 345-6789",
-  //     email: "emily.thompson@abode.com",
-  //     specialties: ["Family Homes", "First-Time Buyers", "Relocation Services"],
-  //     languages: ["English", "French"],
-  //     certifications: ["ABR", "GRI", "SRS"],
-  //     bio: "Emily has been helping families find their perfect homes for over a decade. She specializes in residential sales and relocation services.",
-  //     achievements: ["Top Producer 2023", "Family Choice Award", "Excellence in Service"],
-  //     responseTime: "< 30 minutes",
-  //     commission: "2.5%",
-  //     available: true
-  //   },
-  //   {
-  //     id: 4,
-  //     firstName: "Michael",
-  //     lastName: "Chen",
-  //     title: "Commercial Real Estate Agent",
-  //     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-  //     rating: 4.7,
-  //     reviewCount: 74,
-  //     totalSales: 5600000,
-  //     propertiesSold: 28,
-  //     activeListings: 6,
-  //     yearsExperience: 12,
-  //     location: "Financial District",
-  //     phone: "+1 (555) 456-7890",
-  //     email: "michael.chen@abode.com",
-  //     specialties: ["Commercial Properties", "Office Buildings", "Retail Spaces"],
-  //     languages: ["English", "Mandarin"],
-  //     certifications: ["CCIM", "SIOR"],
-  //     bio: "Michael is a commercial real estate expert with extensive experience in office buildings and retail spaces in the financial district.",
-  //     achievements: ["Commercial Expert 2023", "Deal of the Year Award"],
-  //     responseTime: "< 1 hour",
-  //     commission: "3.0%",
-  //     available: false
-  //   },
-  //   {
-  //     id: 5,
-  //     firstName: "Jessica",
-  //     lastName: "Williams",
-  //     title: "Luxury Home Specialist",
-  //     avatar: "https://randomuser.me/api/portraits/women/28.jpg",
-  //     rating: 4.8,
-  //     reviewCount: 93,
-  //     totalSales: 4100000,
-  //     propertiesSold: 38,
-  //     activeListings: 9,
-  //     yearsExperience: 7,
-  //     location: "Upscale Neighborhoods",
-  //     phone: "+1 (555) 567-8901",
-  //     email: "jessica.williams@abode.com",
-  //     specialties: ["Luxury Homes", "Waterfront Properties", "Estate Sales"],
-  //     languages: ["English"],
-  //     certifications: ["CLHMS", "CRS"],
-  //     bio: "Jessica specializes in luxury and waterfront properties, providing exceptional service to high-end clients seeking premium real estate.",
-  //     achievements: ["Luxury Agent 2023", "Waterfront Specialist Award"],
-  //     responseTime: "< 45 minutes",
-  //     commission: "2.8%",
-  //     available: true
-  //   },
-  //   {
-  //     id: 6,
-  //     firstName: "Robert",
-  //     lastName: "Davis",
-  //     title: "New Construction Specialist",
-  //     avatar: "https://randomuser.me/api/portraits/men/55.jpg",
-  //     rating: 4.6,
-  //     reviewCount: 61,
-  //     totalSales: 2800000,
-  //     propertiesSold: 34,
-  //     activeListings: 11,
-  //     yearsExperience: 9,
-  //     location: "Development Areas",
-  //     phone: "+1 (555) 678-9012",
-  //     email: "robert.davis@abode.com",
-  //     specialties: ["New Construction", "Custom Homes", "Builder Relations"],
-  //     languages: ["English"],
-  //     certifications: ["New Home Sales"],
-  //     bio: "Robert works exclusively with new construction and custom homes, maintaining strong relationships with local builders and developers.",
-  //     achievements: ["New Home Expert 2023", "Builder Partnership Award"],
-  //     responseTime: "< 3 hours",
-  //     commission: "2.5%",
-  //     available: true
-  //   }
-  // ];
-
-  const filteredAgents = data?.filter(agent => {
-    const matchesSearch = 
-      agent?.agency?.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-      // agent.specialties.some(specialty => 
-      //   specialty.toLowerCase().includes(searchTerm.toLowerCase())
-      // ) ||
-      agent?.agency?.address?.toLowerCase()?.includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = 
-      filterBy === "all" ||
-      (filterBy === "available" && agent?.agency.status);
-      // (filterBy === "luxury" && agent.specialties.includes("Luxury Homes")) ||
-      // (filterBy === "commercial" && agent.specialties.includes("Commercial Properties")) ||
-      // (filterBy === "investment" && agent.specialties.includes("Investment Properties"));
-    
-    return matchesSearch && matchesFilter;
+  const [dataState, setDataState] = useState<AgentInterface[]>([{...AgentInitialObject}] as AgentInterface[]);
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const savedPage = getCookie('page');
+    return savedPage ? Number(savedPage) : 1;
   });
-
-  const sortedAgents = [...filteredAgents].sort((a, b) => {
-    switch (sortBy) {
-      case "rating":
-        return b?.agency.rating - a?.agency.rating;
-      case "experience":
-        // Uncomment and use if yearsExperience is available
-        // return b.yearsExperience - a.yearsExperience;
-        return 0;
-      case "name":
-        return a?.agency.name.localeCompare(b?.agency.name);
-      default:
-        return 0;
-    }
-  });
+  const recordsPerPage : number = 10;
+  const lastIndex : number = currentPage * recordsPerPage;
+  const firstIndex : number = lastIndex - recordsPerPage;
+  const records = data?.slice(firstIndex, lastIndex);
+  const nPage = Math.ceil(data?.length / recordsPerPage);
+  const numbers = Array.from({ length: nPage }, (_, i) => i + 1).slice();
 
   useEffect(() => {
     setIsLoading(true);
@@ -207,6 +39,7 @@ const Agents = () => {
     .then((response) => {
       if(response.data.success){
         setData(response.data.data);
+        setDataState(response.data.data);
       }else{
         setErrorObj({...errorMsg, flag : true, msg : response.data.message});
       }
@@ -214,10 +47,47 @@ const Agents = () => {
 
     }).catch((err) => {
       setErrorObj({...errorMsg, flag : true, msg : err?.response?.data?.message});
-      //throw
       setIsLoading(false);
     })
+    
   },[]);
+
+  useEffect(() => {
+      if(searchTerm === "") {
+        // If search term is empty, reset to original data
+        setData(dataState);
+        return;
+      }
+      const filteredData = dataState.filter((agent) => 
+        agent.agency.name.toLowerCase().includes(searchTerm) ||
+        agent.agency.address.toLowerCase().includes(searchTerm) ||
+        agent.agency.email.toLowerCase().includes(searchTerm) ||
+        agent.agency.agencyPhoneNumber.includes(searchTerm) ||
+        agent.propertyTypes.some((type) => 
+          type.name.toLowerCase().includes(searchTerm)
+        )
+      );
+      setData(filteredData);
+  },[searchTerm]);
+
+  useEffect(() => {
+    if (filterBy === "all") {
+      setData(dataState)
+    } else if (filterBy === "available") {
+      setData(dataState.filter(agent => agent?.agency?.status));
+    }
+  },[filterBy, data]);
+
+   useEffect(() => {
+    if (sortBy === "") {
+      setData(dataState)
+    } else if (sortBy === "name") {
+      setData(dataState.sort((a,b) =>  a.agency.name.localeCompare(b.agency.name)));
+    }else if (sortBy === "rating") {
+      setData(dataState.sort((a,b) =>  b.agency.rating - a.agency.rating));
+    }
+  },[sortBy, data]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
@@ -268,33 +138,20 @@ const Agents = () => {
               viewMode={viewMode}
               setViewMode={setViewMode}
               totalAgents={data.length}
-              filteredCount={sortedAgents.length}
+              filteredCount={data.length}
               availableCount={data.filter(a => a?.agency?.status).length}
             />
 
             {/* Agents Grid/List */}
             <section className="py-8">
               <div className="container mx-auto px-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {sortedAgents.map((agent) => (
-                      <AgentCard key={agent?.agency.id} agent={agent} />
-                    ))}
-                  </div>
-                {/* {viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {sortedAgents.map((agent) => (
-                      <AgentCard key={agent?.agency.id} agent={agent} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-4 max-w-6xl mx-auto">
-                    {sortedAgents.map((agent) => (
-                      <AgentListItem key={agent?.agency.id} agent={agent} />
-                    ))}
-                  </div>
-                )} */}
-                
-                {sortedAgents.length === 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {records.map((agent) => (
+                    <AgentCard key={agent?.agency.id} agent={agent} />
+                  ))}
+                </div>
+              
+                {data.length === 0 && (
                   <div className="text-center py-16">
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto">
                       <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -303,6 +160,7 @@ const Agents = () => {
                     </div>
                   </div>
                 )}
+                {numbers.length > 1 && <Pagination _data={numbers} currentPage={currentPage} setCurrentPage={setCurrentPage}/>}
               </div>
             </section>
           </>

@@ -2,7 +2,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Search,
@@ -12,8 +11,11 @@ import {
   TrendingUp,
   SlidersHorizontal
 } from "lucide-react";
+import { AgentInterface } from "../../../../utils/interfaces";
 
 interface AgentFiltersProps {
+  // data : AgentInterface[];
+  // setData : Function;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
   sortBy: string;
@@ -23,7 +25,7 @@ interface AgentFiltersProps {
   viewMode: "grid" | "list";
   setViewMode: (mode: "grid" | "list") => void;
   totalAgents: number;
-  filteredCount: number;
+  filteredCount?: number;
   availableCount: number;
 }
 
@@ -34,8 +36,6 @@ const AgentFilters = ({
   setSortBy,
   filterBy,
   setFilterBy,
-  viewMode,
-  setViewMode,
   totalAgents,
   filteredCount,
   availableCount
@@ -52,7 +52,9 @@ const AgentFilters = ({
                 <Input
                   placeholder="Search by name, specialty, or location..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value)
+                  }}
                   className="pl-10 border-0 bg-gray-50/80 focus:bg-white transition-colors"
                 />
               </div>
@@ -66,9 +68,9 @@ const AgentFilters = ({
                   <SelectContent>
                     <SelectItem value="all">All Agents</SelectItem>
                     <SelectItem value="available">Available</SelectItem>
-                    <SelectItem value="luxury">Luxury</SelectItem>
+                    {/* <SelectItem value="Sales">Sales</SelectItem>
                     <SelectItem value="commercial">Commercial</SelectItem>
-                    <SelectItem value="investment">Investment</SelectItem>
+                    <SelectItem value="investment">Investment</SelectItem> */}
                   </SelectContent>
                 </Select>
                 
@@ -79,8 +81,8 @@ const AgentFilters = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rating">Top Rated</SelectItem>
-                    <SelectItem value="experience">Experience</SelectItem>
-                    <SelectItem value="sales">Sales Volume</SelectItem>
+                    {/* <SelectItem value="experience">Experience</SelectItem>
+                    <SelectItem value="sales">Sales Volume</SelectItem> */}
                     <SelectItem value="name">Name A-Z</SelectItem>
                   </SelectContent>
                 </Select>

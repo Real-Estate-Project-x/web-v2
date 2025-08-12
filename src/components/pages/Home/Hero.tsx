@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Home, Building2, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&q=80",
@@ -17,6 +18,7 @@ const Hero = () => {
   const [searchText, setSearchText] = useState("");
   const [location, setLocation] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,7 +31,8 @@ const Hero = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchText, "in:", location, "with filter:", activeFilter);
+   // console.log("Searching for:", searchText, "in:", location, "with filter:", activeFilter);
+    router.push(`/properties/search?query=${encodeURIComponent(searchText)}&location=${encodeURIComponent(location)}&filter=${activeFilter}`);
   };
 
   
@@ -56,8 +59,8 @@ const Hero = () => {
             }}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 via-navy-900/60 to-transparent" />
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1E3A8A]/80 via-[#1E3A8A]/60 to-transparent" />
+      </div> 
 
       {/* Hero Content */}
       <div className="container mx-auto px-4 z-10 relative mt-4">
