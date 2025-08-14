@@ -256,7 +256,7 @@ const Properties = () => {
             setIsLoading(false);
             console.error("Error fetching properties:", error);
         });
-    },[copyData, properties]);
+    },[]);
 
    
   return (
