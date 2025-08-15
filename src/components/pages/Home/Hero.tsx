@@ -151,7 +151,7 @@ const Hero = () => {
                     <Input
                       ref={searchRef}
                       type="text"
-                      placeholder="Property type, price range..."
+                      placeholder="Property type (I.E Flat, Duplex, Warehouse)..."
                       value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
                       className="pl-12 h-14 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base"
