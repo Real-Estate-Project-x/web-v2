@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ const heroImages = [
 
 const Hero = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeFilter, setActiveFilter] = useState("Buy");
+  const [activeFilter, setActiveFilter] = useState("Rent");
   const [searchText, setSearchText] = useState("");
   const [location, setLocation] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -25,17 +25,18 @@ const Hero = () => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
     }, 6000);
     return () => clearInterval(interval);
-
   }, []);
-
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-   // console.log("Searching for:", searchText, "in:", location, "with filter:", activeFilter);
-    router.push(`/properties/search?query=${encodeURIComponent(searchText)}&location=${encodeURIComponent(location)}&filter=${activeFilter}`);
+    // console.log("Searching for:", searchText, "in:", location, "with filter:", activeFilter);
+    router.push(
+      `/properties/search?query=${encodeURIComponent(
+        searchText
+      )}&location=${encodeURIComponent(location)}&filter=${activeFilter}`
+    );
   };
 
-  
   const quickSearchOptions = [
     { icon: Home, label: "Homes for Sale", count: "2,847" },
     { icon: Building2, label: "New Construction", count: "523" },
@@ -60,7 +61,7 @@ const Hero = () => {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-r from-[#1E3A8A]/80 via-[#1E3A8A]/60 to-transparent" />
-      </div> 
+      </div>
 
       {/* Hero Content */}
       <div className="container mx-auto px-4 z-10 relative mt-4">
@@ -69,7 +70,9 @@ const Hero = () => {
           <div className="space-y-8">
             {/* Badge */}
             <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-              <span className="text-sm text-white font-medium">🏡 Over 15,000+ Properties Available</span>
+              <span className="text-sm text-white font-medium">
+                🏡 Over 15,000+ Properties Available
+              </span>
             </div>
 
             {/* Main Heading */}
@@ -77,10 +80,13 @@ const Hero = () => {
               <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
                 Find Your Perfect
                 {/* <span className="block text-real-300 font-serif italic">Home Sweet Home</span> */}
-                <span className="bg-gradient-to-r from-[#0253CC] to-[#00A6FB] bg-clip-text text-transparent block text-real-300 font-serif italic">Home Sweet Home</span>
+                <span className="bg-gradient-to-r from-[#0253CC] to-[#00A6FB] bg-clip-text text-transparent block text-real-300 font-serif italic">
+                  Home Sweet Home
+                </span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 max-w-lg leading-relaxed">
-                Discover exceptional properties with personalized recommendations and expert guidance every step of the way.
+                Discover exceptional properties with personalized
+                recommendations and expert guidance every step of the way.
               </p>
             </div>
 
@@ -107,7 +113,7 @@ const Hero = () => {
               <div className="space-y-6">
                 {/* Filter Tabs */}
                 <div className="flex flex-wrap gap-2">
-                  {["Buy", "Rent", "Sell", "Estimate"].map((filter) => (
+                  {["Rent", "Sale"].map((filter) => (
                     <Button
                       key={filter}
                       type="button"
@@ -163,7 +169,9 @@ const Hero = () => {
 
                 {/* Quick Search Options */}
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-gray-600">Popular Searches</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Popular Searches
+                  </p>
                   <div className="grid gap-2">
                     {quickSearchOptions.map((option, index) => (
                       <button
@@ -172,9 +180,13 @@ const Hero = () => {
                       >
                         <div className="flex items-center gap-3">
                           <option.icon className="h-4 w-4 text-real-600" />
-                          <span className="text-sm font-medium text-navy-700">{option.label}</span>
+                          <span className="text-sm font-medium text-navy-700">
+                            {option.label}
+                          </span>
                         </div>
-                        <span className="text-xs text-gray-500">{option.count}</span>
+                        <span className="text-xs text-gray-500">
+                          {option.count}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -187,9 +199,18 @@ const Hero = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="flex flex-col items-center gap-2 cursor-pointer animate-bounce"
-             onClick={() => window.scrollTo({ top: window.innerHeight - 100, behavior: 'smooth' })}>
-          <span className="text-white/70 text-sm font-medium">Scroll to explore</span>
+        <div
+          className="flex flex-col items-center gap-2 cursor-pointer animate-bounce"
+          onClick={() =>
+            window.scrollTo({
+              top: window.innerHeight - 100,
+              behavior: "smooth",
+            })
+          }
+        >
+          <span className="text-white/70 text-sm font-medium">
+            Scroll to explore
+          </span>
           <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
             <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
           </div>
@@ -200,5 +221,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
-
