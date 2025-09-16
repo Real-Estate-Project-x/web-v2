@@ -1,12 +1,10 @@
 'use client';
 
-
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 import { 
   Select,
   SelectContent,
@@ -166,15 +164,13 @@ const AgentPropertiesManager = () => {
   ];
 
   // Filter and sort properties
-  const filteredAndSortedProperties = allProperties
-    .filter(property => {
+  const filteredAndSortedProperties = allProperties.filter(property => {
       const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         property.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
         property.type.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === "all" || property.status.toLowerCase() === statusFilter.toLowerCase();
       return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
+    }).sort((a, b) => {
       let aValue, bValue;
       switch (sortBy) {
         case "price":

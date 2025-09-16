@@ -360,7 +360,7 @@ const PropertyDetails = () => {
   };
 
   useEffect(() => { 
-    axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id')}`)
+    axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id') as string}`)
       .then((response) => { 
           if(response.data.success) {
             setProperty(response.data.data?.property || {} as PropertyInterface);

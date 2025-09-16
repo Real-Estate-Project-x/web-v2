@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface Agent {
     name: string;
     role: string;
@@ -155,6 +157,7 @@ export interface LocationsInterface {
 export interface NavDataInterface{
   href: string;
   label: string | React.ReactNode;
+  icon ?: any;
 } 
 
 export interface CommentInterface{
@@ -242,3 +245,171 @@ export const AgentInitialObject = {
   viewingsCount:0
 
 };
+
+export interface SearchPropertyInterfaceType {
+  label: string;
+  property: {
+    id: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    description: string;
+    address: string;
+    agencyId: string;
+    architecturalPlanUrls: string[];
+    averageBroadbandSpeedInMegabytes: number;
+    bluepoddRating: number;
+    geoCoordinates: {
+      latitude: number;
+      longitude: number;
+    };
+    grandTotalPrice: number;
+    hasCarParking: boolean;
+    hasCctv: boolean;
+    hasGym: boolean;
+    hasKidsPlayArea: boolean;
+    hasLaundry: boolean;
+    hasWifi: boolean;
+    isNewBuilding: boolean;
+    isPetFriendly: boolean;
+    isPropertyBlocked: boolean;
+    isPropertyBoosted: boolean;
+    isPropertyTaken: boolean;
+    noOfBedrooms: number;
+    noOfKitchens: number;
+    noOfToilets: number;
+    paymentCoverageDuration: string;
+    additionalCosts: { price: number; title: string }[];
+    agency: {
+    id: string;
+    status: boolean;
+    dateCreated: string;
+    dateOfIncorporation: string;
+    dateUpdated: string;
+    description: string;
+    address: string;
+    email: string;
+    logo: string;
+    name: string;
+    rating: number;
+    rcNumber: string;
+    agencyPhoneNumber: string;
+    whatsappNumber: string;
+    agencyCACDump: Record<string, any>;
+    createdByUserId: string;
+    isRegistered: boolean;
+    inPersonViewingFee: number | null;
+  };
+  photoUrls: string[];
+  postedByUser: {
+    id: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    address: string | null;
+    appleRefreshToken: string | null;
+    authProvider: string;
+    deviceTokens: string[];
+    email: string;
+    firstName: string;
+    formattedPhoneNumber: string;
+    googleRefreshToken: string | null;
+    lastName: string;
+    phoneNumber: string;
+    profileImage: string;
+    roleId: string;
+    thirdPartyUserId: string | null;
+    verificationCode: string | null;
+  };
+  postedByUserId: string;
+  price: number;
+  propertyCategory: string;
+  propertyType: {
+    id: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    name: string;
+    tag: string;
+  };
+  propertyTypeId: string;
+  sizeInSquareFeet: number;
+  state: {
+    id: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    capital: string;
+    countryId: string;
+    initials: string;
+    name: string;
+  };
+  stateId: string;
+  threeDimensionalModelUrl: string;
+  title: string;
+  upFor: string;
+  videoUrl: string;
+  };
+  propertyId: string;
+}
+
+
+// export const SearchPropertyInterface: SearchPropertyInterfaceType = {
+//   label: "Search Result",
+//   property: {
+//     id: "692c5374-e382-4b89-97bd-a393a8e1a342",
+//     status: true,
+//     dateCreated: "2025-08-12T11:13:46.219Z",
+//     dateUpdated: "2025-08-12T11:13:46.219Z",
+//     description: "affordable 1 bedroom mini flat ideal for first-time buyers",
+//     address: "17 sabon gari market road, sabon gari, kaduna",
+//     agencyId: "8b6c7c37-72b5-4db8-9184-214f32b8b68d",
+//     architecturalPlanUrls: ["https://www.google.com"],
+//     averageBroadbandSpeedInMegabytes: 320,
+//     bluepoddRating: 0,
+//     geoCoordinates: {
+//       latitude: 8.882612179920129,
+//       longitude: 11.378938077009188,
+//     },
+//     grandTotalPrice: 0,
+//     hasCarParking: false,
+//     hasCctv: false,
+//     hasGym: false,
+//     hasKidsPlayArea: false,
+//     hasLaundry: true,
+//     hasWifi: true,
+//     isNewBuilding: false,
+//     isPetFriendly: false,
+//     isPropertyBlocked: false,
+//     isPropertyBoosted: false,
+//     isPropertyTaken: false,
+//     noOfBedrooms: 1,
+//     noOfKitchens: 1,
+//     noOfToilets: 1,
+//     paymentCoverageDuration: "YEARLY",
+//     additionalCosts: [
+//       { price: 35000, title: "Property verification" },
+//       { price: 20000, title: "Title search" },
+//     ],
+//   },
+//   agency: {
+//     id: "8b6c7c37-72b5-4db8-9184-214f32b8b68d",
+//     status: true,
+//     dateCreated: "2025-07-28T15:04:47.839Z",
+//     dateOfIncorporation: "2025-07-28",
+//     dateUpdated: "2025-07-28T15:04:47.839Z",
+//     description: "This is a test description",
+//     address: "no. 50 alatunji road",
+//     email: "j.oluwa@example.com",
+//     logo: "https://cdn.pixabay.com/photo/2025/03/06/17/45/duck-9451249_1280.jpg",
+//     name: "oluwafemi's agency",
+//     rating: 0,
+//     rcNumber: "1234567",
+//     agencyPhoneNumber: "08034567890",
+//     whatsappNumber: "08034567890",
+//     agencyCACDump: {},
+//     createdByUserId: "64e06d75-61cb-4069-bf8d-c59b3552d95e",
+//     isRegistered: true,
+//     inPersonViewingFee: null,
+//   },
+// };

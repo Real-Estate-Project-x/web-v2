@@ -131,7 +131,7 @@ const Viewings = () => {
   const filteredAndSortedViewings = viewings
     .filter(viewing => {
       const matchesSearch = viewing.propertyAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           viewing.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+        viewing.clientName.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === "all" || viewing.status === statusFilter;
       return matchesSearch && matchesStatus;
     })

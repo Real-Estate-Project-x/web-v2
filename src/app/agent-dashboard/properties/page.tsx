@@ -1,8 +1,10 @@
-import AgentPropertiesManager from "@/components/Agency/components/Properties";
+// import AgentPropertiesManager from "@/components/Agency/components/Properties";
 
 
-export default function Agent() {
+export default function AgentPropertiesManagerPage() {
   return (
-    <AgentPropertiesManager/>
+    <>
+      {/* <AgentPropertiesManager/> */}
+    </>
   );
 }

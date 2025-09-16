@@ -135,6 +135,17 @@ export const LoaderViewProperty : FC = () => {
   );
 }
 
+export const SearchResultsLoaderCard : FC = () => {
+  return(
+    <div className="">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div className="w-full h-64 animate-pulse bg-slate-200 rounded-lg shadow-md p-6 mb-6" key={index}>
+            
+        </div>
+      ))}
+    </div>
+  );
+}
 export const AgentLoaderCard  : FC = () => {
   return (
     <div className="w-full container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 m-8">

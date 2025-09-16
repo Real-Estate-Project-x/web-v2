@@ -23,9 +23,9 @@ const PopularLocations : FC<Location> = ({data}) => {
           <LoaderCardPopularLocations/>) 
           : 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {data.map((location : LocationsInterface) => (
+            {data.slice(0,3).map((location : LocationsInterface) => (
               <div key={location.state.id}
-                className="group relative overflow-hidden rounded-lg cursor-pointer h-[30vh]"
+                className="group relative overflow-hidden rounded-lg cursor-pointer h-[50vh]"
                 onClick={() => router.push(`/properties/by-state?stateId=${location.state.id}&name=${location.state.name}`)}>
 
                 <div className="aspect-w-16 aspect-h-9">

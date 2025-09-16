@@ -1,9 +1,10 @@
-// Make sure this path is correct
-import Viewings from "@/components/Agency/components/Agent-viewings";
+// import Viewings from "@/components/Agency/components/Agent-viewings";
 
 
-export default function AgentViewings() {
+export default function AgentViewingsPage() {
   return (
-    <Viewings/>
+    <>
+    {/* <Viewings/> */}
+    </>
   );
 }

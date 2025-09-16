@@ -1,8 +1,9 @@
-import Settings from "@/components/Agency/components/Settings";
+// import Settings from "@/components/Agency/components/Settings";
 
 
 export default function AgentSettingsPage() {
   return (
-    <Settings/>
+    <></>
+    // <Settings/>
   );
 }

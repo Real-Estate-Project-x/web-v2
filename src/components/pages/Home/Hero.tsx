@@ -2,9 +2,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Home, Building2, TrendingUp } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Search, Home, Building2, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&q=80",
@@ -14,13 +21,29 @@ const heroImages = [
 
 const Hero = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeFilter, setActiveFilter] = useState("Rent");
-  const [searchText, setSearchText] = useState("");
-  const [location, setLocation] = useState("");
+  const [searchText, setSearchText] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
   const searchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [highlights, setHighlights] = useState<{total : number, totalForRent : number, totalForSale : number}>({
+    total: 0,
+    totalForRent: 0,
+    totalForSale: 0,
+  });
 
   useEffect(() => {
+    axiosInstance.get("/property/customer-listings/metrics/highlights")
+    .then((response) => {
+      setHighlights({
+        total: response.data.data.total,
+        totalForRent: response.data.data.totalForRent,
+        totalForSale: response.data.data.totalForSale,
+      });
+    }).catch((error) => { 
+      console.error("Error fetching highlights:", error);
+    });
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
     }, 6000);
@@ -29,18 +52,18 @@ const Hero = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // console.log("Searching for:", searchText, "in:", location, "with filter:", activeFilter);
+    setLoading(true);
     router.push(
       `/properties/search?query=${encodeURIComponent(
         searchText
-      )}&location=${encodeURIComponent(location)}&filter=${activeFilter}`
+      )}&filter=${encodeURIComponent(category)}`
     );
   };
 
   const quickSearchOptions = [
-    { icon: Home, label: "Homes for Sale", count: "2,847" },
-    { icon: Building2, label: "New Construction", count: "523" },
-    { icon: TrendingUp, label: "Price Reduced", count: "194" },
+    { icon: Home, label: "Homes for Sale", count: highlights.totalForSale },
+    { icon: Building2, label: "Properties for Rent", count: highlights.totalForRent },
+    { icon: TrendingUp, label: "Total Properties", count: highlights.total },
   ];
 
   return (
@@ -112,7 +135,7 @@ const Hero = () => {
             <div className="bg-white/95 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20">
               <div className="space-y-6">
                 {/* Filter Tabs */}
-                <div className="flex flex-wrap gap-2">
+                {/* <div className="flex flex-wrap gap-2">
                   {["Rent", "Sale"].map((filter) => (
                     <Button
                       key={filter}
@@ -129,22 +152,10 @@ const Hero = () => {
                       {filter}
                     </Button>
                   ))}
-                </div>
+                </div> */}
 
                 {/* Search Form */}
                 <form onSubmit={handleSearch} className="space-y-4">
-                  {/* Location Input */}
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
-                      type="text"
-                      placeholder="Enter city, neighborhood, or ZIP"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="pl-12 h-14 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base"
-                    />
-                  </div>
-
                   {/* Property Type Input */}
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -157,13 +168,26 @@ const Hero = () => {
                       className="pl-12 h-14 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base"
                     />
                   </div>
+                  <div className="relative">
+                    <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Select
+                    onValueChange={(value) => setCategory(value)}>
+                      <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                      <SelectItem value="RENT">Rent</SelectItem>
+                      <SelectItem value="SALE">Sale</SelectItem>
+          
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   {/* Search Button */}
-                  <Button
-                    type="submit"
-                    className="w-full h-14 bg-[#0253CC] hover:bg-real-700 text-white text-lg font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Search Properties
+                  <Button type="submit"
+                    disabled={loading}
+                    className="w-full h-14 bg-[#0253CC] hover:bg-real-700 text-white text-lg font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    {loading ? "Searching..." : "Search Properties"}
                   </Button>
                 </form>
 
@@ -176,7 +200,7 @@ const Hero = () => {
                     {quickSearchOptions.map((option, index) => (
                       <button
                         key={index}
-                        className="flex items-center justify-between p-3 text-left hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                        className="flex items-center justify-between p-2 text-left hover:bg-gray-50 rounded-lg transition-colors duration-200"
                       >
                         <div className="flex items-center gap-3">
                           <option.icon className="h-4 w-4 text-real-600" />

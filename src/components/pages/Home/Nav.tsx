@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FC } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, Search, X } from "lucide-react";
+import { Home, Menu, Search, X, Building2, Users2, Contact } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavDataInterface } from "../../../../utils/interfaces";
@@ -12,11 +12,11 @@ type NavData = {
   
 }
 
-  const defaultNavData =[
-    { href: "/", label: "Home" },
-    { href: "/properties", label: "Properties" },
-    { href: "/agents", label: "Agents" },
-    { href: "/contact", label: "Contact" },
+  const defaultNavData = [
+    { href: "/", label: "Home" , icon : Home},
+    { href: "/properties", label: "Properties", icon : Building2 },
+    { href: "/agents", label: "Agents", icon : Users2 },
+    { href: "/contact", label: "Contact", icon :Contact  },
   ]
 const Navbar :FC<NavData> = ({data = defaultNavData}) => {
 
@@ -68,10 +68,11 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
             <Link 
               key={navItem.href}
               href={navItem.href} 
-              className={`hover:text-real-300 transition-colors ${
+              className={`hover:text-real-300 transition-colors flex items-center gap-1 ${
                 pathname === "/" ? scrolled ? "text-[#1E3A8A] font-normal" : "text-gray-200" : pathname === navItem.href ? "text-[#1E3A8A] font-semibold text-shadow-lg" : "text-black"
               }`}
             >
+              <navItem.icon size={18} className="inline-block mr-1" />
               {navItem.label}
             </Link>
           ))}
@@ -111,10 +112,11 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
               <Link 
                 key={navItem.href}
                 href={navItem.href} 
-                className={`block py-2 hover:text-real-300 transition-colors border-b border-slate-200 font-light ${
+                className={`block py-2 flex items-center gap-1 hover:text-real-300 transition-colors border-b border-slate-200 font-light ${
                 pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
               }`}
               >
+                <navItem.icon size={18} className="inline-block mr-1" />
                 {navItem.label}
               </Link>
             ))}
