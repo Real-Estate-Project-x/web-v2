@@ -88,6 +88,70 @@ export interface TopAgentInterface {
 }
 
 
+export interface ViewPropertyInterface {
+  isViewed : boolean;
+  property : Partial<PropertyInterface>;
+  similarProperties : Partial<PropertyInterface>[];
+
+}
+
+//  const sampleInitialObject : ViewPropertyInterface = {
+//   //write an initial object for the above interface
+//   isViewed : false,
+//   property : {
+//     id: "",
+//     title: "",
+//     description: "",    
+//     address: "",
+//     stateId: "",
+//     agencyId: "",     
+//     postedByUserId: "",
+//     propertyTypeId: "",
+//     propertyType : {
+//       id: "",
+//       name: "",
+//       status: false,  
+//       dateCreated: "",
+//       dateUpdated: "",
+//     },  
+//     propertyCategory: "",
+//     upFor: "",
+//     price: 0, 
+//     grandTotalPrice: 0, 
+//     additionalCosts: [],
+//     paymentCoverageDuration: "",
+//     sizeInSquareFeet: 0,
+//     noOfBedrooms: 0,
+//     noOfToilets: 0, 
+//     noOfKitchens: 0,
+//     hasCarParking: false,
+//     hasLaundry: false,        
+//     hasWifi: false,
+//     hasCctv:false,
+//     hasGym: false,
+//     hasKidsPlayArea:false,  
+//     averageBroadbandSpeedInMegabytes: 0,
+//     bluepoddRating: 0,
+//     isPropertyBlocked: false, 
+//     isPropertyBoosted: false,
+//     isPropertyTaken: false,
+//     status: false,  
+//     dateCreated: "",      
+//     dateUpdated: "",
+//     photoUrls: [],
+//     videoUrl: "",
+//     architecturalPlanUrls: [],
+//     isNewBuilding : false,
+//     threeDimensionalModelUrl: "", 
+//     geoCoordinates: {
+//       latitude: 0,
+//       longitude: 0, 
+//     },
+
+//   },
+//   similarProperties : []
+// }
+
 export interface PropertyInterface {
   id: string;
   title: string;
@@ -108,7 +172,7 @@ export interface PropertyInterface {
   upFor: string;
   price: number;
   grandTotalPrice: number;
-  additionalCosts: { name: string; amount: number }[];
+  additionalCosts: { title: string; amount: number }[];
   paymentCoverageDuration: string;
   sizeInSquareFeet: number;
   noOfBedrooms: number;
@@ -137,7 +201,7 @@ export interface PropertyInterface {
     latitude: number;
     longitude: number;
   };
-  similarProperties :  any[];
+  similarProperties ?:  any[];
 }
 
 export interface LocationsInterface {

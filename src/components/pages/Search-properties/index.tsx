@@ -21,6 +21,34 @@ const SearchResults = () => {
   const [searchResults, setSearchResults] = useState<SearchPropertyInterfaceType[]>([] as SearchPropertyInterfaceType[]);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [togglePrice , setTogglePrice] =  useState<boolean>(false);
+  const [toggleDate, setToggleDate] = useState<boolean>(false);
+
+  //how to sort by price
+  const sortByPrice = () => {
+    const sortedData = [...searchResults].sort((a, b) => { 
+      if(togglePrice) {
+        return (b?.property?.price || 0) - (a?.property?.price || 0);
+      }
+      return (a?.property?.price || 0) - (b?.property?.price || 0);
+    
+    });
+    setTogglePrice(!togglePrice);
+    setSearchResults(sortedData);
+  }
+
+  //sorting by date in ascending and descending order
+    const sortByDate = () => {      
+        const sortedData = [...searchResults].sort((a, b) => {  
+            if(toggleDate) {        
+                return new Date(b?.property?.dateCreated || "").getTime() - new Date(a?.property?.dateCreated || "").getTime();
+            }   
+            return new Date(a?.property?.dateCreated || "").getTime() - new Date(b?.property?.dateCreated || "").getTime();
+        });
+        setToggleDate(!toggleDate);
+        setSearchResults(sortedData);
+    } 
+
   useEffect(() => {
     const query = searchParams.get('query') as string;
     const filter = searchParams.get('filter') as string;
@@ -94,7 +122,7 @@ const SearchResults = () => {
 
             {/* Search Results */}
 
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6 h-auto mb-8">
                 <div className="w-fit bg-white p-1 mb-4 text-black rounded-full shadow-sm cursor-pointer"
                     onClick={() => router.back()}>
                     <ChevronLeft/>
@@ -105,8 +133,10 @@ const SearchResults = () => {
                         <p className="text-gray-600">Found {searchResults.length} properties matching your criteria</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Sort by Price</Button>
-                        <Button variant="outline" size="sm">Sort by Date</Button>
+                        <Button variant="outline" size="sm"
+                        onClick={sortByPrice}>Sort by Price</Button>
+                        <Button variant="outline" size="sm"
+                        onClick={sortByDate}>Sort by Date</Button>
                     </div>
                 </div>
                 {loading && (

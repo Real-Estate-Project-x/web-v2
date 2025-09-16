@@ -188,11 +188,11 @@ export const PropertyList : FC<Props> = ({array}) => {
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute top-4 left-4 flex gap-2">
-                            <Badge className={`${property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"} hover:bg-real-700 capitalize`}>{new String(property.upFor).toLowerCase()}</Badge>
+                            <Badge className={`${property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"} hover:bg-real-700 capitalize px-4 py-2 rounded-full`}>{new String(property.upFor).toLowerCase()}</Badge>
                             {property.isNewBuilding && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>}
                         </div>
                         <div className="absolute bottom-4 right-4">
-                            <Badge className="bg-gray-100 text-navy-900">{formatPrice(property.price)}</Badge>
+                            <Badge className="bg-gray-100 text-navy-900 p-2 rounded-full">{formatPrice(property.price)}</Badge>
                         </div>
                     </div>
                     <div className="p-5 capitalize">

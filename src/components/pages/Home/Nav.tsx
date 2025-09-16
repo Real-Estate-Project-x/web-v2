@@ -43,7 +43,7 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
 
   return (
     <nav 
-      className={`fixed top-0 w-full z-50 transition-all duration-300 shadow-sm ${
+      className={`fixed top-0 w-full z-50 transition-all duration-300 shadow ${
         pathname === "/" ?
         scrolled 
           ? "bg-white border-gray-200 text-gray-800 " 

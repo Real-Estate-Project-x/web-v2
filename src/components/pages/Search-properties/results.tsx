@@ -2,9 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, MapPin, Heart, Share, Phone, ArrowLeft } from "lucide-react";
+import { Bed, Bath, Square, MapPin, Heart, Share, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { SearchPropertyInterfaceType } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
 
@@ -13,7 +13,7 @@ type Props = {
 };
 
 const SearchResultsList : FC<Props> = ({data}) => {
-    const router = useRouter();
+  const router = useRouter();
 
   return (
     <div className="space-y-6">
@@ -95,7 +95,7 @@ const SearchResultsList : FC<Props> = ({data}) => {
                   <Button 
                     size="sm"
                     className="bg-[#2563EB] hover:bg-[#1D4ED8]"
-                    onClick={() => router.push(`/properties/${property?.property.id}`)}>
+                    onClick={() => router.push(`/properties/view?id=${property?.property.id}`)}>
                       View Details
                   </Button>
                   </div>
