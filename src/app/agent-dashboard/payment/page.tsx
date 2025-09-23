@@ -1,10 +1,12 @@
 
-// import Payouts from "@/components/Agency/components/Payments";
+import Payouts from "@/components/Agency/components/Payments";
+import AgentLayout from "@/components/Agency/layout";
 
 
 export default function PaymentsPage() {
   return (
-    <></>
-  //  <Payouts/>
+    <AgentLayout>
+      <Payouts/>
+    </AgentLayout>
   );
 }

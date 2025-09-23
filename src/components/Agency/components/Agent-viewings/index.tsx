@@ -20,7 +20,6 @@ import {
   Eye,
   MessageCircle
 } from "lucide-react";
-import Navbar from "@/components/pages/Home/Nav";
 import { agentDashboardData } from "../..";
 import Link from "next/link";
 
@@ -156,12 +155,11 @@ const Viewings = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar data={agentDashboardData}/>
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8 mt-16">
-          <h1 className="text-3xl font-bold mb-2">Scheduled Viewings</h1>
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold mb-2">Scheduled Viewings</h1>
           <p className="text-muted-foreground">Manage your property viewings and client appointments</p>
         </div>
 

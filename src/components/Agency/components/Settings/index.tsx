@@ -8,8 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Bell, User, Shield, Palette, Globe, CreditCard, Settings as SettingsIcon } from "lucide-react";
-import Navbar from "@/components/pages/Home/Nav";
-import { agentDashboardData } from "../..";
 
 
 const Settings = () => {
@@ -37,11 +35,10 @@ const Settings = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar data={agentDashboardData} />
       <main className="flex-1 bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 mt-16">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
               <SettingsIcon className="h-8 w-8" />
               Settings
             </h1>

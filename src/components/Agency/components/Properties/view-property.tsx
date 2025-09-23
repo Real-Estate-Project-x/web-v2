@@ -95,7 +95,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">{property.title}</DialogTitle>
         </DialogHeader>

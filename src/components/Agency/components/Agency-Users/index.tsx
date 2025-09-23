@@ -23,13 +23,11 @@ import {
   User, 
   Mail, 
   Phone, 
-  TrendingUp, 
   Home,
   DollarSign,
   Star
 } from "lucide-react";
 import UserDetailsModal from "./dialogs/view-agency-user";
-import Navbar from "@/components/pages/Home/Nav";
 import { agentDashboardData } from "../..";
 
 interface AgencyUsersViewProps {
@@ -190,10 +188,13 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
 
   return (
     <>
-    <Navbar data={agentDashboardData}/>
     <div className="container mx-auto space-y-6">
       {/* Summary Widgets */}
-      <div className="mt-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+       <div className="my-4">
+          <h2 className="text-2xl font-semibold">Users</h2>
+          <p className="text-muted-foreground">View and track User activity</p>
+        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Sub-Agents</CardTitle>

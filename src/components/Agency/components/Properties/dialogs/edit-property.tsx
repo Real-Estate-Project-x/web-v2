@@ -113,7 +113,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
           <DialogTitle>Edit Property</DialogTitle>
         </DialogHeader>

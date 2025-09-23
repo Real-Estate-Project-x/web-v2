@@ -1,7 +1,7 @@
 
 'use client';
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,15 +20,12 @@ import {
   DollarSign, 
   TrendingUp, 
   Calendar, 
-  MapPin, 
   User, 
   Filter,
   Search,
   Download,
   CreditCard
 } from "lucide-react";
-import Navbar from "@/components/pages/Home/Nav";
-import { agentDashboardData } from "../..";
 
 interface PayoutEntry {
   id: string;
@@ -161,14 +158,13 @@ const Payouts = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar data={agentDashboardData} />
       
-      <div className="container mx-auto px-4 py-8 mt-16">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Payouts & Earnings</h1>
+              <h1 className="text-2xl font-semibold mb-2">Payouts & Earnings</h1>
               <p className="text-muted-foreground">Track your commission earnings and manage payouts</p>
             </div>
             <Button 

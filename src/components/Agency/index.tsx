@@ -1,6 +1,6 @@
 'use client';
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,16 +10,18 @@ import {
   TrendingUp, 
   DollarSign, 
   Users, 
-  Calendar,
   Star,
   Phone,
   Mail,
   MapPin,
   Bell,
   Settings,
+  Building2,
+  Users2,
+  SearchIcon,
+  WalletCards,
   
 } from "lucide-react";
-import Navbar from "../pages/Home/Nav";
 import PropertyStatsChart from "./components/Dashboard/property-stats-chart";
 import RevenueChart from "./components/Dashboard/revenue-chart";
 import TopPerformingProperties from "./components/Dashboard/top-performing-properties";
@@ -43,17 +45,19 @@ import RecentActivities from "./components/Dashboard/recent-activities";
   };
 
 export const agentDashboardData = [
-    { href: "/agent-dashboard", label: "Dashboard" },
-    { href: "/agent-dashboard/properties", label: "Properties" },
-    { href: "/agent-dashboard/users", label: "Users" },
-    { href: "/agent-dashboard/viewings", label: "Viewings" },
-    { href: "/agent-dashboard/payment", label: "Payouts" },
-    {href : "/agent-dashboard/notifications", label: <Bell className="h-4 w-4"/>},
-    {href : "/agent-dashboard/settings", label: <Settings className="h-4 w-4"/>},
-    { href: "/agent-dashboard/profile", label: <Avatar className="h-10 w-10">
-        <AvatarImage src={agentData.avatar} alt={agentData.name} />
-        <AvatarFallback>{agentData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-    </Avatar> }
+    { href: "/agent-dashboard", label: "overview", id: "overview", icon : Home},
+    { href: "/agent-dashboard/properties", label: "Properties", id:"properties", icon: Building2 },
+    { href: "/agent-dashboard/users", label: "Users", id:"users", icon: Users2 },
+    { href: "/agent-dashboard/viewings", label: "Viewings", id:"viewings", icon: SearchIcon },
+    { href: "/agent-dashboard/payment", label: "Payouts", id:"payouts", icon: WalletCards },
+    {href : "/agent-dashboard/notifications", label:'Notifications', id:"notifications", icon:Bell},
+    {href : "/agent-dashboard/settings", label:'Settings',id : "settings", icon : Settings},
+    // {href : "/agent-dashboard/profile", label:'Profile',id : "profile", icon : Avatar},
+    // { href: "/agent-dashboard/profile", label: '',  icon : <Avatar className="h-10 w-10">
+    //     <AvatarImage src={agentData.avatar} alt={agentData.name} />
+    //     <AvatarFallback>{agentData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+    // </Avatar>
+    // }
 ];
 
 const AgentDashboard = () => {
@@ -96,9 +100,8 @@ const AgentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar data={agentDashboardData}/>
-      
-      <div className="container mx-auto px-4 py-8 mt-16">
+ 
+      <div className="container mx-auto px-4 py-8">
         {/* Agent Profile Header */}
         <div className="mb-8">
           <Card>
@@ -124,7 +127,7 @@ const AgentDashboard = () => {
                       </div>
                     </div>
                     
-                    <div className="flex flex-col sm:flex-row gap-2">
+                    {/* <div className="flex flex-col sm:flex-row gap-2">
                       <Button variant="outline" size="sm">
                         <Phone className="h-4 w-4 mr-2" />
                         Call
@@ -133,7 +136,7 @@ const AgentDashboard = () => {
                         <Mail className="h-4 w-4 mr-2" />
                         Email
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                   
                   <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">

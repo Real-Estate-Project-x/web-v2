@@ -31,7 +31,6 @@ import {
   SortDesc,
   Upload
 } from "lucide-react";
-import Navbar from "@/components/pages/Home/Nav";
 import AgentPropertyView from "./view-property";
 import PropertyUploadForm from "./dialogs/upload-property";
 import PropertyEditForm from "./dialogs/edit-property";
@@ -218,8 +217,7 @@ const AgentPropertiesManager = () => {
 
   return (
     <>
-        <Navbar data={agentDashboardData}/>
-        <div className="container mx-auto space-y-6 p-6 mt-16">
+        <div className="w-full mx-auto space-y-6 p-6">
         
         {/* Header with Add Property Button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

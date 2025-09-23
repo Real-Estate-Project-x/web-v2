@@ -15,15 +15,10 @@ import {
   Home, 
   DollarSign, 
   Calendar,
-  Users,
-  Mail,
   MessageSquare,
-  TrendingUp,
   AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
-import Navbar from "@/components/pages/Home/Nav";
-import { agentDashboardData } from "../..";
 
 interface Notification {
   id: number;
@@ -180,90 +175,91 @@ const AgentNotifications = () => {
   };
 
   return (
-    <>
-        <Navbar data={agentDashboardData}/>
-        <div className="container mx-auto space-y-6 p-6">
-        {/* Notifications Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-12">
-            <div>
-            <h2 className="text-2xl font-bold">Notifications</h2>
-            <p className="text-muted-foreground">
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Notifications Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+              <h2 className="text-2xl font-semibold">Notifications</h2>
+              <p className="text-muted-foreground py-2">
                 Stay updated with your real estate activities
-            </p>
-            </div>
-            <div className="flex items-center gap-2">
-            <Badge variant="secondary">
-                {unreadCount} unread
-            </Badge>
-            {actionRequiredCount > 0 && (
-                <Badge variant="destructive">
-                {actionRequiredCount} action required
-                </Badge>
-            )}
-            <Button variant="outline" size="sm" onClick={markAllAsRead}>
-                <Check className="h-4 w-4 mr-2" />
-                Mark all read
-            </Button>
-            </div>
+              </p>
+              </div>
+              <div className="flex items-center gap-2">
+              <Badge variant="secondary">
+                  {unreadCount} unread
+              </Badge>
+              {actionRequiredCount > 0 && (
+                  <Badge variant="destructive">
+                  {actionRequiredCount} action required
+                  </Badge>
+              )}
+              <Button variant="outline" size="sm" onClick={markAllAsRead}>
+                  <Check className="h-4 w-4 mr-2" />
+                  Mark all read
+              </Button>
+              </div>
+          </div>
+
+          {/* Notifications Tabs */}
+          <Tabs defaultValue="all" className="space-y-6">
+              <TabsList className="grid w-full lg:w-[400px] grid-cols-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="unread">
+                  Unread ({unreadCount})
+              </TabsTrigger>
+              <TabsTrigger value="action">
+                  Action Required
+              </TabsTrigger>
+              <TabsTrigger value="high">
+                  High Priority
+              </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all">
+              <NotificationsList
+                  notifications={filterNotifications("all")}
+                  onMarkAsRead={markAsRead}
+                  onDelete={deleteNotification}
+                  getNotificationIcon={getNotificationIcon}
+                  getNotificationColor={getNotificationColor}
+              />
+              </TabsContent>
+
+              <TabsContent value="unread">
+              <NotificationsList
+                  notifications={filterNotifications("unread")}
+                  onMarkAsRead={markAsRead}
+                  onDelete={deleteNotification}
+                  getNotificationIcon={getNotificationIcon}
+                  getNotificationColor={getNotificationColor}
+              />
+              </TabsContent>
+
+              <TabsContent value="action">
+              <NotificationsList
+                  notifications={filterNotifications("action")}
+                  onMarkAsRead={markAsRead}
+                  onDelete={deleteNotification}
+                  getNotificationIcon={getNotificationIcon}
+                  getNotificationColor={getNotificationColor}
+              />
+              </TabsContent>
+
+              <TabsContent value="high">
+              <NotificationsList
+                  notifications={filterNotifications("high")}
+                  onMarkAsRead={markAsRead}
+                  onDelete={deleteNotification}
+                  getNotificationIcon={getNotificationIcon}
+                  getNotificationColor={getNotificationColor}
+              />
+              </TabsContent>
+          </Tabs>
         </div>
-
-        {/* Notifications Tabs */}
-        <Tabs defaultValue="all" className="space-y-6">
-            <TabsList className="grid w-full lg:w-[400px] grid-cols-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="unread">
-                Unread ({unreadCount})
-            </TabsTrigger>
-            <TabsTrigger value="action">
-                Action Required
-            </TabsTrigger>
-            <TabsTrigger value="high">
-                High Priority
-            </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="all">
-            <NotificationsList
-                notifications={filterNotifications("all")}
-                onMarkAsRead={markAsRead}
-                onDelete={deleteNotification}
-                getNotificationIcon={getNotificationIcon}
-                getNotificationColor={getNotificationColor}
-            />
-            </TabsContent>
-
-            <TabsContent value="unread">
-            <NotificationsList
-                notifications={filterNotifications("unread")}
-                onMarkAsRead={markAsRead}
-                onDelete={deleteNotification}
-                getNotificationIcon={getNotificationIcon}
-                getNotificationColor={getNotificationColor}
-            />
-            </TabsContent>
-
-            <TabsContent value="action">
-            <NotificationsList
-                notifications={filterNotifications("action")}
-                onMarkAsRead={markAsRead}
-                onDelete={deleteNotification}
-                getNotificationIcon={getNotificationIcon}
-                getNotificationColor={getNotificationColor}
-            />
-            </TabsContent>
-
-            <TabsContent value="high">
-            <NotificationsList
-                notifications={filterNotifications("high")}
-                onMarkAsRead={markAsRead}
-                onDelete={deleteNotification}
-                getNotificationIcon={getNotificationIcon}
-                getNotificationColor={getNotificationColor}
-            />
-            </TabsContent>
-        </Tabs>
-        </div>
-    </>
+      </main>
+    </div>
   );
 };
 
