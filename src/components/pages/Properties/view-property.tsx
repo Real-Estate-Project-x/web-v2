@@ -1,5 +1,5 @@
 'use client';
-import { Bed, Heart, MapPin, Mail, Phone, Calendar, Star, StarHalf, Wifi, Dumbbell, WashingMachine, MessageCircle, FileImage, FileText, Car, Video, Users, Eye } from "lucide-react";
+import { Bed, Heart, MapPin, Star, StarHalf, Wifi, Dumbbell, WashingMachine, MessageCircle, Video, Eye } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";

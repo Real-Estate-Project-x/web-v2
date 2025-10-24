@@ -44,3 +44,11 @@ export const encryptData = <T>(rawData: T, encryptionKey: string): string => {
   }
   return AES.encrypt(data, encryptionKey).toString();
 };
+
+export const convertDateCreatedToGetNumberOfDays = (dateCreated: string) => {
+  const createdDate = new Date(dateCreated);
+  const currentDate = new Date();
+  const timeDifference = currentDate.getTime() - createdDate.getTime();
+  const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+  return daysDifference;
+}

@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Button } from "../ui/button"
+import { cn } from "@/lib/utils";
 
 export default function LoadingCard() {
   return (
@@ -179,6 +180,28 @@ export const AgentLoaderCard  : FC = () => {
               <div className="w-full items-center gap-2 mb-4 bg-white"/>
           </div>
         </div>
+      ))}
+    </div>
+  );
+}
+
+interface LoadingCardProps {
+  lines?: number;
+  className?: string;
+}
+
+export function LoaderCard({ lines = 3, className }: LoadingCardProps) {
+  return (
+    <div className={cn("space-y-3", className)}>
+      {Array.from({ length: lines }).map((_, i) => (
+        <div
+          key={i}
+          className="h-4 bg-muted animate-pulse rounded"
+          style={{
+            width: `${Math.random() * 30 + 70}%`,
+            animationDelay: `${i * 100}ms`,
+          }}
+        />
       ))}
     </div>
   );

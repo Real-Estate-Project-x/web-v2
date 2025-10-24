@@ -418,6 +418,126 @@ export interface SearchPropertyInterfaceType {
 }
 
 
+export interface AgentDatabaseInterface {
+  id: string;
+  title: string;
+  description: string;
+  address: string;
+  stateId: string;
+  state: {
+    id: string;
+    name: string;
+    initials: string;
+    capital: string;
+    countryId: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+  };
+  agencyId: string;
+  agency: {
+    id: string;
+    name: string;
+    description: string;
+    address: string;
+    email: string;
+    logo: string;
+    rcNumber: string;
+    dateOfIncorporation: string;
+    agencyPhoneNumber: string;
+    whatsappNumber: string;
+    isRegistered: boolean;
+    rating: number;
+    agencyCACDump: Record<string, any>;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    createdByUserId: string;
+    inPersonViewingFee: number | null;
+  };
+  postedByUserId: string;
+  postedByUser: {
+    id: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    roleId: string;
+    address?: string | null;
+    appleRefreshToken?: string | null;
+    authProvider?: string;
+    deviceTokens?: string[];
+    email?: string;
+    firstName?: string;
+    formattedPhoneNumber?: string;
+    googleRefreshToken?: string | null;
+    lastName?: string;
+    phoneNumber?: string;
+    profileImage?: string;
+    thirdPartyUserId?: string | null;
+    verificationCode?: string | null;
+  };
+  propertyTypeId: string;
+  propertyType: {
+    id: string;
+    name: string;
+    status: boolean;
+    dateCreated: string;
+    dateUpdated: string;
+    tag: string;
+  };
+  propertyCategory: string;
+  upFor: string;
+  price: number;
+  grandTotalPrice: number;
+  additionalCosts: { price: number; title: string }[];
+  paymentCoverageDuration: string;
+  sizeInSquareFeet: number;
+  noOfBedrooms: number;
+  noOfToilets: number;
+  noOfKitchens: number;
+  hasCarParking: boolean;
+  hasLaundry: boolean;
+  hasWifi: boolean;
+  hasCctv: boolean;
+  hasGym: boolean;
+  hasKidsPlayArea: boolean;
+  isNewBuilding: boolean;
+  isPetFriendly: boolean;
+  isPropertyBlocked: boolean;
+  isPropertyBoosted: boolean;
+  isPropertyTaken: boolean;
+  averageBroadbandSpeedInMegabytes: number;
+  bluepoddRating: number;
+  status: boolean;
+  dateCreated: string;
+  dateUpdated: string;
+  photoUrls: string[];
+  videoUrl: string;
+  architecturalPlanUrls: string[];
+  threeDimensionalModelUrl: string;
+  geoCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
+export interface PropertyTypesInterface{
+  dateCreated : string;
+  dateUpdated : string;
+  id : string;
+  name : string;
+  status: boolean;
+  tag : string;
+} 
+
+export interface AgentUsersInterface{
+  activeSubAgents: any[];
+  customers: any[];
+  rating: number;
+  totalCustomers: number;
+  totalListings: number;
+  totalSubAgents: number;
+}
 // export const SearchPropertyInterface: SearchPropertyInterfaceType = {
 //   label: "Search Result",
 //   property: {

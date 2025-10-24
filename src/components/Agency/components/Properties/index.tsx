@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,10 @@ import AgentPropertyView from "./view-property";
 import PropertyUploadForm from "./dialogs/upload-property";
 import PropertyEditForm from "./dialogs/edit-property";
 import { agentDashboardData } from "../..";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
+import { convertDateCreatedToGetNumberOfDays, formatPrice } from "../../../../../utils/helpers";
+import PropertyListingDialog from "./dialogs/new-upload";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,173 +50,65 @@ const AgentPropertiesManager = () => {
   const [viewAgentProperty, setViewAgentProperty] = useState<boolean>(false);
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
-  // Mock properties data
-  const allProperties = [
-    {
-      id: 1,
-      title: "Modern Downtown Condo",
-      address: "123 Oak Street",
-      price: 485000,
-      type: "Condo",
-      status: "Active",
-      bedrooms: 2,
-      bathrooms: 2,
-      sqft: 1200,
-      daysOnMarket: 12,
-      views: 245,
-      isBoosted: true,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-15"
-    },
-    {
-      id: 2,
-      title: "Family House with Garden",
-      address: "456 Maple Avenue",
-      price: 675000,
-      type: "Single Family",
-      status: "Pending",
-      bedrooms: 4,
-      bathrooms: 3,
-      sqft: 2400,
-      daysOnMarket: 8,
-      views: 189,
-      isBoosted: false,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-20"
-    },
-    {
-      id: 3,
-      title: "Luxury Townhouse",
-      address: "789 Pine Road",
-      price: 825000,
-      type: "Townhouse",
-      status: "Sold",
-      bedrooms: 3,
-      bathrooms: 2.5,
-      sqft: 1850,
-      daysOnMarket: 25,
-      views: 167,
-      isBoosted: true,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-05"
-    },
-    {
-      id: 4,
-      title: "Cozy Studio Apartment",
-      address: "321 Elm Street",
-      price: 285000,
-      type: "Condo",
-      status: "Active",
-      bedrooms: 1,
-      bathrooms: 1,
-      sqft: 650,
-      daysOnMarket: 5,
-      views: 98,
-      isBoosted: false,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-25"
-    },
-    {
-      id: 5,
-      title: "Spacious Ranch Home",
-      address: "654 Birch Lane",
-      price: 550000,
-      type: "Single Family",
-      status: "Active",
-      bedrooms: 3,
-      bathrooms: 2,
-      sqft: 1800,
-      daysOnMarket: 18,
-      views: 134,
-      isBoosted: false,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-10"
-    },
-    {
-      id: 6,
-      title: "Urban Loft",
-      address: "987 Cedar Court",
-      price: 425000,
-      type: "Condo",
-      status: "Active",
-      bedrooms: 2,
-      bathrooms: 1,
-      sqft: 1100,
-      daysOnMarket: 22,
-      views: 156,
-      isBoosted: true,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-08"
-    },
-    {
-      id: 7,
-      title: "Suburban Villa",
-      address: "159 Willow Way",
-      price: 750000,
-      type: "Single Family",
-      status: "Pending",
-      bedrooms: 4,
-      bathrooms: 3,
-      sqft: 2200,
-      daysOnMarket: 15,
-      views: 201,
-      isBoosted: false,
-      image: "/placeholder.svg",
-      dateAdded: "2024-01-18"
-    }
-  ];
+  const [property, setProperty] = useState<AgentDatabaseInterface>({} as AgentDatabaseInterface);
+  const [properties, setProperties] = useState<AgentDatabaseInterface[]>([] as AgentDatabaseInterface[]);
 
-  // Filter and sort properties
-  const filteredAndSortedProperties = allProperties.filter(property => {
-      const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.type.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "all" || property.status.toLowerCase() === statusFilter.toLowerCase();
-      return matchesSearch && matchesStatus;
-    }).sort((a, b) => {
-      let aValue, bValue;
-      switch (sortBy) {
-        case "price":
-          aValue = a.price;
-          bValue = b.price;
-          break;
-        case "date":
-          aValue = new Date(a.dateAdded).getTime();
-          bValue = new Date(b.dateAdded).getTime();
-          break;
-        case "views":
-          aValue = a.views;
-          bValue = b.views;
-          break;
-        default:
-          aValue = a.daysOnMarket;
-          bValue = b.daysOnMarket;
-      }
-      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+  useEffect(() => {
+    axiosInstance.get(`/property/agency-property-list/${agencyId}`)
+    .then((response) => {
+      setProperties(response.data.data);
+    }).catch((err) => {
+      console.log({err});
     });
+  },[]);
+
+  
+  const filteredAndSortedProperties = properties.filter(property => {
+    const matchesSearch =
+      property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.propertyType?.tag?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      (property.status && statusFilter.toLowerCase() === "active") ||
+      (!property.status && statusFilter.toLowerCase() === "sold");
+
+    return matchesSearch && matchesStatus;
+  })
+  .sort((a, b) => {
+    let aValue, bValue;
+    switch (sortBy) {
+      case "price":
+        aValue = a.price;
+        bValue = b.price;
+        break;
+      case "date":
+        aValue = new Date(a.dateCreated).getTime();
+        bValue = new Date(b.dateCreated).getTime();
+        break;
+      default:
+        aValue = convertDateCreatedToGetNumberOfDays(a.dateCreated);
+        bValue = convertDateCreatedToGetNumberOfDays(b.dateCreated);
+    }
+    return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+  });
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedProperties.length / propertiesPerPage);
   const startIndex = (currentPage - 1) * propertiesPerPage;
   const currentProperties = filteredAndSortedProperties.slice(startIndex, startIndex + propertiesPerPage);
 
+  const agencyId = "8b6c7c37-72b5-4db8-9184-214f32b8b68d";
+
   const getStatusBadge = (status: string) => {
     const variants = {
-      "Active": "default",
-      "Pending": "secondary",
+      "Rent": "default",
+      "Sale": "secondary",
       "Sold": "outline"
     } as const;
     
-    return <Badge variant={variants[status as keyof typeof variants] || "outline"} className={`${status === "Active" && "bg-green-200 text-green 500"}`}>{status}</Badge>;
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    return <Badge variant={variants[status as keyof typeof variants] || "outline"} className={`p-2 font-normal rounded-full ${status && "bg-green-200 text-green 500"}`}>{status ? "Active" : "Sold"}</Badge>;
   };
 
   return (
@@ -239,7 +135,7 @@ const AgentPropertiesManager = () => {
 
         {/* Search and Filters */}
         <Card>
-            <CardContent className="px-4 ">
+          <CardContent className="px-4 ">
             <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
                 <div className="relative">
@@ -262,7 +158,7 @@ const AgentPropertiesManager = () => {
                     <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
+                    {/* <SelectItem value="pending">Pending</SelectItem> */}
                     <SelectItem value="sold">Sold</SelectItem>
                     </SelectContent>
                 </Select>
@@ -274,7 +170,7 @@ const AgentPropertiesManager = () => {
                     <SelectContent>
                     <SelectItem value="date">Date Added</SelectItem>
                     <SelectItem value="price">Price</SelectItem>
-                    <SelectItem value="views">Views</SelectItem>
+                    {/* <SelectItem value="views">Views</SelectItem> */}
                     <SelectItem value="daysOnMarket">Days on Market</SelectItem>
                     </SelectContent>
                 </Select>
@@ -282,76 +178,81 @@ const AgentPropertiesManager = () => {
                 <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                >
+                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
                     {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
                 </Button>
                 </div>
             </div>
-            </CardContent>
+          </CardContent>
         </Card>
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentProperties.map((property) => (
+          {currentProperties.map((property) => (
             <Card key={property.id} className="overflow-hidden pt-0">
                 <div className="relative">
                 <img
-                    src={property.image}
+                    src={property.photoUrls[0]}
                     alt={property.title}
                     className="w-full h-48 object-cover"
                     // width={0}
                     // height={0}
                 />
-                {property.isBoosted && (
+                {/* {property.isBoosted && (
                     <div className="absolute top-2 right-2">
                     <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                         <Zap className="h-3 w-3 mr-1" />
                         Boosted
                     </Badge>
                     </div>
-                )}
+                )} */}
                 <div className="absolute top-2 left-2">
-                    {getStatusBadge(property.status)}
+                    {getStatusBadge(property.upFor)}
                 </div>
                 </div>
                 
                 <CardContent className="p-4">
                 <div className="space-y-3">
                     <div>
-                    <h3 className="font-semibold text-lg">{property.title}</h3>
+                    <h3 className="font-semibold text-lg capitalize">{property.title}</h3>
                     <p className="text-sm text-muted-foreground">{property.address}</p>
                     <p className="text-xl font-bold text-primary">{formatPrice(property.price)}</p>
                     </div>
                     
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{property.bedrooms} bed • {property.bathrooms} bath</span>
-                    <span>{property.sqft} sqft</span>
+                    <span>{property.noOfBedrooms} bed • {property.noOfToilets} bath</span>
+                    <span>{property.sizeInSquareFeet} sqft</span>
                     </div>
                     
                     <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{property.views} views</span>
-                    <span className="text-muted-foreground">{property.daysOnMarket} days on market</span>
+                    {/* <span className="text-muted-foreground">{property.views} views</span> */}
+                    <span className="text-muted-foreground">{convertDateCreatedToGetNumberOfDays(property.dateCreated)} days on market</span>
                     </div>
                     
                     <div className="flex items-center justify-between pt-2">
                     <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => setViewAgentProperty(true)}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
+                        <Button size="sm" variant="outline" onClick={() => {
+                          setProperty(property);
+                          setViewAgentProperty(true);
+                        }}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => setEditProperty(true)}>
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
+                        <Button size="sm" variant="outline" onClick={() => {
+                          setProperty(property);
+                          setEditProperty(true);
+                        }}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
                         </Button>
                     </div>
                     
-                    {!property.isBoosted && (
+                    {/* {!property.isBoosted && (
                         <Button size="sm" variant="secondary">
                         <Zap className="h-4 w-4 mr-1" />
                         Boost
                         </Button>
-                    )}
+                    )} */}
                     </div>
                 </div>
                 </CardContent>
@@ -414,9 +315,10 @@ const AgentPropertiesManager = () => {
             </Card>
         )}
         </div>
-        <AgentPropertyView isOpen={viewAgentProperty} onClose={() => setViewAgentProperty(false)} onBoost={() => {}} property={allProperties[0]}/>
-        <PropertyUploadForm isOpen={uploadProperty} onClose={() => setUploadProperty(false)} onSubmit={() => {}}/>
-        <PropertyEditForm property={allProperties[1]} isOpen={editProperty} onClose={() => setEditProperty(false)} onSave={() => {}} />
+        <AgentPropertyView isOpen={viewAgentProperty} onClose={() => setViewAgentProperty(false)} onBoost={() => {}} property={property}/>
+        {/* <PropertyUploadForm isOpen={uploadProperty} onClose={() => setUploadProperty(false)} onSubmit={() => {}}/> */}
+        <PropertyListingDialog open={uploadProperty} onOpenChange={() => setUploadProperty(false)}/>
+        {/* <PropertyEditForm property={property} isOpen={editProperty} onClose={() => setEditProperty(false)} onSave={() => {}} /> */}
     </>
   );
 };

@@ -21,6 +21,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Save, X } from "lucide-react";
 import { toast } from "sonner";
+import { AgentDatabaseInterface } from "../../../../../../utils/interfaces";
+import { convertDateCreatedToGetNumberOfDays } from "../../../../../../utils/helpers";
 
 interface Property {
   id: number;
@@ -40,10 +42,10 @@ interface Property {
 }
 
 interface PropertyEditFormProps {
-  property: Property | null;
+  property: AgentDatabaseInterface | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (propertyData: Property) => void;
+  onSave: (propertyData: Partial<AgentDatabaseInterface>) => void;
 }
 
 const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
@@ -70,12 +72,12 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         title: property.title,
         address: property.address,
         price: property.price.toString(),
-        type: property.type,
-        status: property.status,
-        bedrooms: property.bedrooms.toString(),
-        bathrooms: property.bathrooms.toString(),
-        sqft: property.sqft.toString(),
-        description: `This beautiful ${property.type.toLowerCase()} offers ${property.bedrooms} bedrooms and ${property.bathrooms} bathrooms in a prime location.`
+        type: property.propertyType.name,
+        status: property.status ? "Active" : "Sold",
+        bedrooms: property.noOfBedrooms.toString(),
+        bathrooms: property.noOfToilets.toString(),
+        sqft: property.sizeInSquareFeet.toString(),
+        description: `This beautiful ${property.propertyType.name.toLowerCase()} offers ${property.noOfBedrooms} bedrooms and ${property.noOfToilets} bathrooms in a prime location.`
       });
     }
   }, [property]);
@@ -92,16 +94,16 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
       return;
     }
 
-    const updatedProperty: Property = {
+    const updatedProperty: Partial<AgentDatabaseInterface> = {
       ...property,
       title: formData.title,
       address: formData.address,
       price: parseFloat(formData.price),
-      type: formData.type,
-      status: formData.status,
-      bedrooms: parseInt(formData.bedrooms) || 0,
-      bathrooms: parseFloat(formData.bathrooms) || 0,
-      sqft: parseInt(formData.sqft) || 0
+      //type : formData.type,
+      status: formData.status.toLowerCase() === "active" ? true : false,
+      noOfBedrooms: parseInt(formData.bedrooms) || 0,
+      noOfToilets: parseFloat(formData.bathrooms) || 0,
+      sizeInSquareFeet: parseInt(formData.sqft) || 0
     };
 
     onSave(updatedProperty);
@@ -123,11 +125,11 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-sm text-muted-foreground">Property ID: #{property.id}</span>
-              {property.isBoosted && (
+              {/* {property.isBoosted && (
                 <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                   Boosted
                 </Badge>
-              )}
+              )} */}
             </div>
             
             <div>
@@ -250,15 +252,15 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
                 <span className="text-muted-foreground">Views:</span>
-                <span className="ml-2 font-medium">{property.views}</span>
+                {/* <span className="ml-2 font-medium">{property.views}</span> */}
               </div>
               <div>
                 <span className="text-muted-foreground">Days on Market:</span>
-                <span className="ml-2 font-medium">{property.daysOnMarket}</span>
+                <span className="ml-2 font-medium">{convertDateCreatedToGetNumberOfDays(property.dateCreated)}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Date Added:</span>
-                <span className="ml-2 font-medium">{new Date(property.dateAdded).toLocaleDateString()}</span>
+                <span className="ml-2 font-medium">{new Date(property.dateCreated).toLocaleDateString()}</span>
               </div>
             </div>
           </div>

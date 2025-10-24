@@ -28,26 +28,12 @@ import {
   Calendar,
   //DollarSign
 } from "lucide-react";
+import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
+import { convertDateCreatedToGetNumberOfDays, formatPrice } from "../../../../../utils/helpers";
 
-interface Property {
-  id: number;
-  title: string;
-  address: string;
-  price: number;
-  type: string;
-  status: string;
-  bedrooms: number;
-  bathrooms: number;
-  sqft: number;
-  daysOnMarket: number;
-  views: number;
-  isBoosted: boolean;
-  image: string;
-  dateAdded: string;
-}
 
 interface AgentPropertyViewProps {
-  property: Property | null;
+  property: AgentDatabaseInterface | null;
   isOpen: boolean;
   onClose: () => void;
   onBoost: (propertyId: number) => void;
@@ -61,22 +47,6 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
 }) => {
   if (!property) return null;
 
-  // Mock additional property images - in real app this would come from the property data
-  const propertyImages = [
-    property.image,
-    "https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&q=80"
-  ];
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -89,7 +59,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
   };
 
   const handleBoost = () => {
-    onBoost(property.id);
+    onBoost(1);
     onClose();
   };
 
@@ -105,7 +75,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
           <div className="relative">
             <Carousel className="w-full">
               <CarouselContent>
-                {propertyImages.map((image, index) => (
+                {property?.photoUrls?.map((image, index) => (
                   <CarouselItem key={index}>
                     <div className="relative">
                       <img
@@ -118,17 +88,17 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                         // fill
                         // sizes="33vw"
                       />
-                      {index === 0 && property.isBoosted && (
+                      {/* {index === 0 && property.isBoosted && (
                         <div className="absolute top-4 right-4">
                           <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                             <Zap className="h-3 w-3 mr-1" />
                             Boosted
                           </Badge>
                         </div>
-                      )}
+                      )} */}
                       {index === 0 && (
                         <div className="absolute top-4 left-4">
-                          {getStatusBadge(property.status)}
+                          {getStatusBadge(property.status ? "Active" : "Sold")}
                         </div>
                       )}
                     </div>
@@ -146,8 +116,8 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-3xl font-bold text-primary">{formatPrice(property.price)}</h3>
-                  <Badge variant="outline">{property.type}</Badge>
+                  <h3 className="text-3xl font-bold text-primary">{formatPrice(property?.price ? property.price : 0)}</h3>
+                  <Badge variant="outline">{property?.propertyType?.name}</Badge>
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <MapPin className="h-4 w-4 mr-2" />
@@ -160,21 +130,21 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                 <div className="flex items-center space-x-2">
                   <Bed className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-semibold">{property.bedrooms}</div>
+                    <div className="font-semibold">{property.noOfBedrooms}</div>
                     <div className="text-sm text-muted-foreground">Bedrooms</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Bath className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-semibold">{property.bathrooms}</div>
+                    <div className="font-semibold">{property.noOfToilets}</div>
                     <div className="text-sm text-muted-foreground">Bathrooms</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Square className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-semibold">{property.sqft}</div>
+                    <div className="font-semibold">{property.sizeInSquareFeet}</div>
                     <div className="text-sm text-muted-foreground">Sq Ft</div>
                   </div>
                 </div>
@@ -190,7 +160,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                     <div className="flex items-center space-x-4">
                       <Eye className="h-5 w-5 text-blue-500" />
                       <div>
-                        <div className="font-medium text-sm">{property.views}</div>
+                        <div className="font-medium text-sm">{"pending....."}</div>
                         <div className="text-sm text-muted-foreground text-sm">Views</div>
                       </div>
                     </div>
@@ -201,7 +171,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                     <div className="flex items-center space-x-4">
                       <Calendar className="h-5 w-5 text-green-500" />
                       <div>
-                        <div className="font-semibold text-sm">{property.daysOnMarket}</div>
+                        <div className="font-semibold text-sm">{convertDateCreatedToGetNumberOfDays(property.dateCreated)}</div>
                         <div className="text-sm text-muted-foreground text-sm">Days on Market</div>
                       </div>
                     </div>
@@ -210,7 +180,7 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
               </div>
               
               <div className="text-sm text-muted-foreground">
-                Listed on: {new Date(property.dateAdded).toLocaleDateString()}
+                Listed on: {new Date(property.dateCreated).toLocaleDateString()}
               </div>
             </div>
           </div>
@@ -219,15 +189,15 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
           <div>
             <h4 className="text-lg font-semibold mb-2">Property Description</h4>
             <p className="text-muted-foreground leading-relaxed text-sm">
-              This beautiful {property.type.toLowerCase()} offers {property.bedrooms} bedrooms and {property.bathrooms} bathrooms 
-              in a prime location. With {property.sqft} square feet of living space, this property provides excellent value 
+              This beautiful {property?.propertyType?.name.toLowerCase()} offers {property.noOfBedrooms} bedrooms and {property.noOfToilets} bathrooms 
+              in a prime location. With {property.sizeInSquareFeet} square feet of living space, this property provides excellent value 
               and has been attracting significant interest from potential buyers. The property features modern amenities 
               and is located in a desirable neighborhood with easy access to local amenities.
             </p>
           </div>
 
           <section className="my-4">
-            {!property.isBoosted && (
+            {/* {!property.isBoosted && (
               <Button onClick={handleBoost} className="bg-yellow-500 hover:bg-yellow-600">
                 <Zap className="h-4 w-4 mr-2" />
                 Boost Property
@@ -238,8 +208,22 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                 <Zap className="h-4 w-4 mr-2" />
                 Already Boosted
               </Button>
-            )}
+            )} */}
           </section>
+          {/* additional costs should be added */}
+          <p className="text-base pt-2 font-medium">Additional Costs</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {property?.additionalCosts && property.additionalCosts.length > 0
+              ? property.additionalCosts.map((cost, index) => (
+                  <div className="text-start" key={index}>
+                    <div className="text-lg font-semibold">{formatPrice(cost.price || 0)}</div>
+                    <p className="text-sm text-gray-600">{cost.title}</p>
+                  </div>
+                ))
+              : ''
+            }
+          </div>
+          
 
           {/* Action Buttons */}
           <div className="flex justify-between items-center pt-4 border-t">
