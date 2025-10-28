@@ -21,18 +21,15 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { 
-  Search, 
-  Plus, 
+  Search,
   Edit, 
   Eye, 
-  Zap, 
   Filter,
   SortAsc,
   SortDesc,
   Upload
 } from "lucide-react";
 import AgentPropertyView from "./view-property";
-import PropertyUploadForm from "./dialogs/upload-property";
 import PropertyEditForm from "./dialogs/edit-property";
 import { agentDashboardData } from "../..";
 import { axiosInstance } from "@/lib/axios-interceptor";
@@ -99,7 +96,7 @@ const AgentPropertiesManager = () => {
   const startIndex = (currentPage - 1) * propertiesPerPage;
   const currentProperties = filteredAndSortedProperties.slice(startIndex, startIndex + propertiesPerPage);
 
-  const agencyId = "8b6c7c37-72b5-4db8-9184-214f32b8b68d";
+  const agencyId = "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2"//"8b6c7c37-72b5-4db8-9184-214f32b8b68d";
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -126,10 +123,6 @@ const AgentPropertiesManager = () => {
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Property
             </Button>
-            {/* <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Property
-            </Button> */}
             </div>
         </div>
 
@@ -137,19 +130,19 @@ const AgentPropertiesManager = () => {
         <Card>
           <CardContent className="px-4 ">
             <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex-1">
+              <div className="flex-1">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                    placeholder="Search properties by title, address, or type..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                    />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                  placeholder="Search properties by title, address, or type..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                  />
                 </div>
-                </div>
+              </div>
                 
-                <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-full sm:w-[150px]">
                     <Filter className="h-4 w-4 mr-2" />
@@ -176,12 +169,12 @@ const AgentPropertiesManager = () => {
                 </Select>
 
                 <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
-                    {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+                  {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
                 </Button>
-                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -189,12 +182,12 @@ const AgentPropertiesManager = () => {
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentProperties.map((property) => (
-            <Card key={property.id} className="overflow-hidden pt-0">
+            <Card key={property.id} className="overflow-hidden pt-0 pb-4">
                 <div className="relative">
                 <img
                     src={property.photoUrls[0]}
                     alt={property.title}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-56 object-cover"
                     // width={0}
                     // height={0}
                 />
@@ -211,40 +204,40 @@ const AgentPropertiesManager = () => {
                 </div>
                 </div>
                 
-                <CardContent className="p-4">
+                <CardContent className="pb-4 px-4 pt-0">
                 <div className="space-y-3">
-                    <div>
+                  <div>
                     <h3 className="font-semibold text-lg capitalize">{property.title}</h3>
-                    <p className="text-sm text-muted-foreground">{property.address}</p>
+                    <p className="text-sm text-muted-foreground capitalize">{property.address}</p>
                     <p className="text-xl font-bold text-primary">{formatPrice(property.price)}</p>
-                    </div>
+                  </div>
                     
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span>{property.noOfBedrooms} bed • {property.noOfToilets} bath</span>
                     <span>{property.sizeInSquareFeet} sqft</span>
-                    </div>
+                  </div>
                     
-                    <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between text-sm">
                     {/* <span className="text-muted-foreground">{property.views} views</span> */}
                     <span className="text-muted-foreground">{convertDateCreatedToGetNumberOfDays(property.dateCreated)} days on market</span>
-                    </div>
+                  </div>
                     
-                    <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center justify-between pt-2">
                     <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => {
-                          setProperty(property);
-                          setViewAgentProperty(true);
-                        }}>
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => {
-                          setProperty(property);
-                          setEditProperty(true);
-                        }}>
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        setProperty(property);
+                        setViewAgentProperty(true);
+                      }}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        {/* View */}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        setProperty(property);
+                        setEditProperty(true);
+                      }}>
+                        <Edit className="h-4 w-4 mr-1" />
+                        {/* Edit */}
+                      </Button>
                     </div>
                     
                     {/* {!property.isBoosted && (
@@ -254,7 +247,7 @@ const AgentPropertiesManager = () => {
                         </Button>
                     )} */}
                     </div>
-                </div>
+                  </div>
                 </CardContent>
             </Card>
             ))}

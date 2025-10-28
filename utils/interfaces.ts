@@ -597,3 +597,27 @@ export interface AgentUsersInterface{
 //     inPersonViewingFee: null,
 //   },
 // };
+
+interface CountryInterface{
+  id: string;
+  code: string;
+  name: string;
+  status: boolean;
+  isSignupEnabled: boolean;
+  dateCreated: string;
+  dateUpdated: string;
+  createdByAdminUserId: string | null;
+  updatedByAdminUserId: string | null;
+}
+
+export interface CountryStatesInterface{
+  capital : string;
+  country : CountryInterface,
+  countryId : string;
+  dateCreated : string;
+  dateUpdated : string;
+  id : string;
+  initials : string;
+  name : string;
+  status : boolean;
+}

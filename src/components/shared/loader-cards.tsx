@@ -206,3 +206,21 @@ export function LoaderCard({ lines = 3, className }: LoadingCardProps) {
     </div>
   );
 }
+
+export function LoaderProcessor () {
+  return(
+    <div
+      id="loading-backdrop"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-200"
+      aria-hidden="false"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white/90 shadow-lg max-w-sm">
+        <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+        <p className="text-sm font-medium text-gray-700 text-center">Loading, please wait…</p>
+      </div>
+    </div>
+
+  );
+}

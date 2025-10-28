@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { X, Video } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -35,13 +34,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Home, MapPin, DollarSign, Image, Info } from "lucide-react";
+import { Building2, Home, Image, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { LoaderCard } from "@/components/shared/loader-cards";
+import { LoaderCard, LoaderProcessor } from "@/components/shared/loader-cards";
 import axios from "axios";
-import { PropertyTypesInterface } from "../../../../../../utils/interfaces";
+import { CountryStatesInterface, PropertyTypesInterface } from "../../../../../../utils/interfaces";
 
 const additionalCostSchema = z.object({
   title: z.string().min(1,""),
@@ -67,8 +66,8 @@ const propertySchema = z.object({
     longitude: z.number().min(-180).max(180),
   }),
   averageBroadbandSpeedInMegabytes: z.number().min(0),
-  videoUrl: z.string().url().optional().or(z.literal("")),
-  architecturalPlanUrls: z.array(z.string().url()),
+  videoUrl : z.array(z.string().url()).optional(),
+  architecturalPlanUrls: z.array(z.string().url()).optional(),
   noOfBedrooms: z.number().min(0),
   noOfToilets: z.number().min(0),
   noOfKitchens: z.number().min(0),
@@ -95,52 +94,55 @@ export default function PropertyListingDialog({
 }: PropertyListingDialogProps) {
     const [activeTab, setActiveTab] = useState("basic");
     const [images, setImages] = useState<File[]>([]);
-    const [videos, setVideos] = useState<File >();
+    const [videos, setVideos] = useState<File[]>([]);
     const [architechturalImages, setArchitechturalImages] = useState<File[]>([]);
-     const [imagesUrl, setImagesUrl] = useState<string[]>([]);
-    const [videosUrl, setVideosUrl] = useState<string>('');
+    const [imagesUrl, setImagesUrl] = useState<string[]>([]);
+    const [videosUrl, setVideosUrl] = useState<string[]>([]);
     const [architechturalImagesUrl, setArchitechturalImagesUrl] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [propertTypes, setPropertyTypes] = useState<PropertyTypesInterface[]>([] as PropertyTypesInterface[]);
-
-  const form = useForm<PropertyFormData, any, PropertyFormData>({
-    resolver: zodResolver(propertySchema),
-    defaultValues: {
-      propertyTypeId: "",
-      title: "",
-      address: "",
-      upFor: "SALE",
-      propertyCategory: "RESIDENTIAL",
-      description: "",
-      photoUrls: [],
-      price: 0,
-      additionalCosts: [],
-      paymentCoverageDuration: "YEARLY",
-      agencyId: "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2",
-      stateId: "",
-      sizeInSquareFeet: 0,
-      geoCoordinates: {
-        latitude: 0,
-        longitude: 0,
+    const [countryStates, setCountryStates] =  useState<CountryStatesInterface[]>([]);
+  
+    const form = useForm<PropertyFormData, any, PropertyFormData>({
+      resolver: zodResolver(propertySchema),
+      defaultValues: {
+        propertyTypeId: "",
+        title: "",
+        address: "",
+        upFor: "SALE",
+        propertyCategory: "RESIDENTIAL",
+        description: "",
+        photoUrls: [],
+        price: 0,
+        additionalCosts: [],
+        paymentCoverageDuration: "YEARLY",
+        agencyId: "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2",
+        stateId: "",
+        sizeInSquareFeet: 0,
+        geoCoordinates: {
+          latitude: 0,
+          longitude: 0,
+        },
+        averageBroadbandSpeedInMegabytes: 0,
+        videoUrl:[], //["https://ik.imagekit.io/un0omayok/f09cd4be-e7c6-470b-a065-f087c790fcc0_X05KfzbpyW.png"],
+        architecturalPlanUrls: [],
+        noOfBedrooms: 0,
+        noOfToilets: 0,
+        noOfKitchens: 0,
+        threeDimensionalModelUrl: "",
+        hasLaundry: false,
+        hasWifi: false,
+        hasCarParking: false,
+        hasKidsPlayArea: false,
+        hasCctv: false,
+        hasGym: false,
+        isNewBuilding: false,
       },
-      averageBroadbandSpeedInMegabytes: 0,
-      videoUrl: "",
-      architecturalPlanUrls: [],
-      noOfBedrooms: 0,
-      noOfToilets: 0,
-      noOfKitchens: 0,
-      threeDimensionalModelUrl: "",
-      hasLaundry: false,
-      hasWifi: false,
-      hasCarParking: false,
-      hasKidsPlayArea: false,
-      hasCctv: false,
-      hasGym: false,
-      isNewBuilding: false,
-    },
-  });
-  
-  
+    });
+
+    // Check if the form is valid for submission
+    const isFormValid = form.formState.isValid;
+    
     const handleFileUpload = (files: FileList | null, type: 'image' | 'video' | 'architecture') => {
       if (!files) return;
       
@@ -160,7 +162,7 @@ export default function PropertyListingDialog({
       } else if (type === 'architecture') {
         setArchitechturalImages(prev => [...prev, ...validFiles]);
       }else{
-        setVideos(validFiles[0]);
+        setVideos(validFiles);
       }
     };
   
@@ -176,7 +178,7 @@ export default function PropertyListingDialog({
     const newUploadFiles = (array : any, type : 'image' | 'video'|'architecture') => {
 
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}upload-files`, {
-            files : array
+          files : array
         }, {headers : {
           'Content-Type' : 'multipart/form-data'
         }}).then(res => {
@@ -196,38 +198,35 @@ export default function PropertyListingDialog({
             }
 
         }).catch(err => {
-
+          toast.error(err?.response?.data?.message);
         });
     }
     const onSubmit = (data: PropertyFormData) => {
+      setIsLoading(true);
       data.photoUrls = imagesUrl;
       data.videoUrl = videosUrl;
       data.architecturalPlanUrls = architechturalImagesUrl;
       data.agencyId = "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2";
       // agency id should be added automatically from agents information
-
-    try {
-        setIsLoading(true);
-        console.log({data});
+      try {
         axiosInstance.post("/property",{
-            ...data
+          ...data
         })
         .then((response) => {
-            console.log("Property created:", response.data);
-            toast.success("Property listing created successfully!");
+          toast.success(response?.data?.message);
         })
-        .catch((error) => {
-        toast.error("Failed to create property listing.");
+        .catch((error : any) => {
+        toast.error(error?.response?.data?.message);
         });
-    } catch (error) {
-        
-    }finally{
-      onOpenChange(false);
-      setIsLoading(false);
-      form.reset();
-    }
+      } catch (error) {
+          
+      }finally{
+        onOpenChange(false);
+        setIsLoading(false);
+        form.reset();
+      }
 
-    };
+      };
 
     useEffect(() => {
       // get property Types
@@ -238,7 +237,13 @@ export default function PropertyListingDialog({
         console.error({err});
       });
 
-      // get country
+      // get country 0b7c1c4d-65a5-484d-9b03-8c6b36d09634
+      axiosInstance.get('country/states/all?countryId=0b7c1c4d-65a5-484d-9b03-8c6b36d09634')
+      .then(res => {
+        setCountryStates(res?.data?.data);
+      }).catch(err => {
+        console.error({err});
+      });
     },[]);
 
     useEffect(() => {
@@ -252,7 +257,7 @@ export default function PropertyListingDialog({
     useEffect(() => {
       if (videos) {
         const formData = new FormData();
-        formData.append('files[]', videos);
+        videos.forEach(file => formData.append('files[]', file));
         newUploadFiles(videos, 'video');
       }
   },[videos]);
@@ -264,7 +269,6 @@ export default function PropertyListingDialog({
       newUploadFiles(architechturalImages, 'architecture');
     }
   },[architechturalImages]);
-
 
 
   return (
@@ -279,7 +283,6 @@ export default function PropertyListingDialog({
             Fill in the details below to list your property
           </DialogDescription>
         </DialogHeader>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
@@ -333,7 +336,7 @@ export default function PropertyListingDialog({
                             </FormControl>
                             <SelectContent>
                               {propertTypes && propertTypes?.map((data : PropertyTypesInterface, i : number) => 
-                                <SelectItem key={`index_${i}`} value={data.id}>{data.name}</SelectItem>
+                                <SelectItem key={`index_${i}`} className="capitalize" value={data.id}>{data.name}</SelectItem>
                               )}
                             </SelectContent>
                           </Select>
@@ -341,20 +344,6 @@ export default function PropertyListingDialog({
                         </FormItem>
                       )}
                     />
-
-                    {/* <FormField
-                      control={form.control}
-                      name="agencyId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Agency ID</FormLabel>
-                          <FormControl>
-                            <Input placeholder="agency-123" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    /> */}
 
                     <FormField
                       control={form.control}
@@ -414,20 +403,28 @@ export default function PropertyListingDialog({
                       )}
                     />
 
-                    <FormField
+                     <FormField
                       control={form.control}
                       name="stateId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>State ID</FormLabel>
-                          <FormControl>
-                            <Input placeholder="state-123" {...field}  required/>
-                          </FormControl>
+                          <FormLabel>State</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} required>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select state" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {countryStates.map((data) => 
+                                <SelectItem value={data.id} key={data.id} className="capitalize">{data.name}</SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
                     <FormField
                       control={form.control}
                       name="price"
@@ -436,7 +433,7 @@ export default function PropertyListingDialog({
                           <FormLabel>Price</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
+                              type="text"
                               placeholder="500000"
                               required
                               {...field}
@@ -788,20 +785,18 @@ export default function PropertyListingDialog({
                                       <Image className="mx-auto h-12 w-12 text-muted-foreground" />
                                     </Label>
                                     <Input
-                                        id="images"
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={(e) => {
-                                          const files = e.target.files;
-                                          handleFileUpload(files, 'image');
-                                          field.onChange(imagesUrl); // update form value manually
-                                        }}
-                                        // onChange={
-                                        //   (e) => handleFileUpload(e.target.files, 'image')}
+                                      id="images"
+                                      type="file"
+                                      multiple
+                                      accept="image/png, image/jpeg, image/gif image/jpg"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const files = e.target.files;
+                                        handleFileUpload(files, 'image');
+                                        field.onChange(imagesUrl); // update form value manually
+                                      }}
                                     />
-                                    <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 10MB each</p>
+                                    <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 2MB each</p>
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -817,17 +812,16 @@ export default function PropertyListingDialog({
                           {(images as File[]).map((file, index) => (
                               <div key={index} className="relative">
                               <img
-                                  src={URL.createObjectURL(file as File)}
-                                  alt={`Upload ${index + 1}`}
-                                  className="w-full h-20 object-cover rounded border"
+                                src={URL.createObjectURL(file as File)}
+                                alt={`Upload ${index + 1}`}
+                                className="w-full h-20 object-cover rounded border"
                               />
                               <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute -top-2 -right-2 h-6 w-6"
-                                  onClick={() => removeFile(index, 'image')}
-                              >
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute -top-2 -right-2 h-6 w-6"
+                                onClick={() => removeFile(index, 'image')}>
                                   <X className="h-3 w-3" />
                               </Button>
                               </div>
@@ -859,17 +853,16 @@ export default function PropertyListingDialog({
                                     <Input
                                       id="videos"
                                       type="file"
-                                      accept="video/*"
+                                      accept=".mp4,.mkv"
                                       className="hidden"
                                       onChange={(e) => {
                                         const files = e.target.files;
                                         handleFileUpload(files, 'video');
                                         field.onChange(videosUrl); // update form value manually
                                       }}
-                                      //{(e) => handleFileUpload(e.target.files, 'video')}
                                     />
                                     
-                                    <p className="text-xs text-muted-foreground mt-2">{videos ? videos?.name : "MP4, MOV, AVI up to 50MB each"}</p>
+                                    <p className="text-xs text-muted-foreground mt-2">{videos ? videos?.[0]?.name : "only .mp4, .mkv allowed and Size should not be greater than 10mb"}</p>
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -897,23 +890,23 @@ export default function PropertyListingDialog({
                                     <FormItem>
                                       <FormControl>
                                         <div className="text-center">
-                                          <Label htmlFor="architecture" className="cursor-pointer">
+                                            <Label htmlFor="architecture" className="cursor-pointer">
                                             <Image className="mx-auto h-12 w-12 text-muted-foreground" />
-                                          </Label>
-                                          <Input
+                                            </Label>
+                                            <Input
                                             id="architecture"
                                             type="file"
                                             multiple
-                                            accept="image/*"
+                                            accept="image/png, image/jpeg, application/pdf"
                                             className="hidden"
-                                             onChange={(e) => {
+                                            onChange={(e) => {
                                               const files = e.target.files;
                                               handleFileUpload(files, 'architecture');
                                               field.onChange(architechturalImagesUrl); // update form value manually
                                             }}
                                             //onChange={(e) => handleFileUpload(e.target.files, 'architecture')}
                                           />
-                                          <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 10MB each</p>
+                                          <p className="text-xs text-muted-foreground mt-2">PNG, JPG, PDF up to 2MB each</p>
                                         </div>
                                       </FormControl>
                                       <FormMessage />
@@ -987,14 +980,14 @@ export default function PropertyListingDialog({
                     Next
                   </Button>
                 ) : (
-                  <Button type="submit">Create Listing</Button>
+                  <Button type="submit" className="disabled:bg-slate-500 disabled:text-white cursor-default" disabled={!isFormValid ? true : false}>Create Listing</Button>
                 )}
               </div>
             </div>
           </form>
         </Form>
-        {isLoading && <LoaderCard/>}
       </DialogContent>
+      {isLoading && <LoaderProcessor/>}
     </Dialog>
   );
 }
