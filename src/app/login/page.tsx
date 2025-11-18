@@ -1,11 +1,14 @@
 
 import AuthLayout from "@/components/layout/auth";
 import LoginForm from "@/components/onboarding/login";
+import { Suspense } from "react";
 
 export default function LoginPage() {
   return (
-    <AuthLayout>
-      <LoginForm/>
-    </AuthLayout>
+    <Suspense>
+      <AuthLayout>
+        <LoginForm/>
+      </AuthLayout>
+    </Suspense>
   );
 }

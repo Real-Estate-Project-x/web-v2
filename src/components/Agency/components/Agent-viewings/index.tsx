@@ -1,7 +1,7 @@
 'use client';
 
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +20,8 @@ import {
   Eye,
   MessageCircle
 } from "lucide-react";
-import { agentDashboardData } from "../..";
 import Link from "next/link";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 interface Viewing {
   id: string;
@@ -138,8 +138,8 @@ const Viewings = () => {
       switch (sortBy) {
         case "date":
           return new Date(a.date + " " + a.time).getTime() - new Date(b.date + " " + b.time).getTime();
-        case "client":
-          return a.clientName.localeCompare(b.clientName);
+        // case "client":
+        //   return a.clientName.localeCompare(b.clientName);
         case "price":
           return b.price - a.price;
         case "status":
@@ -152,6 +152,24 @@ const Viewings = () => {
   const upcomingViewings = viewings.filter(v => v.status === "upcoming" || v.status === "confirmed").length;
   const pendingViewings = viewings.filter(v => v.status === "pending").length;
   const completedViewings = viewings.filter(v => v.status === "completed").length;
+
+  useEffect(() => {
+    axiosInstance.get('/fee-setup/VIRTUAL_PROPERTY_VIEWING_FEE')
+    .then(response => {
+      console.log("Fee setup data:", response.data);
+    }).catch(error => { 
+      console.error("Error fetching fee setup data:", error);
+    });
+
+    //f3c8e0c9-1a43-4dc5-b47b-ff5e3626a58e
+    axiosInstance.get(`/agent-property-viewing?feeSetupId=${'f3c8e0c9-1a43-4dc5-b47b-ff5e3626a58e'}`)
+    .then(response => {
+      console.log("viewings:", response.data);
+    }).catch(error => { 
+      console.error("Error fetching viewings:", error);
+    });
+
+  },[]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -208,8 +226,8 @@ const Viewings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="relative col-span-1 md:col-span-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder="Search by property or client..."
@@ -220,26 +238,27 @@ const Viewings = () => {
               </div>
               
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="upcoming">Upcoming</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="rescheduled">Rescheduled</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="date">Sort by Date</SelectItem>
-                  <SelectItem value="client">Sort by Client</SelectItem>
+                  {/* <SelectItem value="client">Sort by Client</SelectItem> */}
                   <SelectItem value="price">Sort by Price</SelectItem>
                   <SelectItem value="status">Sort by Status</SelectItem>
                 </SelectContent>
@@ -346,14 +365,14 @@ const Viewings = () => {
                         }
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        {/* <Button size="sm" variant="outline">
                           <Phone className="h-4 w-4 mr-2" />
                           Call
                         </Button>
                         <Button size="sm" variant="outline">
                           <MessageCircle className="h-4 w-4 mr-2" />
                           Message
-                        </Button>
+                        </Button> */}
                         <Button size="sm" variant="outline">
                           <Calendar className="h-4 w-4 mr-2" />
                           Reschedule

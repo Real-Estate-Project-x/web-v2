@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Mail, Lock, User, Eye, EyeOff, Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ import {
   validatePassword,
   validatePhoneNumber,
 } from "../../../utils/helpers";
-import { useRouter } from "next/navigation";
+import {useRouter } from "next/navigation";
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import 'react-phone-number-input/style.css';
 
@@ -117,8 +117,8 @@ const SignUpForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmitWithDelay}
-      className="bg-white rounded-xl p-8 flex flex-col gap-6 min-w-[400px] animate-fade-in-up w-full max-w-sm md:max-w-md"
-      style={{ boxShadow: "0 8px 32px rgba(155,135,245,0.15)" }}
+      className="flex flex-col gap-6 min-w-[400px] w-full max-w-sm md:max-w-lg"
+      // style={{ boxShadow: "0 8px 32px rgba(155,135,245,0.15)" }}
     >
       <h2 className="text-3xl font-playfair font-semibold text-primary mb-1">
         Create your account
@@ -305,7 +305,7 @@ const SignUpForm: React.FC = () => {
         {submitting ? "Signing Up..." : "Sign Up"}
       </button>
 
-      <p className="mt-2 text-center text-gray-500 text-[15px]">
+      <p className="text-center text-gray-500 text-[15px]">
         Already have an account?{" "}
         <a
           href="/login"

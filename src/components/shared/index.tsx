@@ -106,5 +106,31 @@ export function HeartFilled(props: LucideProps) {
     </svg>
   );
 }
-
-
+ 
+export const StepSetUpForOnboarding = ({ pathname, type }: { pathname: string, type?:string }) => {
+  return (
+    <div data-pathname={pathname ?? undefined} data-type={type ?? undefined}>
+      {/* Step setup content for onboarding goes here */}
+      <section className="flex flex-row items-center justify-center mb-6 space-x-2 text-gray-400">
+        <div className="text-sm text-center">
+          <span className="py-1">Step-1</span>
+          <div className={`${pathname?.includes('select-account') ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>1</div>
+        </div>
+        <div className={`${pathname?.includes('signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} h-1 w-7 mt-2`}/>
+        <div className="text-sm text-center">
+          <span className="py-1">Step-2</span>
+          <div className={`${pathname?.includes('signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>2</div>
+        </div>
+        {type && type === 'AGENT' && (
+          <>
+            <div className={`${pathname?.includes('complete-agent-signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} h-1 w-7 mt-2`}/>
+            <div className="text-sm text-center">
+              <span className="py-1">Step-3</span>
+              <div className={`${pathname?.includes('complete-agent-signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>3</div>
+            </div>
+          </>
+        )}
+      </section>
+    </div>
+  );
+};

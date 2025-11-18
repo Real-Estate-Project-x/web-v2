@@ -1,11 +1,14 @@
 
 import AuthLayout from "@/components/layout/auth";
 import SignUpForm from "@/components/onboarding/signUp";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <AuthLayout>
-      <SignUpForm/>
-    </AuthLayout>
+    <Suspense>
+      <AuthLayout>
+        <SignUpForm/>
+      </AuthLayout>
+    </Suspense>
   );
 }
