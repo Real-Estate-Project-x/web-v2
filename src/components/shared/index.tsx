@@ -119,14 +119,14 @@ export const StepSetUpForOnboarding = ({ pathname, type }: { pathname: string, t
         <div className={`${pathname?.includes('signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} h-1 w-7 mt-2`}/>
         <div className="text-sm text-center">
           <span className="py-1">Step-2</span>
-          <div className={`${pathname?.includes('signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>2</div>
+          <div className={`${pathname === '/signUp' ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>2</div>
         </div>
         {type && type === 'AGENT' && (
           <>
-            <div className={`${pathname?.includes('complete-agent-signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} h-1 w-7 mt-2`}/>
+            <div className={`${pathname?.includes('profile-agent-signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} h-1 w-7 mt-2`}/>
             <div className="text-sm text-center">
               <span className="py-1">Step-3</span>
-              <div className={`${pathname?.includes('complete-agent-signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>3</div>
+              <div className={`${pathname?.includes('profile-agent-signUp') ? 'bg-gray-800' : 'bg-gray-500/30'} text-white rounded-full py-2 px-4 text-lg font-semibold`}>3</div>
             </div>
           </>
         )}
