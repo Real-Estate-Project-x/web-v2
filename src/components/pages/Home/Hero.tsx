@@ -83,7 +83,7 @@ const Hero = () => {
             }}
           />
         ))}
-        {/* <div className="absolute inset-0 bg-gradient-to-r from-[#1E3A8A]/80 via-[#1E3A8A]/60 to-transparent" /> */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1E3A8A]/80 via-[#1E3A8A]/60 to-transparent" />
       </div>
 
       {/* Hero Content */}
@@ -100,11 +100,11 @@ const Hero = () => {
 
             {/* Main Heading */}
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
-                Find Your Perfect
-                {/* <span className="block text-real-300 font-serif italic">Home Sweet Home</span> */}
-                <span className="bg-gradient-to-r from-[#0253CC] to-[#00A6FB] bg-clip-text text-transparent block text-real-300 font-serif italic">
-                  Home Sweet Home
+              <h1 className="text-4xl lg:text-5xl font-bold font-serif italic text-white leading-tight">
+                Find The Perfect
+                {/* <span className="block text-real-300 font-serif italic">Home For You</span> */}
+                <span className="bg-gradient-to-r from-[#8EC2FF] to-[#00A6FB] bg-clip-text text-transparent block text-[#8EC2FF] font-serif italic">
+                  Home For You
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 max-w-lg leading-relaxed">
@@ -114,20 +114,20 @@ const Hero = () => {
             </div>
 
             {/* Quick Stats */}
-            {/* <div className="flex flex-wrap gap-8 text-white/90">
+            <div className="flex flex-wrap gap-8 text-white/90">
               <div className="text-center">
-                <div className="text-3xl font-bold text-real-300">15K+</div>
-                <div className="text-sm uppercase tracking-wider">Properties</div>
+                <div className="text-3xl font-bold text-[#8EC2FF]">15K+</div>
+                <div className="text-xs py-1 uppercase tracking-wider">Properties</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-real-300">98%</div>
-                <div className="text-sm uppercase tracking-wider">Satisfaction</div>
+                <div className="text-3xl font-bold text-[#8EC2FF]">98%</div>
+                <div className="text-xs py-1 uppercase tracking-wider">Satisfaction</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-real-300">500+</div>
-                <div className="text-sm uppercase tracking-wider">Agents</div>
+                <div className="text-3xl font-bold text-[#8EC2FF]">500+</div>
+                <div className="text-xs py-1 uppercase tracking-wider">Agents</div>
               </div>
-            </div> */}
+            </div>
           </div>
 
           {/* Right Column - Search Form */}

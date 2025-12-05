@@ -61,30 +61,32 @@ export const FeaturedProperties :FC<Property> = ({data}) => {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-semibold text-navy-900 mb-2">Featured Properties</h2>
-            <p className="text-navy-600 max-w-xl font-light">
-              Explore our handpicked selection of premium properties that match your lifestyle and preferences.
-            </p>
+    <>
+      {!data && <LoadingCard/>} 
+      
+      {data && data.length > 0 &&
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-semibold text-navy-900 mb-2">Featured Properties</h2>
+                <p className="text-navy-600 max-w-xl font-light">
+                  Explore our handpicked selection of premium properties that match your lifestyle and preferences.
+                </p>
+              </div>
+              <Button variant="outline" className="flex items-center mt-4 md:mt-0 font-md"
+              onClick={() => router.push('/properties')}>
+                View All Properties <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+            
+            {/* use component below as card */}
+            <PropertyList array={data}/>
+          
           </div>
-          <Button variant="outline" className="flex items-center mt-4 md:mt-0 font-md"
-          onClick={() => router.push('/properties')}>
-            View All Properties <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
         
-        {/* use component below as card */}
-        {
-          !data || data.length === 0 ? 
-            <LoadingCard/>
-          :
-           <PropertyList array={data}/>
-        }
-       
-      </div>
-    </section>
+        </section>
+      }
+    </>
   );
 };

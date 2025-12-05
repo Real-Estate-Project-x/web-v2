@@ -11,7 +11,7 @@ import {
 import Navbar from "../Home/Nav";
 import React, { FC, use, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Building, MapPin, Search } from "lucide-react";
+import { Bath, Bed, Building, MapPin, Search, Square } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import { Pagination } from "@/components/shared/pagination";
 import LoadingCard from "@/components/shared/loader-cards";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { getCookie } from "@/lib/helpers";
+import { Card, CardContent } from "@/components/ui/card";
 
 type Props = {
     array : PropertyInterface[];
@@ -92,7 +93,7 @@ export const PropertyFilter :FC<FilterProps> = ({setData, setLoader, setType, co
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 </div>
                 <Select
-                onValueChange={(value : string) => {
+                    onValueChange={(value : string) => {
                     const [minPrice, maxPrice] = value.split("-");
                     const filteredData = copyData.filter((property) => { 
                         if(!maxPrice){
@@ -180,48 +181,49 @@ export const PropertyList : FC<Props> = ({array}) => {
     return(
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
             {array.map((property) => (
-                <div key={property.id} className="property-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:duration-200">
-                    <div className="relative h-68">
-                        <img 
-                            src={property.photoUrls[0]} 
-                            alt={property.title} 
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-4 left-4 flex gap-2">
-                            <Badge className={`${property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"} hover:bg-real-700 capitalize px-4 py-2 rounded-full`}>{new String(property.upFor).toLowerCase()}</Badge>
-                            {property.isNewBuilding && <Badge className="bg-green-500 hover:bg-green-600">New</Badge>}
-                        </div>
-                        <div className="absolute bottom-4 right-4">
-                            <Badge className="bg-gray-100 text-navy-900 p-2 rounded-full">{formatPrice(property.price)}</Badge>
-                        </div>
-                    </div>
-                    <div className="p-5 capitalize">
-                        <h3 className="text-xl font-semibold mb-2 text-navy-900">{property.title}</h3>
-                        <div className="flex items-center mb-3 text-navy-600">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        <span className="text-sm">{property.address}</span>
-                        </div>
-                        <div className="flex justify-between text-navy-600 pt-3">
-                            <div className="flex items-center">
-                                <Bed className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{property.noOfBedrooms} beds</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Building className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{property.noOfToilets} toilets</span>
-                            </div>
-                            <div className="flex items-center">
-                                <span className="text-sm">{property.sizeInSquareFeet} sqft</span>
-                            </div>
-                        </div>
-                        <Button 
-                        variant="outline" 
-                        className="w-full mt-4 border-[#3B82F6] text-[#2563EB] hover:bg-real-50 cursor-pointer"
+                <>
+                    <Card
+                        key={property.id}
+                        className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
                         onClick={() => router.push(`/properties/view?id=${property.id}`)}>
-                        View Details
-                        </Button>
-                    </div>
-                </div>
+                        <div className="relative h-48 overflow-hidden">
+                            <img
+                                src={property.photoUrls[0]}
+                                alt={property.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <Badge className={`${property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"} absolute top-4 left-4 hover:bg-real-700 capitalize px-4 py-2 rounded-full`}>{property.upFor}</Badge>
+                            {property.isNewBuilding && <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">New</Badge>}
+                            <Badge className="absolute bottom-4 right-4 bg-white text-foreground shadow-lg">
+                                {formatPrice(property.price)}
+                            </Badge>
+
+                        </div>
+                        <CardContent className="p-5">
+                            <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors capitalize">
+                                {property.title}
+                            </h3>
+                            <div className="flex items-center text-muted-foreground mb-4">
+                                <MapPin className="h-4 w-4 mr-1" />
+                                <span className="text-sm capitalize">{property.address}</span>
+                            </div>
+                            <div className="flex justify-between text-muted-foreground border-t pt-4">
+                                <div className="flex items-center gap-1">
+                                <Bed className="h-4 w-4" />
+                                <span className="text-sm">{property.noOfBedrooms} beds</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                <Bath className="h-4 w-4" />
+                                <span className="text-sm">{property.noOfToilets} Toilets</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                <Square className="h-4 w-4" />
+                                <span className="text-sm">{property.sizeInSquareFeet} sqft</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </>
             ))}
         </div>
     );

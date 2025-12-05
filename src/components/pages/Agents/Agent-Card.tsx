@@ -13,19 +13,22 @@ import {
   PhoneCall
 } from "lucide-react";
 import { AgentInterface } from "../../../../utils/interfaces";
+import { useRouter } from "next/navigation";
 
 interface AgentCardProps {
   agent: AgentInterface;
 }
 
 const AgentCard = ({ agent : data }: AgentCardProps) => {
-
+  const router = useRouter();
   const agent = data?.agency;
   const firstNameInitials = agent?.name?.split(' ')[0];
   const lastNameInitials = agent?.name?.split(' ')[1];
 
   return (
-    <Card className="group h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
+    <Card 
+    onClick={() => router.push(`/agents/properties?id=${agent.id}`)}
+    className="group h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start gap-4 mb-6">
