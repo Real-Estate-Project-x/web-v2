@@ -163,7 +163,7 @@ const SearchResults = () => {
                             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         </div>
 
-                        <Button  type="submit" disabled={loading} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 mt-0 md:mt-0 ml-0 md:ml-4">
+                        <Button  type="submit" disabled={loading} className="bg-blue-800 hover:bg-[#1D4ED8] text-white disabled:opacity-50 mt-0 md:mt-0 ml-0 md:ml-4">
                             {loading ? "Searching..." :"Search Properties"}
                         </Button>
                         <Button 

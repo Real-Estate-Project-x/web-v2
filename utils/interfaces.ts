@@ -621,3 +621,63 @@ export interface CountryStatesInterface{
   name : string;
   status : boolean;
 }
+
+export interface AgencyInterface{
+  address : string;
+  createdByUser : {
+    address : string | null;
+    appleRefreshToken : string | null;
+    authProvider : string;
+    dateCreated : string;
+    dateUpdated : string;
+    deviceTokens:any[];
+    email : string;
+    firstName : string;
+    formattedPhoneNumber : string | null;
+    googleRefreshToken : string | null;
+    id : string;
+    lastName : string;
+    phoneNumber : string;
+    profileImage: string;
+    roleId : string;
+    status : boolean; 
+    thirdPartyUserId : string | null;
+    verificationCode : string | null;
+  };
+  agencyCACDump: {
+    data: {
+      affiliates: number;
+      branchAddress: string;
+      city: string;
+      classification: string;
+      companyEmail: string;
+      companyName: string;
+      companyType: string;
+      headOfficeAddress: string;
+      lga: string;
+      rcNumber: string | null;
+      registrationDate: string;
+      shareCapital: string;
+      shareCapitalInWords: string;
+      state: string;
+      status: string;
+    };
+    status: string;
+  };
+  createdByUserId: string;
+  dateCreated: string;
+  dateOfIncorporation: string;
+  dateUpdated: string;
+  description: string;
+  email: string;
+  id: string;
+  isRegistered: boolean;
+  logo: string;
+  name: string;
+  properties: PropertyInterface[];
+  rating: number;
+  rcNumber: string;
+  status: boolean;
+  whatsappNumber: string;
+  agencyPhoneNumber : string;
+}

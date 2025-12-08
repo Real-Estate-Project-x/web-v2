@@ -94,7 +94,7 @@ const Hero = () => {
             {/* Badge */}
             <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
               <span className="text-sm text-white font-medium">
-                🏡 Over 15,000+ Properties Available
+                🏡 Over {highlights?.total}+ Properties Available
               </span>
             </div>
 
@@ -116,15 +116,15 @@ const Hero = () => {
             {/* Quick Stats */}
             <div className="flex flex-wrap gap-8 text-white/90">
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#8EC2FF]">15K+</div>
+                <div className="text-3xl font-bold text-[#8EC2FF]">{highlights?.total}+</div>
                 <div className="text-xs py-1 uppercase tracking-wider">Properties</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-[#8EC2FF]">98%</div>
+              {/* <div className="text-center">
+                <div className="text-3xl font-bold text-[#8EC2FF]">0%</div>
                 <div className="text-xs py-1 uppercase tracking-wider">Satisfaction</div>
-              </div>
+              </div> */}
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#8EC2FF]">500+</div>
+                <div className="text-3xl font-bold text-[#8EC2FF]">4+</div>
                 <div className="text-xs py-1 uppercase tracking-wider">Agents</div>
               </div>
             </div>

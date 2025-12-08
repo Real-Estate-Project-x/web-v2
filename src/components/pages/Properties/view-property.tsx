@@ -23,245 +23,6 @@ import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
 
 
-// This would typically come from an API, using static data for now
-// const getPropertyById = (id: string) => {
-//   const properties = [
-//     {
-//       id: 1,
-//       title: "Modern Luxury Villa",
-//       price: "$1,250,000",
-//       images: [
-//         "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1595526051245-4506e0005bd0?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80"
-//       ],
-//       location: "Beverly Hills, CA",
-//       beds: 4,
-//       baths: 3,
-//       sqft: "3,500",
-//       type: "For Sale",
-//       description: "Experience luxury living in this stunning modern villa. Features include high ceilings, premium finishes, and panoramic views. The property is surrounded by lush gardens and offers complete privacy while being just minutes away from exclusive restaurants and boutiques. The villa boasts a gourmet kitchen with top-of-the-line appliances, a spacious master suite with a spa-like bathroom, and a private terrace overlooking the infinity pool.",
-//       features: ["Smart Home System", "Pool", "Wine Cellar", "Home Theater", "3-Car Garage"],
-//       yearBuilt: 2020,
-//       parkingSpaces: 3,
-//       agentName: "John Smith",
-//       rating: 4.5,
-//       amenities: [
-//         { id: 1, name: "Wi-Fi", icon: "wifi" },
-//         { id: 2, name: "Gym", icon: "gym" },
-//         { id: 3, name: "Washing Machine", icon: "washing-machine" }
-//       ],
-//       comments: [
-//         { id: 1, userName: "Alice Johnson", date: "2024-12-15", text: "Beautiful property with amazing views. The kitchen is a dream for any home chef.", rating: 5 },
-//         { id: 2, userName: "Robert Davis", date: "2024-12-10", text: "Great location, but I found some of the finishes to be less premium than described.", rating: 4 }
-//       ],
-//       architecturalDrawings: [
-//         { id: 1, title: "Floor Plan - First Floor", type: "image", url: "https://images.unsplash.com/photo-1485996463739-9cb09adbe70f?auto=format&fit=crop&q=80" },
-//         { id: 2, title: "Floor Plan - Second Floor", type: "image", url: "https://images.unsplash.com/photo-1484251065541-c9770829890f?auto=format&fit=crop&q=80" },
-//         { id: 3, title: "Property Specifications", type: "document", url: "#" }
-//       ],
-//       agency: {
-//         name: "Luxury Estates Group",
-//         phone: "+1 (310) 555-7890",
-//         email: "info@luxuryestatesgroup.com",
-//         whatsapp: "+1 (310) 555-7891",
-//         logo: "https://images.unsplash.com/photo-1571844307880-751c6d86f3f3?auto=format&fit=crop&q=80&w=200&h=200"
-//       },
-//       similarProperties : [{}]
-//     },
-//     {
-//       id: 2,
-//       title: "Downtown Apartment",
-//       price: "$450,000",
-//       images: [
-//         "https://images.unsplash.com/photo-1524230572899-a752b3835840?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80"
-//       ],
-//       location: "Downtown Seattle, WA",
-//       beds: 2,
-//       baths: 2,
-//       sqft: "1,200",
-//       type: "For Sale",
-//       description: "Live in the heart of the city with this stylish apartment. Enjoy easy access to restaurants, shops, and entertainment. This modern unit features floor-to-ceiling windows with breathtaking city views, hardwood floors throughout, and an open concept living area perfect for entertaining. The kitchen has been recently updated with quartz countertops and stainless steel appliances. Building amenities include 24-hour concierge, fitness center, and a rooftop lounge.",
-//       features: ["City Views", "Fitness Center", "Concierge", "Pet-Friendly", "In-Unit Laundry"],
-//       yearBuilt: 2015,
-//       parkingSpaces: 1,
-//       agentName: "Emily Johnson",
-//       rating: 4.0,
-//       amenities: [
-//         { id: 1, name: "Wi-Fi", icon: "wifi" },
-//         { id: 2, name: "Gym", icon: "gym" }
-//       ],
-//       comments: [
-//         { id: 1, userName: "Michael Brown", date: "2024-11-20", text: "Great city location with amazing views. Very convenient for city life.", rating: 4 }
-//       ],
-//       architecturalDrawings: [
-//         { id: 1, title: "Floor Plan", type: "image", url: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&q=80" }
-//       ],
-//       agency: {
-//         name: "Urban Living Realty",
-//         phone: "+1 (206) 555-4321",
-//         email: "contact@urbanlivingrealty.com",
-//         whatsapp: "+1 (206) 555-4322",
-//         logo: "https://images.unsplash.com/photo-1572521165329-b197f9ea3da6?auto=format&fit=crop&q=80&w=200&h=200"
-//       },
-//       similarProperties : [{}]
-//     },
-//     {
-//       id: 3,
-//       title: "Suburban Family Home",
-//       price: "$750,000",
-//       images: [
-//         "https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1560184897-ae75f418493e?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80",
-//         "https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&q=80"
-//       ],
-//       location: "Bellevue, WA",
-//       beds: 4,
-//       baths: 2.5,
-//       sqft: "2,800",
-//       type: "For Sale",
-//       description: "Perfect for families, this home offers a spacious layout with a large backyard and a quiet, friendly neighborhood. Recently renovated, this classic home combines modern amenities with timeless charm. The main floor features a bright, open living space, a formal dining room, and a gourmet kitchen with a breakfast nook. Upstairs you'll find four generous bedrooms including a master suite with a walk-in closet. The finished basement provides additional living space perfect for a home office, gym, or playroom.",
-//       features: ["Large Backyard", "Excellent Schools", "Fireplace", "Gourmet Kitchen", "Close to Parks"],
-//       yearBuilt: 2010,
-//       parkingSpaces: 2,
-//       agentName: "Michael Rodriguez",
-//       rating: 4.8,
-//       amenities: [
-//         { id: 1, name: "Wi-Fi", icon: "wifi" },
-//         { id: 3, name: "Washing Machine", icon: "washing-machine" }
-//       ],
-//       comments: [
-//         { id: 1, userName: "Jennifer Wilson", date: "2024-12-05", text: "Beautiful family home in a great school district. The backyard is perfect for children.", rating: 5 },
-//         { id: 2, userName: "Thomas Lee", date: "2024-11-28", text: "We loved the open floor plan and updated kitchen. Very family-friendly neighborhood.", rating: 5 }
-//       ],
-//       architecturalDrawings: [
-//         { id: 1, title: "Floor Plan - Main Level", type: "image", url: "https://images.unsplash.com/photo-1604601633243-ea6119932da1?auto=format&fit=crop&q=80" },
-//         { id: 2, title: "Landscape Design", type: "image", url: "https://images.unsplash.com/photo-1492567291473-fe3dfc175b45?auto=format&fit=crop&q=80" }
-//       ],
-//       agency: {
-//         name: "Family Home Realtors",
-//         phone: "+1 (425) 555-6789",
-//         email: "info@familyhomerealtors.com",
-//         whatsapp: "+1 (425) 555-6780",
-//         logo: "https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&q=80&w=200&h=200"
-//       },
-//       similarProperties : [{}]
-//     }
-//   ];
-  
-//   // Generate mock similar properties based on the current property
-//   const property = properties.find(p => p.id === Number(id));
-//   if (property) {
-//     // Get properties that aren't the current one
-//     const otherProperties = properties.filter(p => p.id !== Number(id));
-    
-//     // Create a list of similar properties
-//     property.similarProperties = [
-//       ...otherProperties,
-//       // Generate additional mock properties to have 10 similar properties
-//       {
-//         id: 4,
-//         title: "Coastal Beach House",
-//         price: "$1,100,000",
-//         image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&q=80",
-//         location: "Malibu, CA",
-//         beds: 3,
-//         baths: 2,
-//         sqft: "2,000",
-//         type: "For Sale",
-//         lat: 34.0259,
-//         lng: -118.7798
-//       },
-//       {
-//         id: 5,
-//         title: "Mountain View Cabin",
-//         price: "$850,000",
-//         image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80",
-//         location: "Aspen, CO",
-//         beds: 3,
-//         baths: 2,
-//         sqft: "1,800",
-//         type: "For Sale",
-//         lat: 39.1911,
-//         lng: -106.8175
-//       },
-//       {
-//         id: 6,
-//         title: "Urban Loft",
-//         price: "$550,000",
-//         image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80",
-//         location: "Portland, OR",
-//         beds: 1,
-//         baths: 1,
-//         sqft: "950",
-//         type: "For Sale",
-//         lat: 45.5231,
-//         lng: -122.6765
-//       },
-//       {
-//         id: 7,
-//         title: "Lakefront Property",
-//         price: "$925,000",
-//         image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80",
-//         location: "Lake Tahoe, NV",
-//         beds: 3,
-//         baths: 2,
-//         sqft: "2,200",
-//         type: "For Sale",
-//         lat: 39.0968,
-//         lng: -120.0324
-//       },
-//       {
-//         id: 8,
-//         title: "Historic Townhouse",
-//         price: "$780,000",
-//         image: "https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&q=80",
-//         location: "Boston, MA",
-//         beds: 3,
-//         baths: 2.5,
-//         sqft: "1,950",
-//         type: "For Sale",
-//         lat: 42.3601,
-//         lng: -71.0589
-//       },
-//       {
-//         id: 9,
-//         title: "Desert Oasis Home",
-//         price: "$675,000",
-//         image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80",
-//         location: "Scottsdale, AZ",
-//         beds: 3,
-//         baths: 2,
-//         sqft: "1,800",
-//         type: "For Sale",
-//         lat: 33.4942,
-//         lng: -111.9261
-//       },
-//       {
-//         id: 10,
-//         title: "Glass House",
-//         price: "$1,350,000",
-//         image: "https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&q=80",
-//         location: "Austin, TX",
-//         beds: 4,
-//         baths: 3.5,
-//         sqft: "3,200",
-//         type: "For Sale",
-//         lat: 30.2672,
-//         lng: -97.7431
-//       }
-//     ];
-//   }
-  
-//   return property;
-// };
-
-// Form for requesting a tour
 type TourFormData = {
   name: string;
   email: string;
@@ -333,8 +94,44 @@ const PropertyDetails = () => {
     setRating(0);
   };
 
-  const handleSaveProperty = () => {
+  const handleSaveProperty = async () => {
     setIsSaved(!isSaved);
+    //add to favorite logic here if user is logged in 
+    //if not redirect to login page with a prompt | toast
+    //if property is already saved, remove from favorites
+    try{
+      if(!isSaved){
+        await axiosInstance.post(`/favourite-property`,{
+          propertyId : searchParams.get('id') as string
+
+        }).then(response => {
+
+          console.log(response);
+
+          if(!response.data.success){
+            toast.error(response.data.message);
+            return;
+          }
+          toast.success("Property saved to favorites!");
+
+        })
+      }else{
+        // remove from favorites
+        await axiosInstance.delete(`/favourite-property/`, {
+          data : {propertyIds : [searchParams.get('id') as string]}
+        })
+        .then(response => {
+          if(!response.data.success){
+            toast.error(response.data.message);
+            return;
+          }
+          toast.info("Property removed from favorites.");
+        });
+      }
+    }catch(error){
+      console.log(error);
+    }
+
     if (!isSaved) {
       toast.success("Property saved to favorites!");
     } else {
@@ -364,7 +161,6 @@ const PropertyDetails = () => {
     axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id') as string}`)
       .then((response) => { 
           if(response.data.success) {
-            console.log({response})
             setProperty(response.data.data || {} as ViewPropertyInterface);
             // get comments
             axiosInstance.get(`agent-property-viewing/user-ratings/${response.data.data?.property?.id}`)

@@ -9,9 +9,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Navbar from "../Home/Nav";
-import React, { FC, use, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Bath, Bed, Building, MapPin, Search, Square } from "lucide-react";
+import { Bath, Bed, MapPin, Search, Square } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
