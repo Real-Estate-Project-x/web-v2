@@ -26,10 +26,11 @@ const Hero = () => {
   const searchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-  const [highlights, setHighlights] = useState<{total : number, totalForRent : number, totalForSale : number}>({
+  const [highlights, setHighlights] = useState<{total : number, totalForRent : number, totalForSale : number, totalAgents : number}>({
     total: 0,
     totalForRent: 0,
     totalForSale: 0,
+    totalAgents : 0,
   });
 
   useEffect(() => {
@@ -39,6 +40,7 @@ const Hero = () => {
         total: response.data.data.total,
         totalForRent: response.data.data.totalForRent,
         totalForSale: response.data.data.totalForSale,
+        totalAgents : response.data.data.totalAgents,
       });
     }).catch((error) => { 
       console.error("Error fetching highlights:", error);
@@ -124,7 +126,7 @@ const Hero = () => {
                 <div className="text-xs py-1 uppercase tracking-wider">Satisfaction</div>
               </div> */}
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#8EC2FF]">4+</div>
+                <div className="text-3xl font-bold text-[#8EC2FF]">{highlights.totalAgents}+</div>
                 <div className="text-xs py-1 uppercase tracking-wider">Agents</div>
               </div>
             </div>
