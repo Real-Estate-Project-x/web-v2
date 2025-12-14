@@ -24,7 +24,6 @@ import {
   Mail, 
   Phone, 
   Home,
-  DollarSign,
   Star,
   Users
 } from "lucide-react";

@@ -181,7 +181,7 @@ export const PropertyList : FC<Props> = ({array}) => {
     return(
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
             {array.map((property) => (
-                <>
+                <div key={property.id}>
                     <Card
                         key={property.id}
                         className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
@@ -192,9 +192,9 @@ export const PropertyList : FC<Props> = ({array}) => {
                                 alt={property.title}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
-                            <Badge className={`${property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"} absolute top-4 left-4 hover:bg-real-700 capitalize px-4 py-2 rounded-full`}>{property.upFor}</Badge>
+                            <Badge className={`${property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"} absolute top-4 left-4 hover:bg-real-700 capitalize px-4 py-1.5 rounded-full`}>{property.upFor.toLowerCase()}</Badge>
                             {property.isNewBuilding && <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">New</Badge>}
-                            <Badge className="absolute bottom-4 right-4 bg-white text-foreground shadow-lg">
+                            <Badge className="absolute bottom-4 right-4 bg-white text-foreground shadow-lg py-1.5 rounded-xl">
                                 {formatPrice(property.price)}
                             </Badge>
 
@@ -223,7 +223,7 @@ export const PropertyList : FC<Props> = ({array}) => {
                             </div>
                         </CardContent>
                     </Card>
-                </>
+                </div>
             ))}
         </div>
     );

@@ -27,7 +27,8 @@ import {
   Filter,
   SortAsc,
   SortDesc,
-  Upload
+  Upload,
+  Zap
 } from "lucide-react";
 import AgentPropertyView from "./view-property";
 import PropertyEditForm from "./dialogs/edit-property";
@@ -36,6 +37,8 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
 import { convertDateCreatedToGetNumberOfDays, formatPrice } from "../../../../../utils/helpers";
 import PropertyListingDialog from "./dialogs/new-upload";
+import { useRouter } from "next/navigation";
+import { Separator } from "@radix-ui/react-select";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,16 +47,23 @@ const AgentPropertiesManager = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const propertiesPerPage = 6;
-  const [viewAgentProperty, setViewAgentProperty] = useState<boolean>(false);
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
   const [property, setProperty] = useState<AgentDatabaseInterface>({} as AgentDatabaseInterface);
   const [properties, setProperties] = useState<AgentDatabaseInterface[]>([] as AgentDatabaseInterface[]);
+  const router = useRouter();
 
   useEffect(() => {
-    axiosInstance.get(`/property/agency-property-list/${agencyId}`)
+    // axiosInstance.get(`/property/agency-property-list/${agencyId}`)
+    // .then((response) => {
+    //   setProperties(response.data.data);
+    // }).catch((err) => {
+    //   console.log({err});
+    // });
+
+    axiosInstance.get(`/agency/${agencyId}/properties`)
     .then((response) => {
-      setProperties(response.data.data);
+     setProperties(response.data.data);
     }).catch((err) => {
       console.log({err});
     });
@@ -105,7 +115,9 @@ const AgentPropertiesManager = () => {
       "Sold": "outline"
     } as const;
     
-    return <Badge variant={variants[status as keyof typeof variants] || "outline"} className={`p-2 font-normal rounded-full ${status && "bg-green-200 text-green 500"}`}>{status ? "Active" : "Sold"}</Badge>;
+    return <Badge variant={variants[status as keyof typeof variants]} className={`py-1 font-normal rounded-lg text-white font-medium ${status && "bg-black "}`}>
+      {status ? "Active" : "Sold"}
+    </Badge>;
   };
 
   return (
@@ -185,11 +197,9 @@ const AgentPropertiesManager = () => {
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
                 <div className="relative">
                 <img
-                    src={property.photoUrls[0]}
-                    alt={property.title}
-                    className="w-full h-56 object-cover"
-                    // width={0}
-                    // height={0}
+                  src={property.photoUrls[0]}
+                  alt={property.title}
+                  className="w-full h-56 object-cover"
                 />
                 {/* {property.isBoosted && (
                     <div className="absolute top-2 right-2">
@@ -200,7 +210,7 @@ const AgentPropertiesManager = () => {
                     </div>
                 )} */}
                 <div className="absolute top-2 left-2">
-                    {getStatusBadge(property.upFor)}
+                  {getStatusBadge(property.upFor)}
                 </div>
                 </div>
                 
@@ -218,16 +228,14 @@ const AgentPropertiesManager = () => {
                   </div>
                     
                   <div className="flex items-center justify-between text-sm">
-                    {/* <span className="text-muted-foreground">{property.views} views</span> */}
                     <span className="text-muted-foreground">{convertDateCreatedToGetNumberOfDays(property.dateCreated)} days on market</span>
                   </div>
                     
+                  <Separator className="w-full "/>
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => {
-                        setProperty(property);
-                        setViewAgentProperty(true);
-                      }}>
+                      <Button size="sm" variant="outline" onClick={() =>
+                        router.push(`/agent-dashboard/properties/view?id=${property.id}`)}>
                         <Eye className="h-4 w-4 mr-1" />
                         {/* View */}
                       </Button>
@@ -239,13 +247,10 @@ const AgentPropertiesManager = () => {
                         {/* Edit */}
                       </Button>
                     </div>
-                    
-                    {/* {!property.isBoosted && (
-                        <Button size="sm" variant="secondary">
+                      <Button size="sm" className="bg-green-800 text-white">
                         <Zap className="h-4 w-4 mr-1" />
                         Boost
-                        </Button>
-                    )} */}
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -308,7 +313,6 @@ const AgentPropertiesManager = () => {
             </Card>
         )}
         </div>
-        <AgentPropertyView isOpen={viewAgentProperty} onClose={() => setViewAgentProperty(false)} onBoost={() => {}} property={property}/>
         {/* <PropertyUploadForm isOpen={uploadProperty} onClose={() => setUploadProperty(false)} onSubmit={() => {}}/> */}
         <PropertyListingDialog open={uploadProperty} onOpenChange={() => setUploadProperty(false)}/>
         {/* <PropertyEditForm property={property} isOpen={editProperty} onClose={() => setEditProperty(false)} onSave={() => {}} /> */}
