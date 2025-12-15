@@ -161,6 +161,7 @@ export interface PropertyInterface {
   agencyId: string;
   postedByUserId: string;
   propertyTypeId: string;
+  isBoosted ?: boolean;
   propertyType : {
     id: string;
     name: string;

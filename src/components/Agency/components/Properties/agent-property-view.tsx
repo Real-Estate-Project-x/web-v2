@@ -29,6 +29,7 @@ import {
   XCircle,
   Play,
   CheckCircle,
+  MessageCircleIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -41,6 +42,7 @@ import { convertDateCreatedToGetNumberOfDays, formatPrice } from "../../../../..
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { PropertyInterface } from "../../../../../utils/interfaces";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
+import { Input } from "@/components/ui/input";
 
 const AgentPropertyDetailPage = () => {
   const searchParams = useSearchParams();
@@ -48,7 +50,7 @@ const AgentPropertyDetailPage = () => {
   const router = useRouter();
   
   const [propertyData, setProperty] = useState<PropertyInterface>({} as PropertyInterface);
-  const [isBoosted, setIsBoosted] = useState(propertyData?.isPropertyBoosted);
+  const [isBoosted, setIsBoosted] = useState(propertyData?.isBoosted);
   const [isTaken, setIsTaken] = useState(propertyData?.isPropertyTaken);
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState(false);
@@ -60,11 +62,6 @@ const AgentPropertyDetailPage = () => {
       "Sold": "outline"
     } as const;
     return <Badge variant={variants[status as keyof typeof variants] || "outline"}>{status}</Badge>;
-  };
-
-  const handleBoost = () => {
-    setIsBoosted(true);
-    toast.success("Property Boosted!",{description : "Your property will now appear higher in search results."});
   };
 
   const handleMarkAsTaken = async() => {
@@ -83,8 +80,8 @@ const AgentPropertyDetailPage = () => {
     });
   };
 
-  const handleShare = (platform: string) => {
-    const url = window.location.href;
+  const handleShare = (platform: string, url = window.location.href) => {
+
     const text = `Check out this property: ${propertyData.title}`;
     
     let shareUrl = "";
@@ -94,6 +91,9 @@ const AgentPropertyDetailPage = () => {
         break;
       case "twitter":
         shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+        break;
+      case "whatsapp" : 
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
         break;
       case "linkedin":
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
@@ -109,9 +109,23 @@ const AgentPropertyDetailPage = () => {
     }
   };
 
-// 2)boost property
-// 4)share property videos
-// 5)Edit property
+  useEffect(() => {
+    const boostPaymentReference = localStorage.getItem("boost_payment_reference");
+    if(boostPaymentReference){
+      // verify payment status from backend
+      axiosInstance.get(`/payment/boost/verify/${boostPaymentReference}`)
+      .then((response) => {
+        console.log({response});
+        if(response?.data?.success){
+          toast.success("Property Boosted!",{description : "Your property will now appear higher in search results."});
+          localStorage.removeItem("boost_payment_reference");
+          setIsBoosted(true);
+        }
+      }).catch((err) => {
+        console.log({err});
+      });
+    }
+  },[]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -123,7 +137,7 @@ const AgentPropertyDetailPage = () => {
       setIsLoading(false);
       console.log({err});
     });
-  },[isTaken]);
+  },[isTaken, isBoosted]);
 
   if(isLoading) {
     return <LoaderViewProperty/>
@@ -170,7 +184,7 @@ const AgentPropertyDetailPage = () => {
                 </div>
                 <div className="flex flex-row items-center gap-4 mt-4">
                   {getStatusBadge(!propertyData?.isPropertyTaken ? "Active" : "Taken")}
-                  {propertyData?.isPropertyBoosted && (
+                  {propertyData?.isBoosted && (
                     <Badge className="bg-yellow-500 text-white-900">
                       <Zap className="h-3 w-3 mr-1" />
                       Boosted
@@ -336,15 +350,19 @@ const AgentPropertyDetailPage = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleShare("facebook")}>
+                    <DropdownMenuItem onClick={() => handleShare("facebook", propertyData?.videoUrl)}>
                       <Facebook className="h-4 w-4 mr-2" />
                       Facebook
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("twitter")}>
+                    <DropdownMenuItem onClick={() => handleShare("twitter", propertyData?.videoUrl)}>
                       <Twitter className="h-4 w-4 mr-2" />
                       Twitter
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("copy")}>
+                    <DropdownMenuItem onClick={() => handleShare("whatsapp", propertyData?.videoUrl)}>
+                      <MessageCircleIcon className="h-4 w-4 mr-2" />
+                      whatsapp
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShare("copy",  propertyData?.videoUrl)}>
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Link
                     </DropdownMenuItem>
@@ -426,11 +444,11 @@ const AgentPropertyDetailPage = () => {
                 <h3 className="text-lg font-semibold mb-2">Actions</h3>
                 
                 {/* Boost Button */}
-                {!propertyData?.isPropertyBoosted ? (
+                {!propertyData?.isBoosted ? (
                   <Button 
-                    onClick={handleBoost} 
+                    onClick={() => setIsBoosted(true)} 
                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-yellow-900"
-                    disabled={isTaken}
+                    disabled={isBoosted}
                   >
                     <Zap className="h-4 w-4 mr-2" />
                     Boost Property
@@ -479,10 +497,11 @@ const AgentPropertyDetailPage = () => {
                       <Twitter className="h-4 w-4 mr-2" />
                       Twitter
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("linkedin")}>
-                      <Linkedin className="h-4 w-4 mr-2" />
-                      LinkedIn
+                    <DropdownMenuItem onClick={() => handleShare("whatsapp")}>
+                      <MessageCircleIcon className="h-4 w-4 mr-2" />
+                      Whatsapp
                     </DropdownMenuItem>
+                    
                     <DropdownMenuItem onClick={() => handleShare("copy")}>
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Link
@@ -508,6 +527,13 @@ const AgentPropertyDetailPage = () => {
           onClose={() => setPrompt(false)} 
           onConfirm={handleMarkAsTaken} 
         />}
+        {/* Boost Property Prompt */}
+        {isBoosted && <BoostPropertyPrompt 
+          isOpen={isBoosted} 
+          onClose={() => setIsBoosted(false)} 
+          id={propertyData?.id}
+          setBoost={() => setIsBoosted(true)}
+        />}
       </div>
     </div>
   );
@@ -528,6 +554,60 @@ const ConfirmMarkAsTakenPrompt = ({ isOpen, onClose, onConfirm }: { isOpen: bool
             onConfirm();
             onClose();
           }}>Confirm</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const BoostPropertyPrompt = ({ isOpen, onClose, id,setBoost }: { isOpen: boolean; onClose: () => void; id:string, setBoost : () => void}) => {
+  const [weeks, setNoOfWeeksState] = useState(1);
+
+  if (!isOpen) return null; 
+
+  const onChangeWeeks = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const weeks = parseInt(e.target.value); 
+    if(weeks < 1){
+      toast.error("Invalid Input", {description: "Number of weeks must be at least 1."});
+    }
+    setNoOfWeeksState(weeks);
+  };
+
+   const handleBoost = async () => {
+     await axiosInstance.post(`/payment/boost/purchase`,{
+      propertyId: id,
+      weeks 
+     })
+    .then((response) => {
+      if(response?.data?.success){
+        localStorage.setItem("boost_payment_reference", response?.data?.paymentReference);
+        // redirect to payment gateway 
+        onClose();
+        window.location.href = response?.data?.authorizationUrl;
+      }
+    }).catch((err) => {
+      onClose();
+      console.log({err});
+      toast.error("Action Failed", {description: "Unable to complete the Boosting Process. Please try again."});
+    });
+  };
+
+
+  return( 
+    <div className="fixed inset-0 bg-white/60 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-11/12 max-w-md">
+        <h2 className="text-xl font-semibold mb-4">Boost Property</h2>  
+        <p className="mb-6">Boosting your property will increase its visibility in search results. Do you want to proceed?</p>
+        {/* add input field for number of weeks the agent can afford to boost property nothing less than 1 week should be added  */}
+        <Input type="number" min={1} placeholder="Enter number of weeks to boost" className="mb-6"
+        onChange={onChangeWeeks}/>
+
+        <div className="flex justify-end gap-4">
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={() => {
+            handleBoost();
+          }}>
+          Boost</Button>
         </div>
       </div>
     </div>
