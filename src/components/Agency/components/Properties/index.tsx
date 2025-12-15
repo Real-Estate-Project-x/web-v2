@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -20,22 +20,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { 
+import {
   Search,
-  Edit, 
-  Eye, 
+  Edit,
+  Eye,
   Filter,
   SortAsc,
   SortDesc,
   Upload,
-  Zap
+  Zap,
 } from "lucide-react";
 import AgentPropertyView from "./view-property";
 import PropertyEditForm from "./dialogs/edit-property";
 import { agentDashboardData } from "../..";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
-import { convertDateCreatedToGetNumberOfDays, formatPrice } from "../../../../../utils/helpers";
+import {
+  convertDateCreatedToGetNumberOfDays,
+  formatPrice,
+} from "../../../../../utils/helpers";
 import PropertyListingDialog from "./dialogs/new-upload";
 import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-select";
@@ -49,8 +52,12 @@ const AgentPropertiesManager = () => {
   const propertiesPerPage = 6;
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
-  const [property, setProperty] = useState<AgentDatabaseInterface>({} as AgentDatabaseInterface);
-  const [properties, setProperties] = useState<AgentDatabaseInterface[]>([] as AgentDatabaseInterface[]);
+  const [property, setProperty] = useState<AgentDatabaseInterface>(
+    {} as AgentDatabaseInterface
+  );
+  const [properties, setProperties] = useState<AgentDatabaseInterface[]>(
+    [] as AgentDatabaseInterface[]
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -61,81 +68,98 @@ const AgentPropertiesManager = () => {
     //   console.log({err});
     // });
 
-    axiosInstance.get(`/agency/${agencyId}/properties`)
-    .then((response) => {
-     setProperties(response.data.data);
-    }).catch((err) => {
-      console.log({err});
+    axiosInstance
+      .get(`/agency/${agencyId}/properties`)
+      .then((response) => {
+        setProperties(response.data.data);
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
+  }, []);
+
+  const filteredAndSortedProperties = properties
+    .filter((property) => {
+      const matchesSearch =
+        property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.propertyType?.tag
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (property.status && statusFilter.toLowerCase() === "active") ||
+        (!property.status && statusFilter.toLowerCase() === "sold");
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      let aValue, bValue;
+      switch (sortBy) {
+        case "price":
+          aValue = a.price;
+          bValue = b.price;
+          break;
+        case "date":
+          aValue = new Date(a.dateCreated).getTime();
+          bValue = new Date(b.dateCreated).getTime();
+          break;
+        default:
+          aValue = convertDateCreatedToGetNumberOfDays(a.dateCreated);
+          bValue = convertDateCreatedToGetNumberOfDays(b.dateCreated);
+      }
+      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
     });
-  },[]);
-
-  
-  const filteredAndSortedProperties = properties.filter(property => {
-    const matchesSearch =
-      property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.propertyType?.tag?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" ||
-      (property.status && statusFilter.toLowerCase() === "active") ||
-      (!property.status && statusFilter.toLowerCase() === "sold");
-
-    return matchesSearch && matchesStatus;
-  })
-  .sort((a, b) => {
-    let aValue, bValue;
-    switch (sortBy) {
-      case "price":
-        aValue = a.price;
-        bValue = b.price;
-        break;
-      case "date":
-        aValue = new Date(a.dateCreated).getTime();
-        bValue = new Date(b.dateCreated).getTime();
-        break;
-      default:
-        aValue = convertDateCreatedToGetNumberOfDays(a.dateCreated);
-        bValue = convertDateCreatedToGetNumberOfDays(b.dateCreated);
-    }
-    return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
-  });
 
   // Pagination
-  const totalPages = Math.ceil(filteredAndSortedProperties.length / propertiesPerPage);
+  const totalPages = Math.ceil(
+    filteredAndSortedProperties.length / propertiesPerPage
+  );
   const startIndex = (currentPage - 1) * propertiesPerPage;
-  const currentProperties = filteredAndSortedProperties.slice(startIndex, startIndex + propertiesPerPage);
+  const currentProperties = filteredAndSortedProperties.slice(
+    startIndex,
+    startIndex + propertiesPerPage
+  );
 
-  const agencyId = "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2"//"8b6c7c37-72b5-4db8-9184-214f32b8b68d";
+  const agencyId = "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2"; //"8b6c7c37-72b5-4db8-9184-214f32b8b68d";
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      "Rent": "default",
-      "Sale": "secondary",
-      "Sold": "outline"
+      Rent: "default",
+      Sale: "secondary",
+      Sold: "outline",
     } as const;
-    
-    return <Badge variant={variants[status as keyof typeof variants]} className={`py-1 font-normal rounded-lg text-white font-medium ${status && "bg-black "}`}>
-      {status ? "Active" : "Sold"}
-    </Badge>;
+
+    return (
+      <Badge
+        variant={variants[status as keyof typeof variants]}
+        className={`py-1 font-normal rounded-lg text-white font-medium ${
+          status && "bg-black "
+        }`}
+      >
+        {status ? "Active" : "Sold"}
+      </Badge>
+    );
   };
 
   return (
     <>
-        <div className="w-full mx-auto space-y-6 p-6">
-        
+      <div className="w-full mx-auto space-y-6 p-6">
         {/* Header with Add Property Button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
+          <div>
             <h2 className="text-2xl font-semibold">My Properties</h2>
-            <p className="text-muted-foreground">Manage and track your property listings</p>
-            </div>
-            <div className="flex gap-2">
+            <p className="text-muted-foreground">
+              Manage and track your property listings
+            </p>
+          </div>
+          <div className="flex gap-2">
             <Button variant="outline" onClick={() => setUploadProperty(true)}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Property
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Property
             </Button>
-            </div>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -146,45 +170,52 @@ const AgentPropertiesManager = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
-                  placeholder="Search properties by title, address, or type..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                    placeholder="Search properties by title, address, or type..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
                   />
                 </div>
               </div>
-                
+
               <div className="flex flex-col sm:flex-row gap-2">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-[150px]">
+                  <SelectTrigger className="w-full sm:w-[150px]">
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
+                  </SelectTrigger>
+                  <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     {/* <SelectItem value="pending">Pending</SelectItem> */}
                     <SelectItem value="sold">Sold</SelectItem>
-                    </SelectContent>
+                  </SelectContent>
                 </Select>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-full sm:w-[150px]">
+                  <SelectTrigger className="w-full sm:w-[150px]">
                     <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
+                  </SelectTrigger>
+                  <SelectContent>
                     <SelectItem value="date">Date Added</SelectItem>
                     <SelectItem value="price">Price</SelectItem>
                     {/* <SelectItem value="views">Views</SelectItem> */}
                     <SelectItem value="daysOnMarket">Days on Market</SelectItem>
-                    </SelectContent>
+                  </SelectContent>
                 </Select>
 
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
-                  {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                >
+                  {sortOrder === "asc" ? (
+                    <SortAsc className="h-4 w-4" />
+                  ) : (
+                    <SortDesc className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -195,7 +226,7 @@ const AgentPropertiesManager = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentProperties.map((property) => (
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
-                <div className="relative">
+              <div className="relative">
                 <img
                   src={property.photoUrls[0]}
                   alt={property.title}
@@ -212,110 +243,148 @@ const AgentPropertiesManager = () => {
                 <div className="absolute top-2 left-2">
                   {getStatusBadge(property.upFor)}
                 </div>
-                </div>
-                
-                <CardContent className="pb-4 px-4 pt-0">
+              </div>
+
+              <CardContent className="pb-4 px-4 pt-0">
                 <div className="space-y-3">
                   <div>
-                    <h3 className="font-semibold text-lg capitalize">{property.title}</h3>
-                    <p className="text-sm text-muted-foreground capitalize">{property.address}</p>
-                    <p className="text-xl font-bold text-primary">{formatPrice(property.price)}</p>
+                    <h3 className="font-semibold text-lg capitalize">
+                      {property.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {property.address}
+                    </p>
+                    <p className="text-xl font-bold text-primary">
+                      {formatPrice(property.price)}
+                    </p>
                   </div>
-                    
+
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{property.noOfBedrooms} bed • {property.noOfToilets} bath</span>
+                    <span>
+                      {property.noOfBedrooms} bed • {property.noOfToilets} bath
+                    </span>
                     <span>{property.sizeInSquareFeet} sqft</span>
                   </div>
-                    
+
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{convertDateCreatedToGetNumberOfDays(property.dateCreated)} days on market</span>
+                    <span className="text-muted-foreground">
+                      {convertDateCreatedToGetNumberOfDays(
+                        property.dateCreated
+                      )}{" "}
+                      days on market
+                    </span>
                   </div>
-                    
-                  <Separator className="w-full "/>
+
+                  <Separator className="w-full " />
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() =>
-                        router.push(`/agent-dashboard/properties/view?id=${property.id}`)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          router.push(
+                            `/agent-dashboard/properties/view?id=${property.slug}`
+                          )
+                        }
+                      >
                         <Eye className="h-4 w-4 mr-1" />
                         {/* View */}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => {
-                        setProperty(property);
-                        setEditProperty(true);
-                      }}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setProperty(property);
+                          setEditProperty(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-1" />
                         {/* Edit */}
                       </Button>
                     </div>
-                      <Button size="sm" className="bg-green-800 text-white">
-                        <Zap className="h-4 w-4 mr-1" />
-                        Boost
-                      </Button>
-                    </div>
+                    <Button size="sm" className="bg-green-800 text-white">
+                      <Zap className="h-4 w-4 mr-1" />
+                      Boost
+                    </Button>
                   </div>
-                </CardContent>
+                </div>
+              </CardContent>
             </Card>
-            ))}
+          ))}
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-            <div className="flex justify-center">
+          <div className="flex justify-center">
             <Pagination>
-                <PaginationContent>
+              <PaginationContent>
                 <PaginationItem>
-                    <PaginationPrevious 
+                  <PaginationPrevious
                     href="#"
                     onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) setCurrentPage(currentPage - 1);
+                      e.preventDefault();
+                      if (currentPage > 1) setCurrentPage(currentPage - 1);
                     }}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                    />
+                    className={
+                      currentPage === 1 ? "pointer-events-none opacity-50" : ""
+                    }
+                  />
                 </PaginationItem>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
                     <PaginationItem key={page}>
-                    <PaginationLink
+                      <PaginationLink
                         href="#"
                         onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage(page);
+                          e.preventDefault();
+                          setCurrentPage(page);
                         }}
                         isActive={currentPage === page}
-                    >
+                      >
                         {page}
-                    </PaginationLink>
+                      </PaginationLink>
                     </PaginationItem>
-                ))}
-                
+                  )
+                )}
+
                 <PaginationItem>
-                    <PaginationNext 
+                  <PaginationNext
                     href="#"
                     onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                      e.preventDefault();
+                      if (currentPage < totalPages)
+                        setCurrentPage(currentPage + 1);
                     }}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
+                    className={
+                      currentPage === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }
+                  />
                 </PaginationItem>
-                </PaginationContent>
+              </PaginationContent>
             </Pagination>
-            </div>
+          </div>
         )}
 
         {/* No Results */}
         {filteredAndSortedProperties.length === 0 && (
-            <Card>
+          <Card>
             <CardContent className="p-8 text-center">
-                <p className="text-muted-foreground">No properties found matching your criteria.</p>
+              <p className="text-muted-foreground">
+                No properties found matching your criteria.
+              </p>
             </CardContent>
-            </Card>
+          </Card>
         )}
-        </div>
-        {/* <PropertyUploadForm isOpen={uploadProperty} onClose={() => setUploadProperty(false)} onSubmit={() => {}}/> */}
-        <PropertyListingDialog open={uploadProperty} onOpenChange={() => setUploadProperty(false)}/>
-        {/* <PropertyEditForm property={property} isOpen={editProperty} onClose={() => setEditProperty(false)} onSave={() => {}} /> */}
+      </div>
+      {/* <PropertyUploadForm isOpen={uploadProperty} onClose={() => setUploadProperty(false)} onSubmit={() => {}}/> */}
+      <PropertyListingDialog
+        open={uploadProperty}
+        onOpenChange={() => setUploadProperty(false)}
+      />
+      {/* <PropertyEditForm property={property} isOpen={editProperty} onClose={() => setEditProperty(false)} onSave={() => {}} /> */}
     </>
   );
 };

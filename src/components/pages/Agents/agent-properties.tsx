@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,7 @@ import {
   Building,
   Search,
   SlidersHorizontal,
-  Calendar
+  Calendar,
 } from "lucide-react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
@@ -38,9 +38,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AgencyInterface, PropertyInterface } from "../../../../utils/interfaces";
+import {
+  AgencyInterface,
+  PropertyInterface,
+} from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
-
 
 const ITEMS_PER_PAGE = 6;
 
@@ -48,11 +50,11 @@ const AgentProperties = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  const router  = useRouter();
+  const router = useRouter();
   const [agency, setAgency] = useState<AgencyInterface>({} as AgencyInterface);
 
   const [currentPage, setCurrentPage] = useState(1);
-   const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [bedroomFilter, setBedroomFilter] = useState("all");
@@ -60,34 +62,50 @@ const AgentProperties = () => {
   const allProperties = agency && agency?.properties ? agency?.properties : []; //agent ? generatePropertiesForAgent(agent.id) : [];
 
   // Filter properties based on search and filters
-  const filteredProperties = allProperties.filter((property : PropertyInterface) => {
-    const matchesSearch =
-      property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      property.address.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredProperties = allProperties.filter(
+    (property: PropertyInterface) => {
+      const matchesSearch =
+        property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.address.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesType = propertyType === "all" || property?.propertyType?.name === propertyType;
+      const matchesType =
+        propertyType === "all" || property?.propertyType?.name === propertyType;
 
-    const priceNum = property?.price;
-    let matchesPrice = true;
-    if (priceRange === "under500k") matchesPrice = priceNum < 500000;
-    else if (priceRange === "500k-1m") matchesPrice = priceNum >= 500000 && priceNum < 1000000;
-    else if (priceRange === "1m-2m") matchesPrice = priceNum >= 1000000 && priceNum < 2000000;
-    else if (priceRange === "over2m") matchesPrice = priceNum >= 2000000;
+      const priceNum = property?.price;
+      let matchesPrice = true;
+      if (priceRange === "under500k") matchesPrice = priceNum < 500000;
+      else if (priceRange === "500k-1m")
+        matchesPrice = priceNum >= 500000 && priceNum < 1000000;
+      else if (priceRange === "1m-2m")
+        matchesPrice = priceNum >= 1000000 && priceNum < 2000000;
+      else if (priceRange === "over2m") matchesPrice = priceNum >= 2000000;
 
-    let matchesBedrooms = true;
-    if (bedroomFilter === "1-2") matchesBedrooms = property?.noOfBedrooms >= 1 && property.noOfBedrooms <= 2;
-    else if (bedroomFilter === "3-4") matchesBedrooms = property.noOfBedrooms >= 3 && property.noOfBedrooms <= 4;
-    else if (bedroomFilter === "5+") matchesBedrooms = property.noOfBedrooms >= 5;
+      let matchesBedrooms = true;
+      if (bedroomFilter === "1-2")
+        matchesBedrooms =
+          property?.noOfBedrooms >= 1 && property.noOfBedrooms <= 2;
+      else if (bedroomFilter === "3-4")
+        matchesBedrooms =
+          property.noOfBedrooms >= 3 && property.noOfBedrooms <= 4;
+      else if (bedroomFilter === "5+")
+        matchesBedrooms = property.noOfBedrooms >= 5;
 
-    return matchesSearch && matchesType && matchesPrice && matchesBedrooms;
-  });
+      return matchesSearch && matchesType && matchesPrice && matchesBedrooms;
+    }
+  );
 
   const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProperties = filteredProperties.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedProperties = filteredProperties.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
 
   // Reset to page 1 when filters change
-  const handleFilterChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+  const handleFilterChange = (
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    value: string
+  ) => {
     setter(value);
     setCurrentPage(1);
   };
@@ -101,12 +119,14 @@ const AgentProperties = () => {
   };
 
   useEffect(() => {
-    axiosInstance.get(`/agency/${id}`)
-    .then((response) => {
-      setAgency(response.data.data);
-    }).catch((error) => {
-      console.error("Error fetching agency:", error);
-    })
+    axiosInstance
+      .get(`/agency/${id}`)
+      .then((response) => {
+        setAgency(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching agency:", error);
+      });
 
     // axiosInstance.get(`/agency/${id}/properties`)
     // .then((response) => {
@@ -114,16 +134,20 @@ const AgentProperties = () => {
     // }).catch((error) => {
     //   console.error("Error fetching properties:", error);
     // })
-  },[]);
-  
+  }, []);
+
   if (!agency) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Agent Not Found</h1>
-            <Button onClick={() => router.push("/agents")}>Back to Agents</Button>
+            <h1 className="text-2xl font-bold text-foreground mb-4">
+              Agent Not Found
+            </h1>
+            <Button onClick={() => router.push("/agents")}>
+              Back to Agents
+            </Button>
           </div>
         </main>
         <Footer />
@@ -143,7 +167,8 @@ const AgentProperties = () => {
             <Button
               variant="ghost"
               className="text-white/80 hover:text-white hover:bg-white/10 mb-6"
-              onClick={() => router.push("/agents")}>
+              onClick={() => router.push("/agents")}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Agents
             </Button>
@@ -151,9 +176,13 @@ const AgentProperties = () => {
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="relative">
                 <Avatar className="h-24 w-24 md:h-32 md:w-32 ring-4 ring-white/20 shadow-2xl">
-                  <AvatarImage src={agency?.createdByUser?.profileImage} alt={`${agency?.createdByUser?.firstName} ${agency?.createdByUser?.lastName}`} />
+                  <AvatarImage
+                    src={agency?.createdByUser?.profileImage}
+                    alt={`${agency?.createdByUser?.firstName} ${agency?.createdByUser?.lastName}`}
+                  />
                   <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary to-blue-600 text-white">
-                    {agency?.createdByUser?.firstName}{agency?.createdByUser?.lastName}
+                    {agency?.createdByUser?.firstName}
+                    {agency?.createdByUser?.lastName}
                   </AvatarFallback>
                 </Avatar>
                 <div
@@ -169,11 +198,18 @@ const AgentProperties = () => {
                     {agency?.name}
                   </h1>
                   <Badge
-                    className={`${agency?.isRegistered  ? "bg-green-600 text-white" : "bg-gray-500 text-white"} text-sm py-2 rounded-full`}>
+                    className={`${
+                      agency?.isRegistered
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-500 text-white"
+                    } text-sm py-2 rounded-full`}
+                  >
                     {agency?.isRegistered ? "Registered" : "Not-Registered"}
                   </Badge>
                 </div>
-                <p className="text-lg text-white/80 capitalize">{agency?.description}</p>
+                <p className="text-lg text-white/80 capitalize">
+                  {agency?.description}
+                </p>
                 <div className="flex flex-wrap items-center gap-6 my-2">
                   <div className="flex items-center gap-2 text-white">
                     <Phone className="h-4 w-4" />
@@ -195,7 +231,12 @@ const AgentProperties = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Joined Since {new Date(agency?.dateOfIncorporation).toLocaleDateString()}</span>
+                    <span>
+                      Joined Since{" "}
+                      {new Date(
+                        agency?.dateOfIncorporation
+                      ).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -218,7 +259,7 @@ const AgentProperties = () => {
               </Badge>
             </div>
 
-             {/* Search and Filter Section */}
+            {/* Search and Filter Section */}
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6 mb-8 border border-border/50 shadow-sm">
               <div className="flex flex-col gap-4">
                 {/* Search Bar */}
@@ -227,7 +268,9 @@ const AgentProperties = () => {
                   <Input
                     placeholder="Search by property name or location..."
                     value={searchQuery}
-                    onChange={(e) => handleFilterChange(setSearchQuery, e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange(setSearchQuery, e.target.value)
+                    }
                     className="pl-10 bg-white border-border/50"
                   />
                 </div>
@@ -240,7 +283,12 @@ const AgentProperties = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-3 flex-1">
-                    <Select value={propertyType} onValueChange={(value) => handleFilterChange(setPropertyType, value)}>
+                    <Select
+                      value={propertyType}
+                      onValueChange={(value) =>
+                        handleFilterChange(setPropertyType, value)
+                      }
+                    >
                       <SelectTrigger className="w-full sm:w-[140px] bg-white border-border/50">
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
@@ -251,7 +299,12 @@ const AgentProperties = () => {
                       </SelectContent>
                     </Select>
 
-                    <Select value={priceRange} onValueChange={(value) => handleFilterChange(setPriceRange, value)}>
+                    <Select
+                      value={priceRange}
+                      onValueChange={(value) =>
+                        handleFilterChange(setPriceRange, value)
+                      }
+                    >
                       <SelectTrigger className="w-full sm:w-[160px] bg-white border-border/50">
                         <SelectValue placeholder="Price Range" />
                       </SelectTrigger>
@@ -264,7 +317,12 @@ const AgentProperties = () => {
                       </SelectContent>
                     </Select>
 
-                    <Select value={bedroomFilter} onValueChange={(value) => handleFilterChange(setBedroomFilter, value)}>
+                    <Select
+                      value={bedroomFilter}
+                      onValueChange={(value) =>
+                        handleFilterChange(setBedroomFilter, value)
+                      }
+                    >
                       <SelectTrigger className="w-full sm:w-[140px] bg-white border-border/50">
                         <SelectValue placeholder="Bedrooms" />
                       </SelectTrigger>
@@ -277,7 +335,10 @@ const AgentProperties = () => {
                     </Select>
                   </div>
 
-                  {(searchQuery || propertyType !== "all" || priceRange !== "all" || bedroomFilter !== "all") && (
+                  {(searchQuery ||
+                    propertyType !== "all" ||
+                    priceRange !== "all" ||
+                    bedroomFilter !== "all") && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -295,8 +356,10 @@ const AgentProperties = () => {
               <div className="text-center py-16">
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto">
                   <Building className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-                   <h3 className="text-2xl font-bold text-muted-foreground mb-2">
-                    {allProperties.length === 0 ? "No properties" : "No matching properties"}
+                  <h3 className="text-2xl font-bold text-muted-foreground mb-2">
+                    {allProperties.length === 0
+                      ? "No properties"
+                      : "No matching properties"}
                   </h3>
                   <p className="text-muted-foreground">
                     {allProperties.length === 0
@@ -304,7 +367,11 @@ const AgentProperties = () => {
                       : "Try adjusting your search or filters."}
                   </p>
                   {allProperties.length > 0 && (
-                    <Button variant="outline" className="mt-4" onClick={clearFilters}>
+                    <Button
+                      variant="outline"
+                      className="mt-4"
+                      onClick={clearFilters}
+                    >
                       Clear Filters
                     </Button>
                   )}
@@ -317,15 +384,23 @@ const AgentProperties = () => {
                     <Card
                       key={property.id}
                       className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
-                      onClick={() => router.push(`/properties/view?id=${property.id}`)}
+                      onClick={() =>
+                        router.push(`/properties/view?id=${property.slug}`)
+                      }
                     >
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={property.photoUrls && property.photoUrls.length > 0 ? property.photoUrls[0] : 'https://via.placeholder.com/400x300?text=No+Image'}
+                          src={
+                            property.photoUrls && property.photoUrls.length > 0
+                              ? property.photoUrls[0]
+                              : "https://via.placeholder.com/400x300?text=No+Image"
+                          }
                           alt={property.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <Badge className="absolute top-4 left-4 bg-primary">{property?.propertyType?.name}</Badge>
+                        <Badge className="absolute top-4 left-4 bg-primary">
+                          {property?.propertyType?.name}
+                        </Badge>
                         <Badge className="absolute top-4 right-4 bg-white text-foreground shadow-lg">
                           {formatPrice(property.price)}
                         </Badge>
@@ -341,15 +416,21 @@ const AgentProperties = () => {
                         <div className="flex justify-between text-muted-foreground border-t pt-4">
                           <div className="flex items-center gap-1">
                             <Bed className="h-4 w-4" />
-                            <span className="text-sm">{property?.noOfBedrooms} beds</span>
+                            <span className="text-sm">
+                              {property?.noOfBedrooms} beds
+                            </span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Bath className="h-4 w-4" />
-                            <span className="text-sm">{property?.noOfToilets} baths</span>
+                            <span className="text-sm">
+                              {property?.noOfToilets} baths
+                            </span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Square className="h-4 w-4" />
-                            <span className="text-sm">{property.sizeInSquareFeet} sqft</span>
+                            <span className="text-sm">
+                              {property.sizeInSquareFeet} sqft
+                            </span>
                           </div>
                         </div>
                       </CardContent>
@@ -364,11 +445,20 @@ const AgentProperties = () => {
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious
-                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            onClick={() =>
+                              setCurrentPage((p) => Math.max(1, p - 1))
+                            }
+                            className={
+                              currentPage === 1
+                                ? "pointer-events-none opacity-50"
+                                : "cursor-pointer"
+                            }
                           />
                         </PaginationItem>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        {Array.from(
+                          { length: totalPages },
+                          (_, i) => i + 1
+                        ).map((page) => (
                           <PaginationItem key={page}>
                             <PaginationLink
                               onClick={() => setCurrentPage(page)}
@@ -381,8 +471,14 @@ const AgentProperties = () => {
                         ))}
                         <PaginationItem>
                           <PaginationNext
-                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            onClick={() =>
+                              setCurrentPage((p) => Math.min(totalPages, p + 1))
+                            }
+                            className={
+                              currentPage === totalPages
+                                ? "pointer-events-none opacity-50"
+                                : "cursor-pointer"
+                            }
                           />
                         </PaginationItem>
                       </PaginationContent>
