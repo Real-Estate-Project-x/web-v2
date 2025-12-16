@@ -14,7 +14,6 @@ export const StatePropertyList: FC = () => {
   const [properties, setStateProperties] = useState<PropertyInterface[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const searchParams = useSearchParams();
-  const stateId = searchParams.get("stateId") || "1"; // Default to 1 if not provided
   const stateName = searchParams.get("name") || "State";
   const [type, setType] = useState<string>("");
   const [copyData, setCopyData] = useState<PropertyInterface[]>([]);
