@@ -14,7 +14,6 @@ interface AgentCardProps {
 }
 
 const AgentCard = ({ agent: data }: AgentCardProps) => {
-  console.log({ agent: data, isCurrentlyAvailable: data.isCurrentlyAvailable });
   const router = useRouter();
   const agent = data?.agency;
   const firstNameInitials = agent?.name?.split(" ")[0];
