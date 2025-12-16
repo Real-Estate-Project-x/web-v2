@@ -276,6 +276,7 @@ export interface AgentInterface {
   timeSinceJoined: string;
   totalReviewCount: number;
   viewingsCount: number;
+  isCurrentlyAvailable: boolean;
 }
 
 export const AgentInitialObject = {
