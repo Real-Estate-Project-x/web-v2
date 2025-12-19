@@ -42,8 +42,6 @@ export default function LoginForm() {
     try {
       const result = await axiosInstance.post(url, payload);
 
-      console.log({ login_result: result });
-
       if (result?.data?.success) {
         setLoading(false);
 
