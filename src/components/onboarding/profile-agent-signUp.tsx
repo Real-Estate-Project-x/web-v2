@@ -19,8 +19,7 @@ import {
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const profileSchema = z
   .object({
@@ -67,6 +66,10 @@ export default function ProfileForm() {
   const router = useRouter();
   const [logoUrl, setLogoUrl] = useState<string>("");
 
+  const userId = useSearchParams().get("userId");
+
+  console.log({ userId });
+
   const {
     register,
     handleSubmit,
@@ -83,7 +86,7 @@ export default function ProfileForm() {
   const isBusinessRegistered = watch("isBusinessRegistered");
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files ? e.target.files[0] : null;
     if (file) {
       setFile(file);
       const reader = new FileReader();
@@ -95,55 +98,65 @@ export default function ProfileForm() {
       reader.readAsDataURL(file);
       try {
         const formatData = new FormData();
-        const images: File[] = [];
-        images.push(file as File);
-        images.forEach((file) => formatData.append("files[]", file));
-        const responseData = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}upload-files`,
-          { files: images },
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        if (responseData?.data?.data?.length > 0)
+        formatData.append("files[]", file);
+
+        const url = "upload-files";
+        const headers = { "Content-Type": "multipart/form-data" };
+        const responseData = await axiosInstance.post(url, formatData, {
+          headers,
+        });
+        if (responseData?.data?.data?.length > 0) {
           setLogoUrl(responseData.data.data[0]);
-      } catch (error) {
-        console.error("Error uploading logo:", error);
+        }
+      } catch (ex) {
+        console.error(`Error uploading logo: ${ex}`);
+
+        const errorMessage = "Error uploading logo. Please re-upload";
+        toast(errorMessage, {
+          description: JSON.stringify(ex),
+        });
+        throw ex;
       }
     }
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    await axiosInstance
-      .post("agency/create-agency/profile", {
-        logo: logoUrl,
-        agencyName: data.agencyName,
-        phoneNumber: data.phoneNumber,
-        businessAddress: data.businessAddress,
-        isBusinessRegistered: data.isBusinessRegistered,
-        rcNumber: data.rcNumber,
-        description: data.description,
-      })
-      .then((response) => {
-        if (response.data.success) {
-          setTimeout(() => {
-            toast.success("Profile saved successfully!", {
-              description: "Your business profile has been completed",
-            });
-          }, 2000);
-          router.push(`/login`);
-        } else {
-          toast.error("Sign Up failed. Please try again.");
-        }
-      })
-      .catch((error) => {
-        toast(
-          error.response?.data?.message ||
-            "An error occurred. Please try again."
-        );
-      });
+    if (!logoUrl) {
+      toast("Please re-upload a logo");
+      return;
+    }
+
+    const url = "agency/create-agency/profile";
+    const payload = {
+      userId,
+      logo: logoUrl,
+      rcNumber: data.rcNumber,
+      agencyName: data.agencyName,
+      description: data.description,
+      phoneNumber: data.phoneNumber,
+      businessAddress: data.businessAddress,
+      isBusinessRegistered: data.isBusinessRegistered,
+    };
+
+    console.log({ url, payload });
+    try {
+      const result = await axiosInstance.post(url, payload);
+      if (result?.data?.success) {
+        setTimeout(() => {
+          toast.success("Profile saved successfully!", {
+            description:
+              "Verify your account to complete your sign up. Check your email for the verification code.",
+          });
+        }, 2000);
+        router.push(`/verify-account`);
+      } else {
+        toast.error("Sign Up failed. Please try again.");
+      }
+    } catch (ex: any) {
+      toast(
+        ex.response?.data?.message || "An error occurred. Please try again."
+      );
+    }
   };
 
   return (

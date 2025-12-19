@@ -47,11 +47,28 @@ export default function LoginForm() {
 
         saveInfoToLocalStorage(result.data, encryptionKey);
 
+        const decryptedResponse = JSON.parse(
+          decryptData(result.data.data, encryptionKey)
+        );
+
         setTimeout(() => {
           toast.success("Login Successful!");
           setLoading(false);
+
+          // Navigate to dashboard based on user role
+          switch (decryptedResponse.user.role.name) {
+            default:
+            case "customer":
+              router.push("/user-dashboard");
+              break;
+            case "agent":
+              router.push("/agent-dashboard");
+              break;
+            case "subAgent":
+              router.push("/sub-agent-dashboard");
+              break;
+          }
         }, 2000);
-        router.push("/user-dashboard");
       } else {
         toast.error("Login failed. Please try again.");
       }

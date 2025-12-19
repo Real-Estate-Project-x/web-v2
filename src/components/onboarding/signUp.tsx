@@ -64,7 +64,7 @@ const SignUpForm: React.FC = () => {
 
     if (!validatePassword(form.password)) {
       toast.error(
-        " Password must contain at least 8 characters, at least 1 capital letter, 1 number and 1 special character "
+        "Password must contain at least 8 characters, at least 1 capital letter, 1 number and 1 special character "
       );
       setSubmitting(false);
       return;
@@ -123,12 +123,15 @@ const SignUpForm: React.FC = () => {
 
         const result = await axiosInstance.post(url, payload);
         if (result?.data?.success) {
+          setLocalStorageField("user_email", form.email);
           setSubmitting(false);
           setTimeout(() => {
             toast.success("Sign Up successful!");
             setSubmitting(false);
           }, 2000);
-          router.push(`/profile-agent-signUp?type=AGENT`);
+
+          const userId = result.data.data.id;
+          router.push(`/profile-agent-signUp?type=AGENT&userId=${userId}`);
         } else {
           toast.error("Sign Up failed. Please try again.");
         }
