@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
   encryptData,
+  setLocalStorageField,
   validateEmail,
   validatePassword,
   validatePhoneNumber,
@@ -64,12 +65,6 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    if (!isValidPhoneNumber(form.phone)) {
-      toast.error("Please enter a valid phone number.");
-      setSubmitting(false);
-      return;
-    }
-
     if (!validatePassword(form.password)) {
       toast.error(
         " Password must contain at least 8 characters, at least 1 capital letter, 1 number and 1 special character "
@@ -89,6 +84,13 @@ const SignUpForm: React.FC = () => {
       String(process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY)
     );
     if (type && type.toLowerCase() === "user") {
+      // Only agents need phone_numbers at sign_up
+      if (!isValidPhoneNumber(form.phone)) {
+        toast.error("Please enter a valid phone number.");
+        setSubmitting(false);
+        return;
+      }
+
       await axiosInstance
         .post("user/sign-up", {
           firstName: form.firstName,
@@ -99,6 +101,7 @@ const SignUpForm: React.FC = () => {
         })
         .then((response) => {
           if (response.data.success) {
+            setLocalStorageField("user_email", form.email);
             setSubmitting(false);
             setTimeout(() => {
               toast.success("Sign Up successful! Please verify your account");

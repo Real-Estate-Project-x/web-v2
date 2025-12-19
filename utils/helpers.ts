@@ -1,4 +1,4 @@
-import AES from "crypto-js/aes";
+import { AES, enc } from "crypto-js";
 
 export const formatPrice = (price: number): string => {
   const formatter = new Intl.NumberFormat("en-NG", {
@@ -45,10 +45,24 @@ export const encryptData = <T>(rawData: T, encryptionKey: string): string => {
   return AES.encrypt(data, encryptionKey).toString();
 };
 
+export const decryptData = (
+  encryptedData: string,
+  encryptionKey: string
+): string => AES.decrypt(encryptedData, encryptionKey).toString(enc.Utf8);
+
 export const convertDateCreatedToGetNumberOfDays = (dateCreated: string) => {
   const createdDate = new Date(dateCreated);
   const currentDate = new Date();
   const timeDifference = currentDate.getTime() - createdDate.getTime();
   const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
   return daysDifference;
-}
+};
+
+export const setLocalStorageField = <T>(key: string, data: T) =>
+  localStorage.setItem(key, JSON.stringify(data));
+
+export const getLocalStorageField = (key: string) =>
+  JSON.parse(localStorage.getItem(key) as string);
+
+export const deleteLocalStorageField = (key: string) =>
+  localStorage.removeItem(key);
