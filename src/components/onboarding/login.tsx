@@ -13,6 +13,7 @@ import {
   decryptData,
   setLocalStorageField,
 } from "../../../utils/helpers";
+import { setCookie } from "@/lib/helpers";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -85,6 +86,7 @@ export default function LoginForm() {
     const token = apiResult.token;
 
     setLocalStorageField("token", token);
+    setCookie("access_token", token);
 
     const decryptedInfo = JSON.parse(
       decryptData(apiResult.data, encryptionKey)

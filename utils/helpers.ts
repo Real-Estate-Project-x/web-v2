@@ -67,6 +67,14 @@ export const getLocalStorageField = (key: string) =>
 export const deleteLocalStorageField = (key: string) =>
   localStorage.removeItem(key);
 
+export const pickUserId = () => {
+  const userInfo = decryptData(
+    getLocalStorageField("userInfo"),
+    String(process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY)
+  );
+  return JSON.parse(userInfo).userId;
+};
+
 export const checkForRequiredFields = (
   requiredFields: string[],
   requestPayload: Object
