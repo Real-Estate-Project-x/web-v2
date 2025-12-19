@@ -39,8 +39,6 @@ const VerifyAccountForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const code = otp.join("");
-    console.log("OTP Code:", code);
 
     const localStorageKey = "user_email";
     const userEmail = getLocalStorageField(localStorageKey);
@@ -50,6 +48,7 @@ const VerifyAccountForm: React.FC = () => {
       return;
     }
 
+    const code = otp.join("");
     const url = "user/sign-up/verify";
     const payload = {
       otp: code,

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { use, useState } from "react";
-import { Mail, Lock, User, Eye, EyeOff, Phone } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
+  checkForRequiredFields,
   encryptData,
   setLocalStorageField,
   validateEmail,
@@ -43,19 +44,15 @@ const SignUpForm: React.FC = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    if (type && type.toLowerCase() === "agent") {
-      form.phone = "08090456789";
-    }
+    const typeLowerCase = type?.toLowerCase();
 
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.email ||
-      !form.phone ||
-      !form.password ||
-      !form.confirm
-    ) {
-      toast.info("Please fill out all fields.");
+    const requiredFields = ["firstName", "lastName", "email", "password"];
+    if (typeLowerCase === "user") {
+      requiredFields.push("phone");
+    }
+    const requiredFieldsCheck = checkForRequiredFields(requiredFields, form);
+    if (requiredFieldsCheck?.errorMessage) {
+      toast.info(requiredFieldsCheck.errorMessage);
       setSubmitting(false);
       return;
     }
@@ -79,74 +76,68 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    const encryptedPassword = encryptData(
-      form.password,
-      String(process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY)
+    const encryptionKey = String(
+      process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY
     );
-    if (type && type.toLowerCase() === "user") {
-      // Only agents need phone_numbers at sign_up
-      if (!isValidPhoneNumber(form.phone)) {
-        toast.error("Please enter a valid phone number.");
-        setSubmitting(false);
-        return;
-      }
+    const encryptedPassword = encryptData(form.password, encryptionKey);
 
-      await axiosInstance
-        .post("user/sign-up", {
+    try {
+      if (typeLowerCase === "user") {
+        // Only agents need phone_numbers at sign_up
+        if (!isValidPhoneNumber(form.phone)) {
+          toast.error("Please enter a valid phone number.");
+          setSubmitting(false);
+          return;
+        }
+
+        const url = "user/sign-up";
+        const payload = {
           firstName: form.firstName,
           lastName: form.lastName,
           phoneNumber: form.phone,
           email: form.email,
           password: encryptedPassword,
-        })
-        .then((response) => {
-          if (response.data.success) {
-            setLocalStorageField("user_email", form.email);
-            setSubmitting(false);
-            setTimeout(() => {
-              toast.success("Sign Up successful! Please verify your account");
-              setSubmitting(false);
-            }, 2000);
-            router.push("/verify-account");
-          } else {
-            toast.error("Sign Up failed. Please try again.");
-          }
-        })
-        .catch((error) => {
+        };
+
+        const result = await axiosInstance.post(url, payload);
+        if (result?.data?.success) {
+          setLocalStorageField("user_email", form.email);
           setSubmitting(false);
-          // console.error("Error during sign up:", error);
-          toast(
-            error.response?.data?.message ||
-              "An error occurred. Please try again."
-          );
-        });
-    } else {
-      await axiosInstance
-        .post("agency/create-agency", {
+          setTimeout(() => {
+            toast.success("Sign Up successful! Please verify your account");
+            setSubmitting(false);
+          }, 2000);
+          router.push("/verify-account");
+        } else {
+          toast.error("Sign Up failed. Please try again.");
+        }
+      } else {
+        // type == 'agent'
+        const url = "agency/create-agency";
+        const payload = {
           firstName: form.firstName,
           lastName: form.lastName,
           email: form.email,
           password: encryptedPassword,
-        })
-        .then((response) => {
-          if (response.data.success) {
-            setSubmitting(false);
-            setTimeout(() => {
-              toast.success("Sign Up successful!");
-              setSubmitting(false);
-            }, 2000);
-            router.push(`/profile-agent-signUp?type=AGENT`);
-          } else {
-            toast.error("Sign Up failed. Please try again.");
-          }
-        })
-        .catch((error) => {
+        };
+
+        const result = await axiosInstance.post(url, payload);
+        if (result?.data?.success) {
           setSubmitting(false);
-          toast(
-            error.response?.data?.message ||
-              "An error occurred. Please try again."
-          );
-        });
+          setTimeout(() => {
+            toast.success("Sign Up successful!");
+            setSubmitting(false);
+          }, 2000);
+          router.push(`/profile-agent-signUp?type=AGENT`);
+        } else {
+          toast.error("Sign Up failed. Please try again.");
+        }
+      }
+    } catch (ex: any) {
+      setSubmitting(false);
+      toast(
+        ex.response?.data?.message || "An error occurred. Please try again."
+      );
     }
   };
 

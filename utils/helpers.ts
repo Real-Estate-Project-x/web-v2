@@ -66,3 +66,23 @@ export const getLocalStorageField = (key: string) =>
 
 export const deleteLocalStorageField = (key: string) =>
   localStorage.removeItem(key);
+
+export const checkForRequiredFields = (
+  requiredFields: string[],
+  requestPayload: Object
+): { missingFields: string[]; errorMessage: string } | undefined => {
+  const missingFields = requiredFields.filter(
+    (field: string) =>
+      Object.keys(requestPayload).indexOf(field) < 0 ||
+      Object.values(requestPayload)[
+        Object.keys(requestPayload).indexOf(field)
+      ] === "" ||
+      !Object.values(requestPayload)[Object.keys(requestPayload).indexOf(field)]
+  );
+  if (missingFields.length) {
+    return {
+      missingFields,
+      errorMessage: `Missing required field(s): '${[...missingFields]}'`,
+    };
+  }
+};

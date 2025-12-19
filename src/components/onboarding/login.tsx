@@ -33,7 +33,7 @@ export default function LoginForm() {
     );
     const encryptedPassword = encryptData(form.password, encryptionKey);
 
-    const url = "/auth/login/WEB";
+    const url = "auth/login/WEB";
     const payload = {
       email: form.email,
       password: encryptedPassword,
