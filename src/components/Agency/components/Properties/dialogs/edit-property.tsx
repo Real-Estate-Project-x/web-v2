@@ -24,13 +24,14 @@ import { toast } from "sonner";
 import { AgentDatabaseInterface, CountryStatesInterface, PropertyTypesInterface } from "../../../../../../utils/interfaces";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import axios from "axios";
+import { pickUserId } from "../../../../../../utils/helpers";
 
 interface PropertyEditFormProps {
   property: AgentDatabaseInterface | null;
   isOpen: boolean;
   onClose: () => void;
   index : number;
-  onSave: (propertyData: Partial<AgentDatabaseInterface>) => void;
+  onSave: () => void;
 }
 
 const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
@@ -102,8 +103,9 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log({formData, videosUrl});
+    setLoader(true);
+    const agentId = pickUserId();
+
     // add additional costs for agent, geo cor longitude and lattitude,
     try{
       await axiosInstance.patch(`property`, {
@@ -121,14 +123,14 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         //   }
         // ],
         paymentCoverageDuration: formData?.paymentPlan,
-        agencyId : "string",
+        agencyId : agentId,
         stateId: formData?.state,
         sizeInSquareFeet : formData?.sqft,
         // "geoCoordinates": {
         //   "latitude": 40.7128,
         //   "longitude": -74.006
         // },
-        videoUrl : videosUrl,
+        videoUrl : videosUrl?.length > 0 ? videosUrl[0] : "",
         // "architecturalPlanUrls": [
         //   "string"
         // ],
@@ -145,18 +147,19 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         propertyId: property?.id,
         createdByUserId: property?.postedByUserId
       }).then((response) => {
-
-        console.log({response});
-
+        if(response?.data?.success){
+          onSave();
+          toast.success("Property updated successfully!");
+          //update state to refresh endpoint
+        }
+      
       }).catch((err) => {
         console.log({err});
       })
     } catch(err){
 
     }
-
-   // onSave(updatedProperty);
-    toast.success("Property updated successfully!");
+    setLoader(false); 
     onClose();
   };
 

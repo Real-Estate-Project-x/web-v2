@@ -1,25 +1,27 @@
 "use client";
 
 import React, { use, useState } from "react";
-import { Mail, Lock, User, Eye, EyeOff, Phone } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
+  checkForRequiredFields,
   encryptData,
+  setLocalStorageField,
   validateEmail,
   validatePassword,
   validatePhoneNumber,
 } from "../../../utils/helpers";
-import {useRouter, useSearchParams } from "next/navigation";
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
-import 'react-phone-number-input/style.css';
+import { useRouter, useSearchParams } from "next/navigation";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const SignUpForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const type = useSearchParams().get('type');
+  const type = useSearchParams().get("type");
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -42,19 +44,15 @@ const SignUpForm: React.FC = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    if(type && type.toLowerCase() === "agent"){
-      form.phone = "08090456789";
-    }
+    const typeLowerCase = type?.toLowerCase();
 
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.email ||
-      !form.phone ||
-      !form.password ||
-      !form.confirm
-    ) {
-      toast.info("Please fill out all fields.");
+    const requiredFields = ["firstName", "lastName", "email", "password"];
+    if (typeLowerCase === "user") {
+      requiredFields.push("phone");
+    }
+    const requiredFieldsCheck = checkForRequiredFields(requiredFields, form);
+    if (requiredFieldsCheck?.errorMessage) {
+      toast.info(requiredFieldsCheck.errorMessage);
       setSubmitting(false);
       return;
     }
@@ -64,15 +62,9 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    if (!validatePhoneNumber(form.phone) && isValidPhoneNumber(form.phone)) {
-      toast.error("Please enter a valid phone number.");
-      setSubmitting(false);
-      return;
-    }
-
     if (!validatePassword(form.password)) {
       toast.error(
-        " Password must contain at least 8 characters, at least 1 capital letter, 1 number and 1 special character "
+        "Password must contain at least 8 characters, at least 1 capital letter, 1 number and 1 special character "
       );
       setSubmitting(false);
       return;
@@ -84,66 +76,71 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    const encryptedPassword = encryptData(
-      form.password,
-      String(process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY)
+    const encryptionKey = String(
+      process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY
     );
-    if(type && type.toLowerCase() === 'user'){
-      await axiosInstance
-      .post("user/sign-up", {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        phoneNumber: form.phone,
-        email: form.email,
-        password: encryptedPassword,
-      })
-      .then((response) => {
-        if (response.data.success) {
+    const encryptedPassword = encryptData(form.password, encryptionKey);
+
+    try {
+      if (typeLowerCase === "user") {
+        // Only agents need phone_numbers at sign_up
+        if (!isValidPhoneNumber(form.phone)) {
+          toast.error("Please enter a valid phone number.");
+          setSubmitting(false);
+          return;
+        }
+
+        const url = "user/sign-up";
+        const payload = {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          phoneNumber: form.phone,
+          email: form.email,
+          password: encryptedPassword,
+        };
+
+        const result = await axiosInstance.post(url, payload);
+        if (result?.data?.success) {
+          setLocalStorageField("user_email", form.email);
+          setSubmitting(false);
+          setTimeout(() => {
+            toast.success("Sign Up successful! Please verify your account");
+            setSubmitting(false);
+          }, 2000);
+          router.push("/verify-account");
+        } else {
+          toast.error("Sign Up failed. Please try again.");
+        }
+      } else {
+        // type == 'agent'
+        const url = "agency/create-agency";
+        const payload = {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          password: encryptedPassword,
+        };
+
+        const result = await axiosInstance.post(url, payload);
+        if (result?.data?.success) {
+          setLocalStorageField("user_email", form.email);
           setSubmitting(false);
           setTimeout(() => {
             toast.success("Sign Up successful!");
             setSubmitting(false);
           }, 2000);
-          router.push("/login");
+
+          const userId = result.data.data.id;
+          router.push(`/profile-agent-signUp?type=AGENT&userId=${userId}`);
         } else {
           toast.error("Sign Up failed. Please try again.");
         }
-      })
-      .catch((error) => {
-        setSubmitting(false);
-        // console.error("Error during sign up:", error);
-        toast(
-          error.response?.data?.message ||
-            "An error occurred. Please try again."
-        );
-      });
-    }else{
-      await axiosInstance
-      .post("agency/create-agency", {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: encryptedPassword,
-      })
-      .then((response) => {
-        if (response.data.success) {
-          setSubmitting(false);
-          setTimeout(() => {
-            toast.success("Sign Up successful!");
-            setSubmitting(false);
-          }, 2000);
-          router.push(`/profile-agent-signUp?type=AGENT`);
-        } else {
-          toast.error("Sign Up failed. Please try again.");
-        }
-      })
-      .catch((error) => {
-        setSubmitting(false);
-        toast(
-          error.response?.data?.message ||
-            "An error occurred. Please try again."
-        );
-      });
+      }
+    } catch (ex: any) {
+      setSubmitting(false);
+      toast(
+        ex.response?.data?.message || "An error occurred. Please try again."
+      );
     }
   };
 
@@ -204,7 +201,7 @@ const SignUpForm: React.FC = () => {
           </div>
         </div>
       </section>
-      {type && type.toLowerCase() === 'user' && (
+      {type && type.toLowerCase() === "user" && (
         <div>
           <Label htmlFor="email" className="text-gray-700 font-medium">
             Phone&nbsp;Number
@@ -212,7 +209,7 @@ const SignUpForm: React.FC = () => {
           <PhoneInput
             placeholder="Enter phone number"
             value={form.phone}
-            onChange={(value : any) => setForm({ ...form, phone:value  })}
+            onChange={(value: any) => setForm({ ...form, phone: value })}
             className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg mt-1"
             defaultCountry="NG" // You can set a default country
           />
