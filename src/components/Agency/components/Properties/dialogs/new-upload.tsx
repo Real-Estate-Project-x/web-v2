@@ -38,7 +38,7 @@ import { Building2, Home, Image, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { LoaderCard, LoaderProcessor } from "@/components/shared/loader-cards";
+import { LoaderProcessor } from "@/components/shared/loader-cards";
 import axios from "axios";
 import { CountryStatesInterface, PropertyTypesInterface } from "../../../../../../utils/interfaces";
 
@@ -177,29 +177,29 @@ export default function PropertyListingDialog({
     };
     const newUploadFiles = (array : any, type : 'image' | 'video'|'architecture') => {
 
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}upload-files`, {
-          files : array
-        }, {headers : {
-          'Content-Type' : 'multipart/form-data'
-        }}).then(res => {
-            switch(type){
-                case 'image' : 
-                  setImagesUrl(res.data?.data);
-                break;
-                case 'video' : 
-                  setVideosUrl(res.data?.data);
-                break;
-                case 'architecture' : 
-                  setArchitechturalImagesUrl(res.data?.data);
-                break;
-                default : 
-                  console.log('');
-                break;
-            }
+      axios.post(`${process.env.NEXT_PUBLIC_API_URL}upload-files`, {
+        files : array
+      }, {headers : {
+        'Content-Type' : 'multipart/form-data'
+      }}).then(res => {
+        switch(type){
+          case 'image' : 
+            setImagesUrl(res.data?.data);
+          break;
+          case 'video' : 
+            setVideosUrl(res.data?.data);
+          break;
+          case 'architecture' : 
+            setArchitechturalImagesUrl(res.data?.data);
+          break;
+          default : 
+            console.log('');
+          break;
+        }
 
-        }).catch(err => {
-          toast.error(err?.response?.data?.message);
-        });
+      }).catch(err => {
+        toast.error(err?.response?.data?.message);
+      });
     }
     const onSubmit = (data: PropertyFormData) => {
       setIsLoading(true);
@@ -226,7 +226,7 @@ export default function PropertyListingDialog({
         form.reset();
       }
 
-      };
+    };
 
     useEffect(() => {
       // get property Types
@@ -273,7 +273,16 @@ export default function PropertyListingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] p-0 bg-white">
+      <DialogContent aria-describedby={undefined} className="
+        w-[95vw]
+        max-w-full
+        sm:max-w-[95vw]
+        md:max-w-5xl
+        lg:max-w-6xl
+        max-h-[90vh]
+        overflow-y-auto
+        bg-white
+      ">
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
@@ -329,7 +338,7 @@ export default function PropertyListingDialog({
                         <FormItem>
                           <FormLabel>Property Type</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value} required>
-                            <FormControl>
+                            <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select Property Type" />
                               </SelectTrigger>
@@ -352,7 +361,7 @@ export default function PropertyListingDialog({
                         <FormItem>
                           <FormLabel>Listing Type</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value} required>
-                            <FormControl>
+                            <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select type" />
                               </SelectTrigger>
@@ -374,7 +383,7 @@ export default function PropertyListingDialog({
                         <FormItem>
                           <FormLabel>Category</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value} required>
-                            <FormControl>
+                            <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
@@ -410,7 +419,7 @@ export default function PropertyListingDialog({
                         <FormItem>
                           <FormLabel>State</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value} required>
-                            <FormControl>
+                            <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select state" />
                               </SelectTrigger>
@@ -460,6 +469,7 @@ export default function PropertyListingDialog({
                             <SelectContent>
                               <SelectItem value="MONTHLY">Monthly</SelectItem>
                               <SelectItem value="YEARLY">Yearly</SelectItem>
+                              <SelectItem value="QUARTERLY">Quarterly</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -831,9 +841,9 @@ export default function PropertyListingDialog({
                     </div>
                     {/* Videos */}
                     <div>
-                      <Label>Property Videos</Label>
+                      <Label>Property Video</Label>
                       <FormDescription>
-                        Upload Property Videos (You can upload multiple images)
+                        Upload Property Video
                       </FormDescription>
                       <div className="mt-2">
                         <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">

@@ -115,7 +115,6 @@ const AgentPropertyDetailPage = () => {
       // verify payment status from backend
       axiosInstance.get(`/payment/boost/verify/${boostPaymentReference}`)
       .then((response) => {
-        console.log({response});
         if(response?.data?.success){
           toast.success("Property Boosted!",{description : "Your property will now appear higher in search results."});
           localStorage.removeItem("boost_payment_reference");
@@ -560,7 +559,7 @@ const ConfirmMarkAsTakenPrompt = ({ isOpen, onClose, onConfirm }: { isOpen: bool
   );
 }
 
-const BoostPropertyPrompt = ({ isOpen, onClose, id,setBoost }: { isOpen: boolean; onClose: () => void; id:string, setBoost : () => void}) => {
+export const BoostPropertyPrompt = ({ isOpen, onClose, id,setBoost }: { isOpen: boolean; onClose: () => void; id:string, setBoost : () => void}) => {
   const [weeks, setNoOfWeeksState] = useState(1);
 
   if (!isOpen) return null; 

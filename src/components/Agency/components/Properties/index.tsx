@@ -30,15 +30,16 @@ import {
   Upload,
   Zap
 } from "lucide-react";
-import AgentPropertyView from "./view-property";
 import PropertyEditForm from "./dialogs/edit-property";
-import { agentDashboardData } from "../..";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
 import { convertDateCreatedToGetNumberOfDays, formatPrice } from "../../../../../utils/helpers";
 import PropertyListingDialog from "./dialogs/new-upload";
 import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-select";
+import { BoostPropertyPrompt } from "./agent-property-view";
+import { toast } from "sonner";
+
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,9 +47,11 @@ const AgentPropertiesManager = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isBoosted, setIsBoosted] = useState(false);
   const propertiesPerPage = 6;
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
+  const [index, setIndex] = useState<number>(0);
   const [property, setProperty] = useState<AgentDatabaseInterface>({} as AgentDatabaseInterface);
   const [properties, setProperties] = useState<AgentDatabaseInterface[]>([] as AgentDatabaseInterface[]);
   const router = useRouter();
@@ -60,6 +63,20 @@ const AgentPropertiesManager = () => {
     // }).catch((err) => {
     //   console.log({err});
     // });
+    const boostPaymentReference = localStorage.getItem("boost_payment_reference");
+    if(boostPaymentReference){
+      // verify payment status from backend
+      axiosInstance.get(`/payment/boost/verify/${boostPaymentReference}`)
+      .then((response) => {
+        if(response?.data?.success){
+          toast.success("Property Boosted!",{description : "Your property will now appear higher in search results."});
+          localStorage.removeItem("boost_payment_reference");
+          setIsBoosted(true);
+        }
+      }).catch((err) => {
+        console.log({err});
+      });
+    }
 
     axiosInstance.get(`/agency/${agencyId}/properties`)
     .then((response) => {
@@ -193,7 +210,7 @@ const AgentPropertiesManager = () => {
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentProperties.map((property) => (
+          {currentProperties.map((property, index) => (
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
                 <div className="relative">
                 <img
@@ -241,13 +258,19 @@ const AgentPropertiesManager = () => {
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => {
                         setProperty(property);
+                        setIndex(index);
                         setEditProperty(true);
                       }}>
                         <Edit className="h-4 w-4 mr-1" />
                         {/* Edit */}
                       </Button>
                     </div>
-                      <Button size="sm" className="bg-green-800 text-white">
+                      <Button size="sm" className="bg-green-800 text-white"
+                      disabled={property?.isBoosted}
+                      onClick={() => {
+                        setProperty(property);
+                        setIsBoosted(true);
+                      }}>
                         <Zap className="h-4 w-4 mr-1" />
                         Boost
                       </Button>
@@ -313,9 +336,20 @@ const AgentPropertiesManager = () => {
             </Card>
         )}
         </div>
-        {/* <PropertyUploadForm isOpen={uploadProperty} onClose={() => setUploadProperty(false)} onSubmit={() => {}}/> */}
         <PropertyListingDialog open={uploadProperty} onOpenChange={() => setUploadProperty(false)}/>
-        {/* <PropertyEditForm property={property} isOpen={editProperty} onClose={() => setEditProperty(false)} onSave={() => {}} /> */}
+        <PropertyEditForm 
+          property={property} 
+          isOpen={editProperty} 
+          index={index+1}
+          onClose={() => setEditProperty(false)} 
+          onSave={() => {}} 
+        />
+        <BoostPropertyPrompt 
+          isOpen={isBoosted} 
+          onClose={() => setIsBoosted(false)} 
+          id={property?.id}
+          setBoost={() => setIsBoosted(true)}
+        />
     </>
   );
 };
