@@ -63,7 +63,6 @@ export default function ProfileForm() {
   const [logoPreview, setLogoPreview] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
-  // const [logoUrl, setLogoUrl] = useState<string>("");
   const [logo, setLogo] = useState<any>({});
 
   const userId = useSearchParams().get("userId");
