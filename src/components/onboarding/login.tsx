@@ -29,6 +29,7 @@ export default function LoginForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    setLoading(true);
     const encryptionKey = String(
       process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY
     );
@@ -55,10 +56,11 @@ export default function LoginForm() {
         setTimeout(() => {
           toast.success("Login Successful!");
           setLoading(false);
-
           // Navigate to dashboard based on user role
           switch (decryptedResponse.user.role.name) {
             default:
+              router.push("/agent-dashboard");
+              break;
             case "customer":
               router.push("/user-dashboard");
               break;

@@ -127,12 +127,6 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
     }
   }
 
-  // Calculate summary stats
-  const totalAgents = filteredAndSortedAgents?.length;
-  const totalSales = filteredAndSortedAgents?.reduce((sum, agent) => sum + agent.totalSales, 0);
-  const totalListings = filteredAndSortedAgents?.reduce((sum, agent) => sum + agent.activeListings, 0);
-  const averageRating = filteredAndSortedAgents?.reduce((sum, agent) => sum + agent.rating, 0) / totalAgents;
-
   useEffect(() => {
     axiosInstance.get('/agency/list-agents-under-agency/dashboard/48de2418-9e30-4cb9-b3e7-438e406db377')
     .then(res => {
@@ -146,10 +140,10 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
     <>
     <div className="container mx-auto space-y-6">
       {/* Summary Widgets */}
-       <div className="my-4">
-          <h2 className="text-2xl font-semibold">Users</h2>
-          <p className="text-muted-foreground">View and track User activity</p>
-        </div>
+      <div className="my-4">
+        <h2 className="text-2xl font-semibold">Users</h2>
+        <p className="text-muted-foreground">View and track User activity</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

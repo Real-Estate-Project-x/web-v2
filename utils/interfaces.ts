@@ -506,6 +506,7 @@ export interface AgentDatabaseInterface {
   hasGym: boolean;
   hasKidsPlayArea: boolean;
   isNewBuilding: boolean;
+  isBoosted ?: boolean;
   isPetFriendly: boolean;
   isPropertyBlocked: boolean;
   isPropertyBoosted: boolean;

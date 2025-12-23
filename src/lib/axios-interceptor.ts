@@ -13,7 +13,7 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getCookie("bearer_token");
+    const token = getCookie("access_token");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
         const response = await axios.get(`${apiBaseURL}auth/refresh`, {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${getCookie("bearer_token")}`,
+            Authorization: `Bearer ${getCookie("access_token")}`,
             ...returnHeaders(),
           },
         });
