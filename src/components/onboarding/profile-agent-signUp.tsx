@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import {
   Card,
   CardContent,
@@ -64,11 +63,10 @@ export default function ProfileForm() {
   const [logoPreview, setLogoPreview] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
-  const [logoUrl, setLogoUrl] = useState<string>("");
+  // const [logoUrl, setLogoUrl] = useState<string>("");
+  const [logo, setLogo] = useState<any>({});
 
   const userId = useSearchParams().get("userId");
-
-  console.log({ userId });
 
   const {
     register,
@@ -106,7 +104,7 @@ export default function ProfileForm() {
           headers,
         });
         if (responseData?.data?.data?.length > 0) {
-          setLogoUrl(responseData.data.data[0]);
+          setLogo(responseData.data.data[0]);
         }
       } catch (ex) {
         console.error(`Error uploading logo: ${ex}`);
@@ -121,7 +119,7 @@ export default function ProfileForm() {
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!logoUrl) {
+    if (!logo) {
       toast("Please re-upload a logo");
       return;
     }
@@ -129,7 +127,7 @@ export default function ProfileForm() {
     const url = "agency/create-agency/profile";
     const payload = {
       userId,
-      logo: logoUrl,
+      logoId: logo.id,
       rcNumber: data.rcNumber,
       agencyName: data.agencyName,
       description: data.description,
@@ -138,7 +136,6 @@ export default function ProfileForm() {
       isBusinessRegistered: data.isBusinessRegistered,
     };
 
-    console.log({ url, payload });
     try {
       const result = await axiosInstance.post(url, payload);
       if (result?.data?.success) {
