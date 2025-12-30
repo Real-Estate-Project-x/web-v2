@@ -84,7 +84,7 @@ const LandingPage = () => {
       <Navbar />
       <Hero />
       <FeaturedProperties data={featured_properties} />
-      <PopularLocations data={popular_locations} />
+      <PopularLocations data={popular_locations} /> 
       <Services />
       <Testimonials _data_for_TopAgents={top_agents} />
       <CTA />

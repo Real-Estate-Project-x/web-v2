@@ -16,8 +16,8 @@ interface AgentCardProps {
 const AgentCard = ({ agent: data }: AgentCardProps) => {
   const router = useRouter();
   const agent = data?.agency;
-  const firstNameInitials = agent?.name?.split(" ")[0];
-  const lastNameInitials = agent?.name?.split(" ")[1];
+  const firstNameInitials = agent?.name?.split(" ")?.[0];
+  const lastNameInitials = agent?.name?.split(" ")?.[1];
 
   return (
     <Card
@@ -29,31 +29,31 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
         <div className="flex items-start gap-4 mb-6">
           <div className="relative">
             <Avatar className="h-16 w-16 ring-2 ring-white shadow-lg">
-              <AvatarImage src={agent.logo} alt={`${agent.name}`} />
+              <AvatarImage src={agent?.logo} alt={`${agent?.name}`} />
               <AvatarFallback className="text-lg font-semibold bg-gradient-to-br from-primary to-blue-600 text-white">
-                {firstNameInitials[0]} {lastNameInitials[0]}
+                {firstNameInitials?.[0]} {lastNameInitials?.[0]}
               </AvatarFallback>
             </Avatar>
             <div
               className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white shadow-sm ${
-                agent.status ? "bg-green-500" : "bg-gray-400"
+                agent?.status ? "bg-green-500" : "bg-gray-400"
               }`}
             />
           </div>
 
           <div className="flex-1 min-w-0">
             <h3 className="text-xl font-bold text-gray-900 mb-1 capitalize">
-              {agent.name}
+              {agent?.name}
             </h3>
             <p className="text-sm text-gray-600 mb-2 normal-case">
-              {agent.description}
+              {agent?.description}
             </p>
 
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span className="text-sm font-semibold text-gray-900">
-                  {agent.rating}
+                  {agent?.rating}
                 </span>
                 <span className="text-xs text-gray-500">
                   ({data?.totalReviewCount})
@@ -64,7 +64,7 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
             </div>
           </div>
 
-          {data.isCurrentlyAvailable ? (
+          {data?.isCurrentlyAvailable ? (
             <Badge
               variant="secondary"
               className="text-xs bg-[#25D366] text-black"
@@ -89,13 +89,13 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
           </div>
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900">
-              {data.viewingsCount}
+              {data?.viewingsCount}
             </div>
             <div className="text-xs text-gray-500">Scheduled Viewings</div>
           </div>
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900">
-              {data.timeSinceJoined}
+              {data?.timeSinceJoined}
             </div>
             <div className="text-xs text-gray-500">Time Joined</div>
           </div>
@@ -105,7 +105,7 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
         <div className="flex items-center gap-2 mb-4">
           <MapPin className="h-4 w-4 text-gray-400" />
           <span className="text-sm text-gray-600 capitalize">
-            {agent.address}
+            {agent?.address}
           </span>
         </div>
 

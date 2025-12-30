@@ -198,58 +198,58 @@ export const PropertyList: FC<Props> = ({ array }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
-      {array.map((property) => (
-        <div key={property.id}>
+      {array && array.map((property) => (
+        <div key={property?.id}>
           <Card
-            key={property.id}
+            key={property?.id}
             className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
-            onClick={() => router.push(`/properties/view?id=${property.slug}`)}
+            onClick={() => router.push(`/properties/view?id=${property?.slug}`)}
           >
             <div className="relative h-48 overflow-hidden">
               <img
-                src={property.photoUrls[0]}
-                alt={property.title}
+                src={property?.photoUrls?.[0]}
+                alt={property?.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <Badge
                 className={`${
-                  property.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"
+                  property?.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"
                 } absolute top-4 left-4 hover:bg-real-700 capitalize px-4 py-1.5 rounded-full`}
               >
-                {property.upFor.toLowerCase()}
+                {property?.upFor.toLowerCase()}
               </Badge>
-              {property.isNewBuilding && (
+              {property?.isNewBuilding && (
                 <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
                   New
                 </Badge>
               )}
               <Badge className="absolute bottom-4 right-4 bg-white text-foreground shadow-lg py-1.5 rounded-xl">
-                {formatPrice(property.price)}
+                {formatPrice(property?.price)}
               </Badge>
             </div>
             <CardContent className="p-5">
               <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors capitalize">
-                {property.title}
+                {property?.title}
               </h3>
               <div className="flex items-center text-muted-foreground mb-4">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span className="text-sm capitalize">{property.address}</span>
+                <span className="text-sm capitalize">{property?.address}</span>
               </div>
               <div className="flex justify-between text-muted-foreground border-t pt-4">
                 <div className="flex items-center gap-1">
                   <Bed className="h-4 w-4" />
-                  <span className="text-sm">{property.noOfBedrooms} beds</span>
+                  <span className="text-sm">{property?.noOfBedrooms} beds</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Bath className="h-4 w-4" />
                   <span className="text-sm">
-                    {property.noOfToilets} Toilets
+                    {property?.noOfToilets} Toilets
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Square className="h-4 w-4" />
                   <span className="text-sm">
-                    {property.sizeInSquareFeet} sqft
+                    {property?.sizeInSquareFeet} sqft
                   </span>
                 </div>
               </div>
@@ -314,7 +314,7 @@ const Properties = () => {
           <div className="flex justify-start">
             <LoadingCard />
           </div>
-        ) : properties?.length === 0 ? (
+        ) : properties.length <= 0 ? (
           <div className="text-center text-gray-500">
             <p className="text-lg pt-6">
               {(type && type.toLowerCase() === "RENT") ||

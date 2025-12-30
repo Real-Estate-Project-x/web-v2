@@ -109,12 +109,12 @@ const Agents = () => {
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
                 <div className="bg-black/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold text-white">{data.length}</div>
+                  <div className="text-3xl font-bold text-white">{data?.length}</div>
                   <div className="text-sm text-white/80">Expert Agents</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                   <div className="text-3xl font-bold text-white">
-                    {(data.reduce((sum, agent) => sum + agent?.agency?.rating, 0) / data.length).toFixed(1)}
+                    {(data?.reduce((sum, agent) => sum + agent?.agency?.rating, 0) / data.length).toFixed(1)}
                   </div>
                   <div className="text-sm text-white/80">Avg Rating</div>
                 </div>
@@ -146,8 +146,8 @@ const Agents = () => {
             <section className="py-8">
               <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {records.map((agent) => (
-                    <AgentCard key={agent?.agency.id} agent={agent} />
+                  {records && records?.map((agent) => (
+                    <AgentCard key={agent?.agency?.id} agent={agent} />
                   ))}
                 </div>
               

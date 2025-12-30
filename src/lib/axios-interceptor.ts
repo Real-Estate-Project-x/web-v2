@@ -37,6 +37,9 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true; // Mark the request as retried to avoid loops
       // refresh token logic below
+      handleLoggingOff();
+      // for now ...since no refresh endpiont is available
+      return;
       try {
         const response = await axios.get(`${apiBaseURL}auth/refresh`, {
           withCredentials: true,

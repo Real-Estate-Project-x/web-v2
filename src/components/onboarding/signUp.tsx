@@ -12,7 +12,6 @@ import {
   setLocalStorageField,
   validateEmail,
   validatePassword,
-  validatePhoneNumber,
 } from "../../../utils/helpers";
 import { useRouter, useSearchParams } from "next/navigation";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";

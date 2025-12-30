@@ -25,12 +25,12 @@ import {
   Phone, 
   Home,
   Star,
-  Users
+  Users,
 } from "lucide-react";
 import UserDetailsModal from "./dialogs/view-agency-user";
-import { agentDashboardData } from "../..";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { AgentUsersInterface } from "../../../../../utils/interfaces";
+import { AddAgent } from "./dialogs/add-agent";
 
 interface AgencyUsersViewProps {
   searchTerm: string;
@@ -44,7 +44,7 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [agentsUsers, setAgentsUsers] = useState<AgentUsersInterface>({} as AgentUsersInterface);
-
+  const [refreshState, setRefreshState] = useState<boolean>(false);
   const handleUserClick = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -57,53 +57,26 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
 
   // Filter and sort logic
   const filteredAndSortedAgents = useMemo(() => {
-    let filtered = agentsUsers?.activeSubAgents?.filter(agent => 
-      agent?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent?.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent?.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+    let filtered = agentsUsers?.activeSubAgents?.filter(agent => {
+      agent?.user?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agent?.user?.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agent?.user?.email.toLowerCase().includes(searchTerm.toLowerCase())
+      //|| agent?.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+    }
     );
 
     filtered?.sort((a, b) => {
       switch (sortBy) {
         case "name":
-          return a.firstName.localeCompare(b.firstName);
+          return a?.user?.firstName.localeCompare(b?.user?.firstName);
         case "email":
-          return a.email.localeCompare(b.email);
-        case "sales":
-          return b.totalSales - a.totalSales;
+          return a?.user?.email.localeCompare(b?.user?.email);
+        // case "sales":
+        //   return b.totalSales - a.totalSales;
         case "listings":
-          return b.activeListings - a.activeListings;
+          return b.totalListings - a.totalListings;
         case "joined":
-          return new Date(b.joined).getTime() - new Date(a.joined).getTime();
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [searchTerm, sortBy]);
-
-    const filteredAndSortedCustomers = useMemo(() => {
-    let filtered = agentsUsers?.customers?.filter(customers => 
-      customers?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customers?.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customers?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customers?.specialization.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    filtered?.sort((a, b) => {
-      switch (sortBy) {
-        case "name":
-          return a.firstName.localeCompare(b.firstName);
-        case "email":
-          return a.email.localeCompare(b.email);
-        case "sales":
-          return b.totalSales - a.totalSales;
-        case "listings":
-          return b.activeListings - a.activeListings;
-        case "joined":
-          return new Date(b.joined).getTime() - new Date(a.joined).getTime();
+          return new Date(b?.user?.dateCreated).getTime() - new Date(a?.user?.dateCreated).getTime();
         default:
           return 0;
       }
@@ -127,14 +100,15 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
     }
   }
 
+//48de2418-9e30-4cb9-b3e7-438e406db377
   useEffect(() => {
-    axiosInstance.get('/agency/list-agents-under-agency/dashboard/48de2418-9e30-4cb9-b3e7-438e406db377')
+    axiosInstance.get(`/agency/list-agents-under-agency/dashboard/8b6c7c37-72b5-4db8-9184-214f32b8b68d`)
     .then(res => {
      setAgentsUsers(res.data.data);
     }).catch(err => {
       console.log({err});
     })
-  },[]);
+  },[refreshState]);
 
   return (
     <>
@@ -151,7 +125,7 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{agentsUsers?.activeSubAgents ? agentsUsers?.activeSubAgents : 0}</div>
+            <div className="text-2xl font-bold">{agentsUsers?.totalSubAgents ? agentsUsers?.totalSubAgents : 0}</div>
             <p className="text-xs text-muted-foreground">Active agents</p>
           </CardContent>
         </Card>
@@ -189,178 +163,51 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
           </CardContent>
         </Card>
       </div>
-        {/*Users Table  */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Users under Agency ({filteredAndSortedCustomers?.length})</CardTitle>
-            <CardDescription>
-            List of Customers using Agency. Click on any row to view detailed information.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {
-              paginatedReturn(filteredAndSortedCustomers)?.totalPages  > 1 ?
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Budget</TableHead>
-                    <TableHead>Status</TableHead>
-                    {/* <TableHead>Rating</TableHead>
-                    <TableHead>Commission</TableHead> */}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedReturn(filteredAndSortedCustomers).paginatedData?.map((agent) => (
-                    <TableRow 
-                      key={agent.id}
-                      className="cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => handleUserClick(agent)}
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={agent.avatar} alt={`${agent.firstName} ${agent.lastName}`} />
-                            <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{agent.firstName} {agent.lastName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Joined {new Date(agent.joined).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1 text-sm">
-                            <Mail className="h-3 w-3" />
-                            {agent.email}
-                          </div>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Phone className="h-3 w-3" />
-                            {agent.phone}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{agent.specialization}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium">${(agent.totalSales / 1000000).toFixed(1)}M</div>
-                      </TableCell>
-                      {/* <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Home className="h-3 w-3" />
-                          {agent.activeListings}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{agent.rating}</span>
-                          <span className="text-muted-foreground text-sm">({agent.reviews})</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium">{agent.commissionRate}%</div>
-                      </TableCell> */}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            :
-              <p>Zero Records Found</p>
-            }
+       
 
-            {/* Pagination */}
-            {paginatedReturn(filteredAndSortedCustomers)?.totalPages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // if (currentPage > 1) setCurrentPage(currentPage - 1);
-                        }}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: paginatedReturn(filteredAndSortedCustomers).totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setCurrentPage(page);
-                          }}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                        }}
-                        className={currentPage === paginatedReturn(filteredAndSortedCustomers).totalPages  ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
-          </CardContent>
-      </Card>
       {/* Agents Table */}
       <Card>
         <CardHeader>
           <CardTitle>Sub-Agents ({filteredAndSortedAgents?.length})</CardTitle>
-          <CardDescription>
+          <CardDescription className="flex justify-between items-center">
             Manage and view performance of all sub-agents in your agency. Click on any row to view detailed information.
+            <AddAgent setRefresh={setRefreshState}/>
           </CardDescription>
         </CardHeader>
         <CardContent>
           {
-            paginatedReturn(filteredAndSortedAgents)?.totalPages  > 1 ?
+            // paginatedReturn(filteredAndSortedAgents)?.totalPages  > 1
+            agentsUsers?.activeSubAgents?.length > 0 ?
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Agent</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Specialization</TableHead>
-                  <TableHead>Sales</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>PhoneNumber</TableHead>
+                  {/* <TableHead>Specialization</TableHead>
+                  <TableHead>Sales</TableHead> */}
                   <TableHead>Listings</TableHead>
-                  <TableHead>Rating</TableHead>
-                  <TableHead>Commission</TableHead>
+                  {/* <TableHead>Rating</TableHead>
+                  <TableHead>Commission</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedReturn(filteredAndSortedAgents)?.paginatedData?.map((agent) => (
+                { 
+                paginatedReturn(agentsUsers?.activeSubAgents)?.paginatedData?.map((agent, index) => (
                   <TableRow 
-                    key={agent.id}
+                    key={index}
                     className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => handleUserClick(agent)}
-                  >
+                    onClick={() => handleUserClick(agent)}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={agent.avatar} alt={`${agent.firstName} ${agent.lastName}`} />
-                          <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
+                          {/* <AvatarImage src={''}  alt={`${agent?.activeSubAgents?.firstName} ${agent?.activeSubAgents?.lastName}`} /> */}
+                          <AvatarFallback>{agent?.user?.firstName?.[0]}{agent?.user?.lastName?.[0]}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium">{agent.firstName} {agent.lastName}</div>
+                          <div className="font-medium">{agent?.user?.firstName} {agent?.user?.lastName}</div>
                           <div className="text-sm text-muted-foreground">
-                            Joined {new Date(agent.joined).toLocaleDateString()}
+                            Joined {new Date(agent?.user?.dateCreated).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
@@ -369,27 +216,30 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
                       <div className="space-y-1">
                         <div className="flex items-center gap-1 text-sm">
                           <Mail className="h-3 w-3" />
-                          {agent.email}
+                          {agent?.user?.email}
                         </div>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Phone className="h-3 w-3" />
-                          {agent.phone}
-                        </div>
+                        
                       </div>
                     </TableCell>
                     <TableCell>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Phone className="h-3 w-3" />
+                        {agent?.user?.phoneNumber}
+                      </div>
+                    </TableCell>
+                    {/* <TableCell>
                       <Badge variant="secondary">{agent.specialization}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">${(agent.totalSales / 1000000).toFixed(1)}M</div>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Home className="h-3 w-3" />
-                        {agent.activeListings}
+                        {agent?.totalListings}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <div className="flex items-center gap-1">
                         <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                         <span className="font-medium">{agent.rating}</span>
@@ -398,17 +248,17 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">{agent.commissionRate}%</div>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           :
-            <p>Zero Records Found</p>
+            <p className="text-base text-center text-grey-300">No Records Found</p>
           }
 
           {/* Pagination */}
-          {paginatedReturn(filteredAndSortedAgents)?.totalPages  > 1 && (
+          {paginatedReturn(agentsUsers?.activeSubAgents)?.totalPages  > 1 && (
             <div className="flex justify-center pt-4">
               <Pagination>
                 <PaginationContent>
@@ -423,7 +273,7 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
                     />
                   </PaginationItem>
                   
-                  {Array.from({ length: paginatedReturn(filteredAndSortedAgents)?.totalPages }, (_, i) => i + 1).map((page) => (
+                  {Array.from({ length: paginatedReturn(agentsUsers?.activeSubAgents)?.totalPages }, (_, i) => i + 1).map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink
                         href="#"
@@ -445,7 +295,7 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
                         e.preventDefault();
                         // if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                       }}
-                      className={currentPage === paginatedReturn(filteredAndSortedAgents)?.totalPages ? "pointer-events-none opacity-50" : ""}
+                      className={currentPage === paginatedReturn(agentsUsers?.activeSubAgents)?.totalPages ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -454,7 +304,7 @@ const AgencyUsersView = ({ searchTerm, sortBy, currentPage, setCurrentPage }: Ag
           )}
         </CardContent>
       </Card>
-
+  
       {/* User Details Modal */}
       <UserDetailsModal
         isOpen={isModalOpen}
