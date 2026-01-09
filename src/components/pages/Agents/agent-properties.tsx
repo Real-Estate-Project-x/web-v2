@@ -391,8 +391,8 @@ const AgentProperties = () => {
                       <div className="relative h-48 overflow-hidden">
                         <img
                           src={
-                            property.photoUrls && property.photoUrls.length > 0
-                              ? property.photoUrls[0]
+                            property.propertyImages && property.propertyImages.length > 0
+                              ? property.propertyImages?.[0]?.image?.url
                               : "https://via.placeholder.com/400x300?text=No+Image"
                           }
                           alt={property.title}

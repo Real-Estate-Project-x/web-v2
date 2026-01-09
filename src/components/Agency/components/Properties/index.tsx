@@ -36,6 +36,7 @@ import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
 import {
   convertDateCreatedToGetNumberOfDays,
   formatPrice,
+  getLocalStorageFieldRaw,
 } from "../../../../../utils/helpers";
 import PropertyListingDialog from "./dialogs/new-upload";
 import { useRouter } from "next/navigation";
@@ -43,12 +44,11 @@ import { Separator } from "@radix-ui/react-select";
 import { BoostPropertyPrompt } from "./agent-property-view";
 import { toast } from "sonner";
 
-
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("ALPHABETICAL_ORDER");
   const [currentPage, setCurrentPage] = useState(1);
   const [isBoosted, setIsBoosted] = useState(false);
   const propertiesPerPage = 6;
@@ -61,12 +61,6 @@ const AgentPropertiesManager = () => {
   const [reload, setReload] = useState<boolean>(false);
 
   useEffect(() => {
-    // axiosInstance.get(`/property/agency-property-list/${agencyId}`)
-    // .then((response) => {
-    //   setProperties(response.data.data);
-    // }).catch((err) => {
-    //   console.log({err});
-    // });
     const boostPaymentReference = localStorage.getItem("boost_payment_reference");
     if(boostPaymentReference){
       // verify payment status from backend
@@ -82,29 +76,36 @@ const AgentPropertiesManager = () => {
       });
     }
 
-    axiosInstance.get(`/agency/${agencyId}/properties`)
+    axiosInstance.get(`/agency/${getLocalStorageFieldRaw('agentId')}/properties?sortBy=${statusFilter}`)
     .then((response) => {
      setProperties(response.data.data);
     }).catch((err) => {
       console.log({err});
     });
-  },[reload]);
+  },[reload, statusFilter]);
 
-  
-  const filteredAndSortedProperties = properties.filter(property => {
-    const matchesSearch =
-      property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.propertyType?.tag?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredAndSortedProperties = () : AgentDatabaseInterface[] => {
+    if(properties.length === 0){
+      return [];
+    }
+    if(statusFilter === "ALPHABETICAL_ORDER" || statusFilter === "NEWEST" || statusFilter === "OLDEST"){
+      return properties;
+    }else{
+     return properties.filter(property => {
+      const matchesSearch =
+        property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.propertyType?.tag?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" ||
-        (property.status && statusFilter.toLowerCase() === "active") ||
-        (!property.status && statusFilter.toLowerCase() === "sold");
+        return matchesSearch;
 
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
+        // const matchesStatus =
+        //   statusFilter === "all" ||
+        //   (property.status && statusFilter.toLowerCase() === "active") ||
+        //   (!property.status && statusFilter.toLowerCase() === "sold");
+
+        // return matchesSearch && matchesStatus;
+    }).sort((a, b) => {
       let aValue, bValue;
       switch (sortBy) {
         case "price":
@@ -121,18 +122,18 @@ const AgentPropertiesManager = () => {
       }
       return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
     });
-
+    }
+  }
+  
   // Pagination
   const totalPages = Math.ceil(
     filteredAndSortedProperties.length / propertiesPerPage
   );
   const startIndex = (currentPage - 1) * propertiesPerPage;
-  const currentProperties = filteredAndSortedProperties.slice(
+  const currentProperties = filteredAndSortedProperties()?.slice(
     startIndex,
     startIndex + propertiesPerPage
   );
-
-  const agencyId = "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2"; //"8b6c7c37-72b5-4db8-9184-214f32b8b68d";
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -195,10 +196,10 @@ const AgentPropertiesManager = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="ALPHABETICAL_ORDER">A-Z</SelectItem>
+                    <SelectItem value="OLDEST">Oldest</SelectItem>
                     {/* <SelectItem value="pending">Pending</SelectItem> */}
-                    <SelectItem value="sold">Sold</SelectItem>
+                    <SelectItem value="NEWEST">Newest</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -234,11 +235,11 @@ const AgentPropertiesManager = () => {
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentProperties.map((property, index) => (
+          {currentProperties && currentProperties?.map((property, index) => (
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
               <div className="relative">
                 <img
-                  src={property.photoUrls[0]}
+                  src={property.photoUrls?.[0]}
                   alt={property.title}
                   className="w-full h-56 object-cover"
                 />
@@ -408,5 +409,6 @@ const AgentPropertiesManager = () => {
     </>
   );
 };
+
 
 export default AgentPropertiesManager;

@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,8 @@ import RevenueChart from "./components/Dashboard/revenue-chart";
 import TopPerformingProperties from "./components/Dashboard/top-performing-properties";
 import PropertyTypesChart from "./components/Dashboard/property-types-chat";
 import RecentActivities from "./components/Dashboard/recent-activities";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import { setLocalStorageField } from "../../../utils/helpers";
 
   const agentData = {
     name: "Sarah Johnson",
@@ -97,6 +99,15 @@ const AgentDashboard = () => {
       description: "Overall rating"
     }
   ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const feeSetupResponse = await axiosInstance.get('/user/profile');
+      //save agent id to local storage
+      setLocalStorageField('agentId', feeSetupResponse?.data?.data?.agenciesCreated?.[0]?.id);
+    }
+    fetchData();
+  },[]);
 
   return (
     <div className="min-h-screen bg-background">

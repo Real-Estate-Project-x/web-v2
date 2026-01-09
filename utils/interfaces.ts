@@ -189,10 +189,27 @@ export interface PropertyInterface {
   isPropertyBlocked: boolean;
   isPropertyBoosted: boolean;
   isPropertyTaken: boolean;
+  isPetFriendly : boolean;
   status: boolean;
   dateCreated: string;
   dateUpdated: string;
-  photoUrls: string[];
+  propertyImages: {
+    dateCreated: string;
+    dateUpdated: string;
+    id:string;
+    image: {
+      cloudFileId: string;
+      dateCreated: string;
+      dateUpdated:string;
+      id: string;
+      mimeType:string;
+      status: boolean;
+      url:string;
+    },
+    imageId: string;
+    propertyId:string;
+    status:boolean;
+  }[];
   videoUrl: string;
   architecturalPlanUrls: string[];
   isNewBuilding: boolean;
@@ -686,3 +703,8 @@ export interface AgencyInterface {
   whatsappNumber: string;
   agencyPhoneNumber: string;
 }
+
+
+export interface AgencyViewingsInterface{
+  
+} 

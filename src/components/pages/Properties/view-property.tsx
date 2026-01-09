@@ -21,6 +21,8 @@ import { formatPrice } from "../../../../utils/helpers";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
 import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
+import { hasAmenities, hasFeatures, isUserLoggedIn } from "@/lib/utils";
+import AgentAvailabilityPicker from "@/components/shared/agent-availability-component";
 
 
 type TourFormData = {
@@ -157,6 +159,11 @@ const PropertyDetails = () => {
     return stars;
   };
 
+
+  const onSelect = (e : any) => {
+    console.log({e})
+  }
+  
   useEffect(() => { 
     axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id') as string}`)
       .then((response) => { 
@@ -212,11 +219,11 @@ const PropertyDetails = () => {
                   <div className="relative">
                     <Carousel className="w-full">
                       <CarouselContent>
-                        {propertyData.property?.photoUrls?.map((image, index) => (
+                        {propertyData.property?.propertyImages?.map((image, index) => (
                           <CarouselItem key={index}>
                             <div className="relative">
                               <img
-                                src={image}
+                                src={image?.image?.url}
                                 alt={`${propertyData.property.title} - Image ${index + 1}`}
                                 className="w-full h-[350px] sm:h-[400px] md:h-[500px] object-cover rounded-lg"
                               />
@@ -287,57 +294,65 @@ const PropertyDetails = () => {
                     </div>
 
                     {/* Amenities Section */}
-                    <div>
-                      <h2 className="text-xl md:text-2xl font-semibold mb-3">Amenities</h2>
-                      <div className="flex flex-col sm:flex-row items-center gap-4">
-                        {propertyData?.property?.hasWifi && (
-                          <div className="flex items-center p-3 w-fit bg-white rounded-lg shadow-sm border">
-                            <Wifi className="h-5 w-5 mr-2 text-real-600" />
-                            <span className="text-sm md:text-base">Wi-Fi</span>
-                          </div>
-                        )}
-                        {propertyData?.property?.hasGym && (
-                          <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
-                            <Dumbbell className="h-5 w-5 mr-2 text-real-600" />
-                            <span className="text-sm md:text-base">Gym</span>
-                          </div>
-                        )}
-                        {propertyData?.property?.hasLaundry && (
-                          <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
-                            <WashingMachine className="h-5 w-5 mr-2 text-real-600" />
-                            <span className="text-sm md:text-base">Laundry&nbsp;services</span>
-                          </div>
-                        )}
-                    
-                        {propertyData?.property?.hasCctv && (
-                          <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
-                            <Video className="h-5 w-5 mr-2 text-real-600" />
-                            <span className="text-sm md:text-base">CCtv</span>
-                          </div>
-                        )}
+                    {hasAmenities(propertyData) && 
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-semibold mb-3">Amenities</h2>
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                          {propertyData?.property?.hasWifi && (
+                            <div className="flex items-center p-3 w-fit bg-white rounded-lg shadow-sm border">
+                              <Wifi className="h-5 w-5 mr-2 text-real-600" />
+                              <span className="text-sm md:text-base">Wi-Fi</span>
+                            </div>
+                          )}
+                          {propertyData?.property?.hasGym && (
+                            <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
+                              <Dumbbell className="h-5 w-5 mr-2 text-real-600" />
+                              <span className="text-sm md:text-base">Gym</span>
+                            </div>
+                          )}
+                          {propertyData?.property?.hasLaundry && (
+                            <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
+                              <WashingMachine className="h-5 w-5 mr-2 text-real-600" />
+                              <span className="text-sm md:text-base">Laundry&nbsp;services</span>
+                            </div>
+                          )}
+                      
+                          {propertyData?.property?.hasCctv && (
+                            <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
+                              <Video className="h-5 w-5 mr-2 text-real-600" />
+                              <span className="text-sm md:text-base">CCtv</span>
+                            </div>
+                          )}
                         
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <div>
-                      <h2 className="text-xl md:text-2xl font-semibold mb-3">Features</h2>
-                      <div className="grid grid-cols-2 gap-2">
-                        {propertyData?.property?.hasCarParking&& (
-                          <div className="flex items-center text-gray-600 text-sm md:text-base">
-                            <span className="mr-2">•</span>
-                            {"Car Parking"}
-                          </div>
-                        )}
-                        {propertyData?.property?.hasKidsPlayArea && (
-                          <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
-                            <span className="mr-2">•</span>
-                            <span className="text-sm md:text-base">{"Kids Play Area"}</span>
-                          </div>
-                        )}
+                        </div>
                       
                       </div>
-                    </div>
+                    }
+
+                    {/* Features */}
+                    {hasFeatures(propertyData) && 
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-semibold mb-3">Features</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                          {propertyData?.property?.hasCarParking&& (
+                            <div className="flex items-center text-gray-600 text-sm md:text-base">
+                              <span className="mr-2">•</span>
+                              {"Car Parking"}
+                            </div>
+                          )}
+                          {propertyData?.property?.hasKidsPlayArea && (
+                            <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                              <span className="mr-2">•</span>
+                              <span className="text-sm md:text-base">{"Kids Play Area"}</span>
+                            </div>
+                          )}
+                        
+                        </div>
+                      </div>
+                    }
+                    {isUserLoggedIn() &&
+                      <AgentAvailabilityPicker propertyId={propertyData?.property?.id as string} onSelect={onSelect}/>
+                    }
                     {/* Video tag section*/}
                     {propertyData?.property?.videoUrl && 
                       <div className="my-4">
@@ -345,14 +360,6 @@ const PropertyDetails = () => {
                         <video width="600" height="360" controls>
                           <source src={propertyData?.property?.videoUrl} type="video/mp4"/>
                         </video>
-                        {/* <iframe 
-                        width="640" 
-                        height="360" 
-                        src="https://www.jw.org/en/library/videos/#en/mediaitems/VODMovies/docid-502100006_1_VIDEO" 
-                        frameborder="0" 
-                        allowfullscreen
-                        >
-                      </iframe> */}
                       </div>
                     }
                     
@@ -654,7 +661,7 @@ const PropertyDetails = () => {
                             <Card className="overflow-hidden flex items-center gap-2 flex-row hover:shadow-lg transition-shadow h-full py-0">
                               <div className="w-1/2 relative h-56">
                                 <img
-                                  src={similarProperty.photoUrls ? similarProperty.photoUrls[0] : "https://via.placeholder.com/150"}
+                                  src={similarProperty.propertyImages ? similarProperty.propertyImages[0]?.image?.url : "https://via.placeholder.com/150"}
                                   alt={similarProperty?.title}
                                   className="w-full h-full object-cover"
                                 />
@@ -723,3 +730,5 @@ const PropertyDetails = () => {
 };
 
 export default PropertyDetails;
+
+

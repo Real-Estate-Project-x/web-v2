@@ -41,10 +41,11 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import { LoaderProcessor } from "@/components/shared/loader-cards";
 import axios from "axios";
 import { CountryStatesInterface, PropertyTypesInterface } from "../../../../../../utils/interfaces";
+import { getLocalStorageFieldRaw } from "../../../../../../utils/helpers";
 
 const additionalCostSchema = z.object({
-  title: z.string().min(1,""),
-  price: z.number().min(1,'0')
+  title: z.string().optional().or(z.literal("")), //.min(1,""),
+  price: z.number().optional().or(z.literal(0)) //.min(1,'0')
 });
 
 const propertySchema = z.object({
@@ -54,23 +55,38 @@ const propertySchema = z.object({
   upFor: z.enum(["SALE", "RENT"]),
   propertyCategory: z.enum(["RESIDENTIAL", "COMMERCIAL"]),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000),
-  photoUrls: z.array(z.string().url()),
-  price: z.number().min(0, "Price must be positive"),
+  photoIds: z.array(z.string()).min(1, "At least one photo is required"),
+  price: z.string().regex(/^\d+$/, "Price must contain only digits").min(5, "Price must be at least 5 digits"), // z.number().min(0, "Price must be positive"),
   additionalCosts: z.array(additionalCostSchema),
   paymentCoverageDuration: z.enum(["MONTHLY", "YEARLY", "ONE_TIME"]),
   agencyId: z.string().min(1, "Agency ID is required"),
   stateId: z.string().min(1, "State is required"),
-  sizeInSquareFeet: z.number().min(1, "Size is required"),
+  sizeInSquareFeet:z.string().regex(/^\d+$/, "Square feet must contain only digits").min(1, "Square feet is required"),
   geoCoordinates: z.object({
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
+    latitude: z.string().regex(
+    /^-?\d+(\.\d+)?$/,
+    "Latitude must be a valid decimal number"
+  ).refine(val => {
+    const num = Number(val)
+    return num >= -90 && num <= 90
+  }, {
+    message: "Latitude must be between -90 and 90",
   }),
-  averageBroadbandSpeedInMegabytes: z.number().min(0),
-  videoUrl : z.array(z.string().url()).optional(),
-  architecturalPlanUrls: z.array(z.string().url()).optional(),
-  noOfBedrooms: z.number().min(0),
-  noOfToilets: z.number().min(0),
-  noOfKitchens: z.number().min(0),
+    longitude: z.string().regex(
+    /^-?\d+(\.\d+)?$/,
+    "Longitude must be a valid decimal number"
+  ).refine(val => {
+    const num = Number(val)
+    return num >= -180 && num <= 180
+  }, {
+    message: "Longitude must be between -180 and 180",
+  }),//z.number().min(-180).max(180),
+  }),
+  averageBroadbandSpeedInMegabytes: z.string().regex(/^\d+$/, "Average broadband speed must contain only digits").min(2, "Average broadband speed is required"),
+  architecturalPlanIds: z.array(z.string()).optional().or(z.literal("")),
+  noOfBedrooms: z.string().regex(/^\d+$/, "Number of Bedrooms must contain only digits").min(1, "Number of Bedrooms is required"), //z.number().min(1),
+  noOfToilets:z.string().regex(/^\d+$/, "Number of Toilets must contain only digits").min(1, "Number of Toilets is required"), //z.number().min(1),
+  noOfKitchens: z.string().regex(/^\d+$/, "Number of Kitchens must contain only digits").min(1, "Number of Kitchens is required"), //z.number().min(1),
   threeDimensionalModelUrl: z.string().url().optional().or(z.literal("")),
   hasLaundry: z.boolean(),
   hasWifi: z.boolean(),
@@ -94,10 +110,10 @@ export default function PropertyListingDialog({
 }: PropertyListingDialogProps) {
     const [activeTab, setActiveTab] = useState("basic");
     const [images, setImages] = useState<File[]>([]);
-    const [videos, setVideos] = useState<File[]>([]);
+    //const [videos, setVideos] = useState<File[]>([]);
     const [architechturalImages, setArchitechturalImages] = useState<File[]>([]);
     const [imagesUrl, setImagesUrl] = useState<string[]>([]);
-    const [videosUrl, setVideosUrl] = useState<string[]>([]);
+    //const [videosUrl, setVideosUrl] = useState<string[]>([]);
     const [architechturalImagesUrl, setArchitechturalImagesUrl] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [propertTypes, setPropertyTypes] = useState<PropertyTypesInterface[]>([] as PropertyTypesInterface[]);
@@ -105,6 +121,7 @@ export default function PropertyListingDialog({
   
     const form = useForm<PropertyFormData, any, PropertyFormData>({
       resolver: zodResolver(propertySchema),
+      mode : "onChange",
       defaultValues: {
         propertyTypeId: "",
         title: "",
@@ -112,23 +129,22 @@ export default function PropertyListingDialog({
         upFor: "SALE",
         propertyCategory: "RESIDENTIAL",
         description: "",
-        photoUrls: [],
-        price: 0,
-        additionalCosts: [],
+        photoIds: [],
+        price: "",
+        additionalCosts: [{title: "Agency fee", price: 1000}],
         paymentCoverageDuration: "YEARLY",
-        agencyId: "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2",
+        agencyId: getLocalStorageFieldRaw('agentId') as string,
         stateId: "",
-        sizeInSquareFeet: 0,
+        sizeInSquareFeet: "",
         geoCoordinates: {
-          latitude: 0,
-          longitude: 0,
+          latitude: "",
+          longitude: "",
         },
-        averageBroadbandSpeedInMegabytes: 0,
-        videoUrl:[], //["https://ik.imagekit.io/un0omayok/f09cd4be-e7c6-470b-a065-f087c790fcc0_X05KfzbpyW.png"],
-        architecturalPlanUrls: [],
-        noOfBedrooms: 0,
-        noOfToilets: 0,
-        noOfKitchens: 0,
+        averageBroadbandSpeedInMegabytes: "",
+        architecturalPlanIds: [],
+        noOfBedrooms: "",
+        noOfToilets: "",
+        noOfKitchens: "",
         threeDimensionalModelUrl: "",
         hasLaundry: false,
         hasWifi: false,
@@ -140,9 +156,6 @@ export default function PropertyListingDialog({
       },
     });
 
-    // Check if the form is valid for submission
-    const isFormValid = form.formState.isValid;
-    
     const handleFileUpload = (files: FileList | null, type: 'image' | 'video' | 'architecture') => {
       if (!files) return;
       
@@ -161,8 +174,9 @@ export default function PropertyListingDialog({
         setImages(prev => [...prev, ...validFiles]);
       } else if (type === 'architecture') {
         setArchitechturalImages(prev => [...prev, ...validFiles]);
-      }else{
-        setVideos(validFiles);
+      }
+      else{
+        //setVideos(validFiles);
       }
     };
   
@@ -185,12 +199,19 @@ export default function PropertyListingDialog({
         switch(type){
           case 'image' : 
             setImagesUrl(res.data?.data);
+            form.setValue('photoIds', res.data?.data?.map((item : any) => item.id), {
+              shouldValidate: true,
+              shouldDirty : true
+            });
+            
           break;
-          case 'video' : 
-            setVideosUrl(res.data?.data);
-          break;
+          // case 'video' : 
+          //   setVideosUrl(res.data?.data);
+          //   //form.setValue('videoId', res.data?.data?.map((item : any) => item.id));
+          // break;
           case 'architecture' : 
             setArchitechturalImagesUrl(res.data?.data);
+            form.setValue('architecturalPlanIds',res.data?.data?.map((item : any) => item.id));
           break;
           default : 
             console.log('');
@@ -203,27 +224,42 @@ export default function PropertyListingDialog({
     }
     const onSubmit = (data: PropertyFormData) => {
       setIsLoading(true);
-      data.photoUrls = imagesUrl;
-      data.videoUrl = videosUrl;
-      data.architecturalPlanUrls = architechturalImagesUrl;
-      data.agencyId = "c0c6a20e-f7f6-4f59-8147-02a4ae541dd2";
       // agency id should be added automatically from agents information
+      const newData = {
+        ...data,
+        price : parseInt(data.price),
+        sizeInSquareFeet : parseInt(data.sizeInSquareFeet),
+        averageBroadbandSpeedInMegabytes : parseInt(data.averageBroadbandSpeedInMegabytes),
+        noOfBedrooms : parseInt(data.noOfBedrooms),
+        noOfKitchens : parseInt(data.noOfKitchens),
+        noOfToilets : parseInt(data.noOfToilets),
+        geoCoordinates : {
+          latitude : parseFloat(data.geoCoordinates.latitude),
+          longitude : parseFloat(data.geoCoordinates.longitude)
+        },
+        videoId:null
+        
+      };
       try {
         axiosInstance.post("/property",{
-          ...data
+          ...newData
         })
         .then((response) => {
           toast.success(response?.data?.message);
+          onOpenChange(false);
+          setIsLoading(false);
+          form.reset();
         })
         .catch((error : any) => {
-        toast.error(error?.response?.data?.message);
+          toast.error(error?.response?.data?.message);
+          setIsLoading(false);
         });
       } catch (error) {
           
       }finally{
-        onOpenChange(false);
-        setIsLoading(false);
-        form.reset();
+        // onOpenChange(false);
+        // setIsLoading(false);
+        // form.reset();
       }
 
     };
@@ -254,13 +290,13 @@ export default function PropertyListingDialog({
       }
     },[images]);
 
-    useEffect(() => {
-      if (videos) {
-        const formData = new FormData();
-        videos.forEach(file => formData.append('files[]', file));
-        newUploadFiles(videos, 'video');
-      }
-  },[videos]);
+  //   useEffect(() => {
+  //     if (videos) {
+  //       const formData = new FormData();
+  //       videos.forEach(file => formData.append('files[]', file));
+  //       newUploadFiles(videos, 'video');
+  //     }
+  // },[videos]);
 
   useEffect(() => {
     if (architechturalImages.length > 0) {
@@ -269,7 +305,6 @@ export default function PropertyListingDialog({
       newUploadFiles(architechturalImages, 'architecture');
     }
   },[architechturalImages]);
-
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -412,7 +447,7 @@ export default function PropertyListingDialog({
                       )}
                     />
 
-                     <FormField
+                    <FormField
                       control={form.control}
                       name="stateId"
                       render={({ field }) => (
@@ -446,7 +481,7 @@ export default function PropertyListingDialog({
                               placeholder="500000"
                               required
                               {...field}
-                             onChange={(e) => field.onChange(parseInt(e.target.value))}
+                             onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -469,7 +504,7 @@ export default function PropertyListingDialog({
                             <SelectContent>
                               <SelectItem value="MONTHLY">Monthly</SelectItem>
                               <SelectItem value="YEARLY">Yearly</SelectItem>
-                              <SelectItem value="QUARTERLY">Quarterly</SelectItem>
+                              <SelectItem value="ONE_TIME">Once</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -509,10 +544,10 @@ export default function PropertyListingDialog({
                           <FormControl>
                             <Input
                               type="text"
-                              placeholder="1500"
+                              placeholder="E.g., 1500"
                               required
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -529,10 +564,10 @@ export default function PropertyListingDialog({
                           <FormControl>
                             <Input
                               type="number"
-                              placeholder="100"
+                              placeholder="E.g., 100"
                               required
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -545,14 +580,14 @@ export default function PropertyListingDialog({
                       name="noOfBedrooms"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Bedrooms</FormLabel>
+                          <FormLabel>Rooms</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              placeholder="3"
+                              type="text"
+                              placeholder="Enter Number of Rooms"
                               {...field}
                               required
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -568,11 +603,11 @@ export default function PropertyListingDialog({
                           <FormLabel>Toilets</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              placeholder="2"
+                              type="text"
+                              placeholder="Enter Number of Toilets & Bathrooms"
                               required
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -588,11 +623,11 @@ export default function PropertyListingDialog({
                           <FormLabel>Kitchens</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              placeholder="1"
+                              type="text"
+                              placeholder="Enter Number of Kitchens"
                               required
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -611,12 +646,12 @@ export default function PropertyListingDialog({
                               <FormLabel>Latitude</FormLabel>
                               <FormControl>
                                 <Input
-                                  type="number"
+                                  type="text"
                                   step="any"
                                   required
-                                  placeholder="40.7128"
+                                  placeholder="Enter latitude of building. E.g., 40.7128"
                                   {...field}
-                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  onChange={(e) => field.onChange(e.target.value)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -632,12 +667,12 @@ export default function PropertyListingDialog({
                               <FormLabel>Longitude</FormLabel>
                               <FormControl>
                                 <Input
-                                  type="number"
+                                  type="text"
                                   step="any"
-                                  placeholder="-74.0060"
+                                  placeholder="Enter longitude of building. E.g., -74.0060"
                                   required
                                   {...field}
-                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  onChange={(e) => field.onChange(e.target.value)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -786,7 +821,7 @@ export default function PropertyListingDialog({
                           <FormField
                             control={form.control}
                             rules={{required : "Please Upload at least one Image"}}
-                            name="photoUrls"
+                            name="photoIds"
                             render={({ field }) => (
                               <FormItem>
                                 <FormControl>
@@ -803,7 +838,7 @@ export default function PropertyListingDialog({
                                       onChange={(e) => {
                                         const files = e.target.files;
                                         handleFileUpload(files, 'image');
-                                        field.onChange(imagesUrl); // update form value manually
+                                        //field.onChange(imagesUrl); // update form value manually
                                       }}
                                     />
                                     <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 2MB each</p>
@@ -840,7 +875,7 @@ export default function PropertyListingDialog({
                       )}
                     </div>
                     {/* Videos */}
-                    <div>
+                    {/* <div>
                       <Label>Property Video</Label>
                       <FormDescription>
                         Upload Property Video
@@ -850,8 +885,8 @@ export default function PropertyListingDialog({
                           <CardContent className="p-6">
                             <FormField
                             control={form.control}
-                            rules={{required : "Video is required"}}
-                            name="videoUrl"
+                            // rules={{required : "Video is required"}}
+                            name="videoId"
                             render={({ field }) => (
                               <FormItem>
                                 
@@ -883,7 +918,7 @@ export default function PropertyListingDialog({
                         </Card>
                           
                       </div>
-                    </div>
+                    </div> */}
                     {/* Architechture */}
                     <div className="space-y-2">
                     <FormLabel>Architectural Plans(optional)</FormLabel>
@@ -895,7 +930,7 @@ export default function PropertyListingDialog({
                               <CardContent className="p-6">
                                 <FormField
                                   control={form.control}
-                                  name="architecturalPlanUrls"
+                                  name="architecturalPlanIds"
                                   render={({ field }) => (
                                     <FormItem>
                                       <FormControl>
@@ -912,7 +947,7 @@ export default function PropertyListingDialog({
                                             onChange={(e) => {
                                               const files = e.target.files;
                                               handleFileUpload(files, 'architecture');
-                                              field.onChange(architechturalImagesUrl); // update form value manually
+                                              //field.onChange(architechturalImagesUrl); // update form value manually
                                             }}
                                             //onChange={(e) => handleFileUpload(e.target.files, 'architecture')}
                                           />
@@ -990,7 +1025,10 @@ export default function PropertyListingDialog({
                     Next
                   </Button>
                 ) : (
-                  <Button type="submit" className="disabled:bg-slate-500 disabled:text-white cursor-default" disabled={!isFormValid ? true : false}>Create Listing</Button>
+                  <Button type="submit" className="disabled:bg-slate-500 disabled:text-white cursor-default" 
+                  disabled={!form.formState.isValid ? true : false}>
+                    Create Listing
+                  </Button>
                 )}
               </div>
             </div>

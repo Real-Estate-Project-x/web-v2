@@ -12,16 +12,16 @@ import {
   Calendar, 
   Clock, 
   MapPin, 
-  User, 
   Phone, 
   Mail,
   Search,
   Filter,
-  Eye,
-  MessageCircle
+  Eye
 } from "lucide-react";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios-interceptor";
+import { ScheduleDialog } from "./dialogs/schedule-viewing";
+import { LoaderViewings } from "@/components/shared/loader-cards";
 
 interface Viewing {
   id: string;
@@ -41,74 +41,76 @@ interface Viewing {
 const Viewings = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("date");
+  const [sortBy, setSortBy] = useState("VIRTUAL_PROPERTY_VIEWING_FEE");
+  const [feeSetupId, setFeeSetupId] = useState("");
+  const [viewings, setViewings] = useState<Viewing[]>([]);
 
   // Mock data for scheduled viewings
-  const viewings: Viewing[] = [
-    {
-      id: "1",
-      propertyAddress: "123 Beverly Hills Dr, Los Angeles, CA",
-      propertyType: "Luxury Home",
-      date: "2024-06-15",
-      time: "10:00 AM",
-      clientName: "John Smith",
-      clientEmail: "john.smith@email.com",
-      clientPhone: "+1 (555) 123-4567",
-      status: "confirmed",
-      price: 2400000,
-      notes: "Client interested in the pool area and garage space"
-    },
-    {
-      id: "2",
-      propertyAddress: "456 Sunset Blvd, West Hollywood, CA",
-      propertyType: "Condo",
-      date: "2024-06-15",
-      time: "2:30 PM",
-      clientName: "Maria Garcia",
-      clientEmail: "maria.garcia@email.com",
-      clientPhone: "+1 (555) 987-6543",
-      status: "upcoming",
-      price: 1800000,
-      notes: "First-time buyer, needs detailed explanation"
-    },
-    {
-      id: "3",
-      propertyAddress: "789 Ocean Ave, Santa Monica, CA",
-      propertyType: "Beachfront",
-      date: "2024-06-16",
-      time: "11:15 AM",
-      clientName: "David Wilson",
-      clientEmail: "david.wilson@email.com",
-      clientPhone: "+1 (555) 456-7890",
-      status: "pending",
-      price: 3200000
-    },
-    {
-      id: "4",
-      propertyAddress: "321 Hollywood Hills Rd, Los Angeles, CA",
-      propertyType: "Modern Villa",
-      date: "2024-06-16",
-      time: "4:00 PM",
-      clientName: "Sarah Johnson",
-      clientEmail: "sarah.johnson@email.com",
-      clientPhone: "+1 (555) 234-5678",
-      status: "confirmed",
-      price: 2950000,
-      notes: "Interested in smart home features"
-    },
-    {
-      id: "5",
-      propertyAddress: "654 Malibu Coast Hwy, Malibu, CA",
-      propertyType: "Beach House",
-      date: "2024-06-14",
-      time: "9:00 AM",
-      clientName: "Michael Brown",
-      clientEmail: "michael.brown@email.com",
-      clientPhone: "+1 (555) 345-6789",
-      status: "completed",
-      price: 4100000
-    }
-  ];
+  // const viewings: Viewing[] = [
+  //   {
+  //     id: "1",
+  //     propertyAddress: "123 Beverly Hills Dr, Los Angeles, CA",
+  //     propertyType: "Luxury Home",
+  //     date: "2024-06-15",
+  //     time: "10:00 AM",
+  //     clientName: "John Smith",
+  //     clientEmail: "john.smith@email.com",
+  //     clientPhone: "+1 (555) 123-4567",
+  //     status: "confirmed",
+  //     price: 2400000,
+  //     notes: "Client interested in the pool area and garage space"
+  //   },
+  //   {
+  //     id: "2",
+  //     propertyAddress: "456 Sunset Blvd, West Hollywood, CA",
+  //     propertyType: "Condo",
+  //     date: "2024-06-15",
+  //     time: "2:30 PM",
+  //     clientName: "Maria Garcia",
+  //     clientEmail: "maria.garcia@email.com",
+  //     clientPhone: "+1 (555) 987-6543",
+  //     status: "upcoming",
+  //     price: 1800000,
+  //     notes: "First-time buyer, needs detailed explanation"
+  //   },
+  //   {
+  //     id: "3",
+  //     propertyAddress: "789 Ocean Ave, Santa Monica, CA",
+  //     propertyType: "Beachfront",
+  //     date: "2024-06-16",
+  //     time: "11:15 AM",
+  //     clientName: "David Wilson",
+  //     clientEmail: "david.wilson@email.com",
+  //     clientPhone: "+1 (555) 456-7890",
+  //     status: "pending",
+  //     price: 3200000
+  //   },
+  //   {
+  //     id: "4",
+  //     propertyAddress: "321 Hollywood Hills Rd, Los Angeles, CA",
+  //     propertyType: "Modern Villa",
+  //     date: "2024-06-16",
+  //     time: "4:00 PM",
+  //     clientName: "Sarah Johnson",
+  //     clientEmail: "sarah.johnson@email.com",
+  //     clientPhone: "+1 (555) 234-5678",
+  //     status: "confirmed",
+  //     price: 2950000,
+  //     notes: "Interested in smart home features"
+  //   },
+  //   {
+  //     id: "5",
+  //     propertyAddress: "654 Malibu Coast Hwy, Malibu, CA",
+  //     propertyType: "Beach House",
+  //     date: "2024-06-14",
+  //     time: "9:00 AM",
+  //     clientName: "Michael Brown",
+  //     clientEmail: "michael.brown@email.com",
+  //     clientPhone: "+1 (555) 345-6789",
+  //     status: "completed",
+  //     price: 4100000
+  //   }
+  // ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -154,22 +156,23 @@ const Viewings = () => {
   const completedViewings = viewings.filter(v => v.status === "completed").length;
 
   useEffect(() => {
-    axiosInstance.get('/fee-setup/VIRTUAL_PROPERTY_VIEWING_FEE')
+    // VIRTUAL_PROPERTY_VIEWING_FEE, IN_PERSON_PROPERTY_VIEWING_FEE,PROPERTY_AD_BOOSTING filter based on these
+    axiosInstance.get(`/fee-setup/${sortBy}`)
     .then(response => {
-      console.log("Fee setup data:", response.data);
+      setFeeSetupId(response?.data?.id);
     }).catch(error => { 
       console.error("Error fetching fee setup data:", error);
     });
 
     //f3c8e0c9-1a43-4dc5-b47b-ff5e3626a58e
-    axiosInstance.get(`/agent-property-viewing?feeSetupId=${'f3c8e0c9-1a43-4dc5-b47b-ff5e3626a58e'}`)
+    axiosInstance.get(`/agent-property-viewing?feeSetupId=${feeSetupId}`)
     .then(response => {
-      console.log("viewings:", response.data);
+      setViewings(response.data?.data || []);
     }).catch(error => { 
       console.error("Error fetching viewings:", error);
     });
 
-  },[]);
+  },[sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,7 +181,8 @@ const Viewings = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold mb-2">Scheduled Viewings</h1>
-          <p className="text-muted-foreground">Manage your property viewings and client appointments</p>
+          <p className="text-muted-foreground mb-4">Manage your property viewings and client appointments</p>
+          <ScheduleDialog/>
         </div>
 
         {/* Stats Cards */}
@@ -189,7 +193,7 @@ const Viewings = () => {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{upcomingViewings}</div>
+              <div className="text-2xl font-bold">{upcomingViewings ? upcomingViewings : 0}</div>
               <p className="text-xs text-muted-foreground">Next 7 days</p>
             </CardContent>
           </Card>
@@ -200,7 +204,7 @@ const Viewings = () => {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{pendingViewings}</div>
+              <div className="text-2xl font-bold">{pendingViewings ? pendingViewings : 0}</div>
               <p className="text-xs text-muted-foreground">Awaiting response</p>
             </CardContent>
           </Card>
@@ -211,7 +215,7 @@ const Viewings = () => {
               <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{completedViewings}</div>
+              <div className="text-2xl font-bold">{completedViewings ? completedViewings : 0}</div>
               <p className="text-xs text-muted-foreground">Last 7 days</p>
             </CardContent>
           </Card>
@@ -257,26 +261,26 @@ const Viewings = () => {
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="date">Sort by Date</SelectItem>
-                  {/* <SelectItem value="client">Sort by Client</SelectItem> */}
-                  <SelectItem value="price">Sort by Price</SelectItem>
-                  <SelectItem value="status">Sort by Status</SelectItem>
+                  <SelectItem value="VIRTUAL_PROPERTY_VIEWING_FEE">Sort by Virtual Viewings</SelectItem>
+                  <SelectItem value="IN_PERSON_PROPERTY_VIEWING_FEE">Sort by In-person Viewings</SelectItem>
+                  {/* <SelectItem value="status">Sort by Status</SelectItem> */}
                 </SelectContent>
               </Select>
               
               <Button variant="outline" onClick={() => {
                 setSearchTerm("");
                 setStatusFilter("all");
-                setSortBy("date");
-              }}>
+                setSortBy("date");}}>
                 Clear Filters
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Viewings List */}
-        <div className="space-y-4">
+        {!viewings ?
+          <LoaderViewings/>
+          :
+          <div className="space-y-4">
           {filteredAndSortedViewings.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
@@ -386,11 +390,12 @@ const Viewings = () => {
           )}
 
           {/* Add Pagination to this page */}
-          
         </div>
+      }
       </div>
     </div>
   );
 };
 
 export default Viewings;
+

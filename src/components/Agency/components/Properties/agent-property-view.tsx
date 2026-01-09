@@ -205,11 +205,11 @@ const AgentPropertyDetailPage = () => {
             <div className="relative">
               <Carousel className="w-full">
                 <CarouselContent>
-                  {propertyData?.photoUrls?.map((image, index) => (
+                  {propertyData?.propertyImages?.map((image, index) => (
                     <CarouselItem key={index}>
                       <div className="relative">
                         <img
-                          src={image}
+                          src={image?.image?.url}
                           alt={`${propertyData?.title} - Photo ${index + 1}`}
                           className="w-full h-[400px] md:h-[500px] object-cover rounded-xl"
                         />
@@ -226,7 +226,7 @@ const AgentPropertyDetailPage = () => {
                           </div>
                         )}
                         <div className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm">
-                          {index + 1} / {propertyData?.photoUrls?.length}
+                          {index + 1} / {propertyData?.propertyImages?.length}
                         </div>
                       </div>
                     </CarouselItem>
@@ -376,7 +376,7 @@ const AgentPropertyDetailPage = () => {
                 playsInline
                 src={propertyData?.videoUrl}
                 className="w-full h-64 md:h-80 lg:h-96 object-cover rounded-lg"
-                poster={propertyData?.photoUrls?.[0]}
+                poster={propertyData?.propertyImages?.[0]?.image?.url}
               />
 
             {/* architectural plans */}

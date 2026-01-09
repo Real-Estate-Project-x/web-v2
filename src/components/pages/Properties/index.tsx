@@ -207,7 +207,7 @@ export const PropertyList: FC<Props> = ({ array }) => {
           >
             <div className="relative h-48 overflow-hidden">
               <img
-                src={property?.photoUrls?.[0]}
+                src={property?.propertyImages?.[0]?.image?.url}
                 alt={property?.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
