@@ -59,16 +59,16 @@ export default function LoginForm() {
           // Navigate to dashboard based on user role
           switch (decryptedResponse.user.role.name) {
             default:
-              router.push("/agent-dashboard");
+              router.push("//agent-dashboard/properties");
               break;
             case "customer":
               router.push("/user-dashboard");
               break;
             case "agent":
-              router.push("/agent-dashboard");
+              router.push("/agent-dashboard/properties");
               break;
             case "subAgent":
-              router.push("/sub-agent-dashboard");
+              router.push("/agent-dashboard/properties");
               break;
           }
         }, 2000);

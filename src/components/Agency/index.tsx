@@ -47,7 +47,7 @@ import { setLocalStorageField } from "../../../utils/helpers";
   };
 
 export const agentDashboardData = [
-    { href: "/agent-dashboard", label: "overview", id: "overview", icon : Home},
+    // { href: "/agent-dashboard", label: "overview", id: "overview", icon : Home},
     { href: "/agent-dashboard/properties", label: "Properties", id:"properties", icon: Building2 },
     { href: "/agent-dashboard/users", label: "Users", id:"users", icon: Users2 },
     { href: "/agent-dashboard/viewings", label: "Viewings", id:"viewings", icon: SearchIcon },
@@ -63,7 +63,6 @@ export const agentDashboardData = [
 ];
 
 const AgentDashboard = () => {
-
   // Mock statistics data
   const stats = [
     {

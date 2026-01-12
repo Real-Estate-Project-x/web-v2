@@ -84,13 +84,15 @@ const AgentPropertiesManager = () => {
     });
   },[reload, statusFilter]);
 
+  console.log({searchTerm});
+
   const filteredAndSortedProperties = () : AgentDatabaseInterface[] => {
     if(properties.length === 0){
       return [];
     }
-    if(statusFilter === "ALPHABETICAL_ORDER" || statusFilter === "NEWEST" || statusFilter === "OLDEST"){
-      return properties;
-    }else{
+    // if((statusFilter === "ALPHABETICAL_ORDER" || statusFilter === "NEWEST" || statusFilter === "OLDEST") && !searchTerm){
+    //   return properties;
+    // }else{
      return properties.filter(property => {
       const matchesSearch =
         property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -107,7 +109,7 @@ const AgentPropertiesManager = () => {
         // return matchesSearch && matchesStatus;
     }).sort((a, b) => {
       let aValue, bValue;
-      switch (sortBy) {
+      switch (statusFilter.toLowerCase()) {
         case "price":
           aValue = a.price;
           bValue = b.price;
@@ -122,7 +124,7 @@ const AgentPropertiesManager = () => {
       }
       return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
     });
-    }
+    
   }
   
   // Pagination
@@ -200,17 +202,17 @@ const AgentPropertiesManager = () => {
                     <SelectItem value="OLDEST">Oldest</SelectItem>
                     {/* <SelectItem value="pending">Pending</SelectItem> */}
                     <SelectItem value="NEWEST">Newest</SelectItem>
+                    <SelectItem value="PRICE">Price</SelectItem>
                   </SelectContent>
                 </Select>
 
-                <Select value={sortBy} onValueChange={setSortBy}>
+                {/* <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-full sm:w-[150px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="date">Date Added</SelectItem>
                     <SelectItem value="price">Price</SelectItem>
-                    {/* <SelectItem value="views">Views</SelectItem> */}
                     <SelectItem value="daysOnMarket">Days on Market</SelectItem>
                   </SelectContent>
                 </Select>
@@ -227,7 +229,7 @@ const AgentPropertiesManager = () => {
                   ) : (
                     <SortDesc className="h-4 w-4" />
                   )}
-                </Button>
+                </Button> */}
               </div>
             </div>
           </CardContent>
