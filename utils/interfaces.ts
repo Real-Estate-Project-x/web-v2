@@ -708,3 +708,19 @@ export interface AgencyInterface {
 export interface AgencyViewingsInterface{
   
 } 
+
+export interface AgencyScheduleInterface{
+  date:string;
+  openWindows: {
+    agencyId : string,
+    date : string,
+    dateCreated : string,
+    dateUpdated: string,
+    endDateTime : string,
+    id : string,
+    isBooked: boolean,
+    startDateTime : string,
+    status : boolean,
+    timeSlot: string
+  }[]
+}

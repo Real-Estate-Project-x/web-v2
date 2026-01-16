@@ -59,8 +59,10 @@ const AgentPropertiesManager = () => {
   const [properties, setProperties] = useState<AgentDatabaseInterface[]>([] as AgentDatabaseInterface[]);
   const router = useRouter();
   const [reload, setReload] = useState<boolean>(false);
+  const agencyId = getLocalStorageFieldRaw('agentId');
 
   useEffect(() => {
+
     const boostPaymentReference = localStorage.getItem("boost_payment_reference");
     if(boostPaymentReference){
       // verify payment status from backend
@@ -76,13 +78,14 @@ const AgentPropertiesManager = () => {
       });
     }
 
-    axiosInstance.get(`/agency/${getLocalStorageFieldRaw('agentId')}/properties?sortBy=${statusFilter}`)
+    axiosInstance.get(`/agency/${agencyId}/properties?sortBy=${statusFilter}`)
     .then((response) => {
      setProperties(response.data.data);
     }).catch((err) => {
       console.log({err});
     });
-  },[reload, statusFilter]);
+
+  },[reload, statusFilter, agencyId]);
 
   console.log({searchTerm});
 

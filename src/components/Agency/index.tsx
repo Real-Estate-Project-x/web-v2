@@ -20,6 +20,7 @@ import {
   Users2,
   SearchIcon,
   WalletCards,
+  Calendar,
   
 } from "lucide-react";
 import PropertyStatsChart from "./components/Dashboard/property-stats-chart";
@@ -53,6 +54,7 @@ export const agentDashboardData = [
     { href: "/agent-dashboard/viewings", label: "Viewings", id:"viewings", icon: SearchIcon },
     { href: "/agent-dashboard/payment", label: "Payouts", id:"payouts", icon: WalletCards },
     {href : "/agent-dashboard/notifications", label:'Notifications', id:"notifications", icon:Bell},
+    {href : "/agent-dashboard/schedule", label:'Schedule', id:"schedule", icon:Calendar},
     {href : "/agent-dashboard/settings", label:'Settings',id : "settings", icon : Settings},
     // {href : "/agent-dashboard/profile", label:'Profile',id : "profile", icon : Avatar},
     // { href: "/agent-dashboard/profile", label: '',  icon : <Avatar className="h-10 w-10">

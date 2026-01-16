@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -30,9 +30,14 @@ const TIME_WINDOWS = [
   "5:00pm - 6:00pm",
   "6:00pm - 7:00pm",
   "7:00pm - 8:00pm"
-]
+];
 
-export function ScheduleDialog() {
+type Props = {
+  refresh : React.Dispatch<React.SetStateAction<boolean>>
+
+}
+export function ScheduleDialog({refresh} : Props) {
+
   const [schedule, setSchedule] = useState<
     { date: string; openWindows: string[] }[]
   >([{ date: "", openWindows: [] }])
@@ -84,6 +89,7 @@ export function ScheduleDialog() {
         setLoading(false);
         setOpen(false);
         setSchedule([{ date: "", openWindows: [] }]);
+        refresh(true);
       }
     }catch(err : any) {
       toast.error(err?.response?.data?.message || "Error submitting schedule");

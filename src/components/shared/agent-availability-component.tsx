@@ -10,10 +10,25 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { toast } from "sonner";
 
 type Availability = {
   date: string
-  openWindows: string[]
+  openWindows: [
+    {
+        agencyId : string,
+        date : string,
+        dateCreated : string,
+        dateUpdated : string,
+        endDateTime:string,
+        id:string,
+        isBooked:boolean,
+        startDateTime:string,
+        status:boolean,
+        timeSlot:string
+    }
+  ]
 }
 
 type SelectedSlot = {
@@ -33,6 +48,7 @@ export default function AgentAvailabilityPicker({
   propertyId
 }: Props) {
   const [selected, setSelected] = useState<SelectedSlot | null>(null)
+  const [availabilityId, setAvailabilityId] = useState<string>("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [medium, setMedium] = useState<"IN_PERSON" | "VIRTUAL">("IN_PERSON");
@@ -83,6 +99,9 @@ export default function AgentAvailabilityPicker({
         }, 10000);
     }
   }
+
+  console.log({timeWindows});
+
 
   return (
     <div className="space-y-4">
@@ -149,37 +168,43 @@ export default function AgentAvailabilityPicker({
                 {loading ? 'Loading...' : 'Submit'}
             </Button>
         </form>
-        {timeWindows.length > 0 ? timeWindows?.map((day) => (
-            <Card key={day.date} className="rounded-2xl">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-muted-foreground">
-                {day.date}
-                </CardTitle>
-            </CardHeader>
+        {timeWindows.length > 0 && (
+            <h3 className="text-lg font-medium">Available Time Slots</h3>
+        )}
+        {timeWindows.length > 0 ? timeWindows?.map((day, index) => (
+            <Card key={index} className="rounded-2xl">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-semibold text-muted-foreground">
+                        {day.date}
+                    </CardTitle>
+                </CardHeader>
 
-            <CardContent className="flex flex-wrap gap-2">
-                {day.openWindows.map((time) => {
-                const isActive =
-                    selected?.date === day.date &&
-                    selected?.time === time
+                <CardContent className="flex flex-wrap gap-2">
+                    {day.openWindows.map((time, index) => {
+                    const isActive =
+                        selected?.date === day.date &&
+                        selected?.time === time.timeSlot
 
-                return (
-                    <Button
-                    key={time}
-                    variant={isActive ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleSelect(day.date, time)}
-                    className={clsx(
-                        "flex items-center gap-2 rounded-xl",
-                        isActive && "shadow-md"
-                    )}
-                    >
-                    <Clock className="h-4 w-4" />
-                    {time}
-                    </Button>
-                )
-                })}
-            </CardContent>
+                    return (
+                        <Button
+                        key={`${time}-${index}`}
+                        variant={isActive ? "default" : "outline"}
+                        size="sm"
+                        onClick={() =>{ 
+                            handleSelect(day.date, time.timeSlot);
+                            setAvailabilityId(time.id);
+                        }}
+                        className={clsx(
+                            "flex items-center gap-2 rounded-xl",
+                            isActive && "shadow-md"
+                        )}
+                        >
+                        <Clock className="h-4 w-4" />
+                            {time.timeSlot}
+                        </Button>
+                    )
+                    })}
+                </CardContent>
             </Card>
 
         )) : (
@@ -188,9 +213,76 @@ export default function AgentAvailabilityPicker({
 
       {selected && (
         <Badge variant="secondary" className="text-sm">
-          Selected: {selected.date} • {selected.time}
+          Selected : {selected.date} • {selected.time} 
         </Badge>
       )}
+      <BookViewingDialog
+        isOpen={selected !== null}
+        onClose={() => setSelected(null)}
+        selected={selected}
+        availabilityWindowId={availabilityId}
+      />
     </div>
   )
 }
+
+type DialogProps = {
+    isOpen : boolean;
+    onClose : () => void;
+    selected : SelectedSlot | null;
+    availabilityWindowId : string;
+}
+
+const BookViewingDialog = ({ isOpen, onClose, selected, availabilityWindowId }: DialogProps) => {
+    const [loading, setLoading] = useState(false);
+
+    const reformatDate = selected ?  selected?.date?.split('/')  : [];
+    const reformattedDateString = reformatDate.length === 3 ? `${reformatDate[2]}-${reformatDate[1]}-${reformatDate[0]}` : '';
+
+    const onBookHandler = async () => {
+        setLoading(true);
+        // booking logic here
+        try{
+            const bookingResponse = await axiosInstance.get(`agency-availability/verify-time-slot-availability/${availabilityWindowId}`);
+            if(bookingResponse?.data?.success){
+                toast.success(bookingResponse?.data?.message);
+                onClose();
+            }
+            setLoading(false);
+        }catch(error){
+            console.error('Error verifying time slot availability:', error);
+            setLoading(false);
+        }
+        
+    }
+
+    return(
+        // dialog for booking viewing slot
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-[400px] bg-white">
+                <DialogHeader>
+                    <section className="text-base">
+                        <p className="text-base font-normal">Do you want to book a viewing for</p> 
+
+                        <p className="pt-3 pb-1 font-medium text-sm">{
+                            new Date(reformattedDateString).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                weekday  :"long",
+                                month : "short"
+                            })
+                        } </p>
+                        <p className="py-1 font-medium text-sm">Time = {selected?.time} </p>
+                    </section>
+                </DialogHeader>
+
+                <DialogFooter>
+                    <Button type="button" className="w-full my-2 disabled:bg-slate-300 cursor-pointer" disabled={loading}
+                    onClick={onBookHandler}>
+                      { loading ? 'Booking...' : 'Confirm Booking'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+

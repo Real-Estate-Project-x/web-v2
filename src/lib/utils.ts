@@ -31,8 +31,8 @@ export const returnHeaders = (ip = "104.28.204.233", longitude = "7.520406", lat
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "x-user-ip": ip,
-    "x-longitude": longitude,
-    "x-latitude": latitude,
+    // "x-longitude": longitude,
+    // "x-latitude": latitude,
   };
 };
 

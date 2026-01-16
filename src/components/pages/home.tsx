@@ -10,7 +10,7 @@ import Services from "./Home/Services";
 import Testimonials from "./Home/Testimonials";
 import axios from "axios";
 import { getUserIp, returnHeaders } from "@/lib/utils";
-import { setCookie } from "@/lib/helpers";
+import { getCookie, setCookie } from "@/lib/helpers";
 import { CTA } from "./Home/CTA";
 import { axiosInstance } from "@/lib/axios-interceptor";
 
@@ -51,7 +51,10 @@ const LandingPage = () => {
   useEffect(() => {
     // setAlert();
     getUserIpAddress(setUserIp);
-
+    axios.get(``, {headers : {...returnHeaders()}})
+    .then((response) => {
+      console.log({response});
+    });
     axios
       .all([
         axiosInstance.get(`${API_BASE_URL}agency/list/top-agents`),

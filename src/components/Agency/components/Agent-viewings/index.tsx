@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { ScheduleDialog } from "./dialogs/schedule-viewing";
 import { LoaderViewings } from "@/components/shared/loader-cards";
 
 interface Viewing {
@@ -41,7 +40,7 @@ interface Viewing {
 const Viewings = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("VIRTUAL_PROPERTY_VIEWING_FEE");
+  const [sortBy, setSortBy] = useState("IN_PERSON_PROPERTY_VIEWING_FEE");
   const [feeSetupId, setFeeSetupId] = useState("");
   const [viewings, setViewings] = useState<Viewing[]>([]);
 
@@ -159,20 +158,29 @@ const Viewings = () => {
     // VIRTUAL_PROPERTY_VIEWING_FEE, IN_PERSON_PROPERTY_VIEWING_FEE,PROPERTY_AD_BOOSTING filter based on these
     axiosInstance.get(`/fee-setup/${sortBy}`)
     .then(response => {
-      setFeeSetupId(response?.data?.id);
+      setFeeSetupId(response?.data?.data?.id);
     }).catch(error => { 
       console.error("Error fetching fee setup data:", error);
     });
 
     //f3c8e0c9-1a43-4dc5-b47b-ff5e3626a58e
+
+  },[sortBy]);
+
+  useEffect(() => {
+    if(!feeSetupId){
+      return;
+    }
+    //9a7d7c4d-7c5e-4414-9d9d-efc5973e16e0
     axiosInstance.get(`/agent-property-viewing?feeSetupId=${feeSetupId}`)
     .then(response => {
       setViewings(response.data?.data || []);
     }).catch(error => { 
       console.error("Error fetching viewings:", error);
     });
+    
+  },[feeSetupId]);
 
-  },[sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -182,7 +190,6 @@ const Viewings = () => {
         <div className="mb-8">
           <h1 className="text-2xl font-semibold mb-2">Scheduled Viewings</h1>
           <p className="text-muted-foreground mb-4">Manage your property viewings and client appointments</p>
-          <ScheduleDialog/>
         </div>
 
         {/* Stats Cards */}
@@ -398,4 +405,3 @@ const Viewings = () => {
 };
 
 export default Viewings;
-
