@@ -533,7 +533,23 @@ export interface AgentDatabaseInterface {
   status: boolean;
   dateCreated: string;
   dateUpdated: string;
-  photoUrls: string[];
+    propertyImages: {
+    dateCreated: string;
+    dateUpdated: string;
+    id:string;
+    image: {
+      cloudFileId: string;
+      dateCreated: string;
+      dateUpdated:string;
+      id: string;
+      mimeType:string;
+      status: boolean;
+      url:string;
+    },
+    imageId: string;
+    propertyId:string;
+    status:boolean;
+  }[];
   videoUrl: string;
   architecturalPlanUrls: string[];
   threeDimensionalModelUrl: string;
@@ -560,65 +576,6 @@ export interface AgentUsersInterface {
   totalListings: number;
   totalSubAgents: number;
 }
-// export const SearchPropertyInterface: SearchPropertyInterfaceType = {
-//   label: "Search Result",
-//   property: {
-//     id: "692c5374-e382-4b89-97bd-a393a8e1a342",
-//     status: true,
-//     dateCreated: "2025-08-12T11:13:46.219Z",
-//     dateUpdated: "2025-08-12T11:13:46.219Z",
-//     description: "affordable 1 bedroom mini flat ideal for first-time buyers",
-//     address: "17 sabon gari market road, sabon gari, kaduna",
-//     agencyId: "8b6c7c37-72b5-4db8-9184-214f32b8b68d",
-//     architecturalPlanUrls: ["https://www.google.com"],
-//     averageBroadbandSpeedInMegabytes: 320,
-//     bluepoddRating: 0,
-//     geoCoordinates: {
-//       latitude: 8.882612179920129,
-//       longitude: 11.378938077009188,
-//     },
-//     grandTotalPrice: 0,
-//     hasCarParking: false,
-//     hasCctv: false,
-//     hasGym: false,
-//     hasKidsPlayArea: false,
-//     hasLaundry: true,
-//     hasWifi: true,
-//     isNewBuilding: false,
-//     isPetFriendly: false,
-//     isPropertyBlocked: false,
-//     isPropertyBoosted: false,
-//     isPropertyTaken: false,
-//     noOfBedrooms: 1,
-//     noOfKitchens: 1,
-//     noOfToilets: 1,
-//     paymentCoverageDuration: "YEARLY",
-//     additionalCosts: [
-//       { price: 35000, title: "Property verification" },
-//       { price: 20000, title: "Title search" },
-//     ],
-//   },
-//   agency: {
-//     id: "8b6c7c37-72b5-4db8-9184-214f32b8b68d",
-//     status: true,
-//     dateCreated: "2025-07-28T15:04:47.839Z",
-//     dateOfIncorporation: "2025-07-28",
-//     dateUpdated: "2025-07-28T15:04:47.839Z",
-//     description: "This is a test description",
-//     address: "no. 50 alatunji road",
-//     email: "j.oluwa@example.com",
-//     logo: "https://cdn.pixabay.com/photo/2025/03/06/17/45/duck-9451249_1280.jpg",
-//     name: "oluwafemi's agency",
-//     rating: 0,
-//     rcNumber: "1234567",
-//     agencyPhoneNumber: "08034567890",
-//     whatsappNumber: "08034567890",
-//     agencyCACDump: {},
-//     createdByUserId: "64e06d75-61cb-4069-bf8d-c59b3552d95e",
-//     isRegistered: true,
-//     inPersonViewingFee: null,
-//   },
-// };
 
 interface CountryInterface {
   id: string;

@@ -75,11 +75,11 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
           <div className="relative">
             <Carousel className="w-full">
               <CarouselContent>
-                {property?.photoUrls?.map((image, index) => (
+                {property?.propertyImages?.map((image, index) => (
                   <CarouselItem key={index}>
                     <div className="relative">
                       <img
-                        src={image}
+                        src={image?.image?.url}
                         alt={`${property.title} - Photo ${index + 1}`}
                         className="w-full h-[400px] object-cover rounded-lg"
                         // width={500}
@@ -88,14 +88,14 @@ const AgentPropertyView: React.FC<AgentPropertyViewProps> = ({
                         // fill
                         // sizes="33vw"
                       />
-                      {/* {index === 0 && property.isBoosted && (
+                      {index === 0 && property.isBoosted && (
                         <div className="absolute top-4 right-4">
                           <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                             <Zap className="h-3 w-3 mr-1" />
                             Boosted
                           </Badge>
                         </div>
-                      )} */}
+                      )}
                       {index === 0 && (
                         <div className="absolute top-4 left-4">
                           {getStatusBadge(property.status ? "Active" : "Sold")}

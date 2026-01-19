@@ -4,9 +4,10 @@ import { AgentSidebar } from "../shared/sideBar";
 import { SidebarProvider } from "../ui/sidebar";
 import { Card, CardContent } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Badge, Mail, MapPin, MessageCircle, Phone, Star, User } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone, Star, User } from "lucide-react";
 import { setLocalStorageField } from "../../../utils/helpers";
 import { axiosInstance } from "@/lib/axios-interceptor";
+
 
 const AgentLayout = ({ children }: { children: React.ReactNode }) => {
 

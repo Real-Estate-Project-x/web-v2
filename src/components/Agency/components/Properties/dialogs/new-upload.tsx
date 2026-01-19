@@ -248,6 +248,7 @@ export default function PropertyListingDialog({
           toast.success(response?.data?.message);
           onOpenChange(false);
           setIsLoading(false);
+          
           form.reset();
         })
         .catch((error : any) => {

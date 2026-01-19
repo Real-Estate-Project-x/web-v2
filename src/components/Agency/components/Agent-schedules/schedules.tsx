@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { cn, reformatDate } from "@/lib/utils";
 import { 
   Calendar as CalendarIcon, 
   Clock, 
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { getLocalStorageFieldRaw } from "../../../../../utils/helpers";
-import { ScheduleDialog } from "../Agent-viewings/dialogs/schedule-viewing";
+import { ScheduleDialog } from "./dialog/schedule-viewing";
 import { AgencyScheduleInterface } from "../../../../../utils/interfaces";
 
 
@@ -97,17 +97,11 @@ const AgentSchedule = () => {
             if(schedules?.data?.data?.length > 0){
               //const data = schedules?.data?.data;
                 const formattedData = schedules?.data?.data?.map((s : AgencyScheduleInterface) =>{
-                  const dateSplit = s.date?.split('/');
-                  const reformattedDate = `${dateSplit[2]}/${dateSplit[1]}/${dateSplit[0]}`;
+                  const reformattedDate = reformatDate(s.date);
                   return{
                     ...s,
                     date : reformattedDate
                   }
-                  // new Date(reformattedDate).toLocaleDateString('en-us', {
-                  //   weekday : 'long',
-                  //   month : "short",
-                  //   year : "numeric"
-                  // })
                 });
               setSchedules(formattedData);
               return
@@ -338,7 +332,7 @@ const AgentSchedule = () => {
                             <div
                               key={slot.id}
                               className="flex items-center gap-1 bg-muted px-3 py-1.5 rounded-full">
-                                
+
                               <Clock className="h-3 w-3 text-muted-foreground" />
                               <span className="text-sm">{slot?.timeSlot}</span>
                               <button

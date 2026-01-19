@@ -46,9 +46,8 @@ import { toast } from "sonner";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [statusFilter, setStatusFilter] = useState("ALPHABETICAL_ORDER");
+  const [statusFilter, setStatusFilter] = useState("NEWEST");
   const [currentPage, setCurrentPage] = useState(1);
   const [isBoosted, setIsBoosted] = useState(false);
   const propertiesPerPage = 6;
@@ -78,6 +77,12 @@ const AgentPropertiesManager = () => {
       });
     }
 
+  },[]);
+
+  useEffect(() => {
+
+    if(!agencyId) return;
+
     axiosInstance.get(`/agency/${agencyId}/properties?sortBy=${statusFilter}`)
     .then((response) => {
      setProperties(response.data.data);
@@ -85,17 +90,13 @@ const AgentPropertiesManager = () => {
       console.log({err});
     });
 
-  },[reload, statusFilter, agencyId]);
+  },[isBoosted, agencyId, reload, statusFilter]);
 
-  console.log({searchTerm});
 
   const filteredAndSortedProperties = () : AgentDatabaseInterface[] => {
     if(properties.length === 0){
       return [];
     }
-    // if((statusFilter === "ALPHABETICAL_ORDER" || statusFilter === "NEWEST" || statusFilter === "OLDEST") && !searchTerm){
-    //   return properties;
-    // }else{
      return properties.filter(property => {
       const matchesSearch =
         property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -103,13 +104,6 @@ const AgentPropertiesManager = () => {
         property.propertyType?.tag?.toLowerCase().includes(searchTerm.toLowerCase());
 
         return matchesSearch;
-
-        // const matchesStatus =
-        //   statusFilter === "all" ||
-        //   (property.status && statusFilter.toLowerCase() === "active") ||
-        //   (!property.status && statusFilter.toLowerCase() === "sold");
-
-        // return matchesSearch && matchesStatus;
     }).sort((a, b) => {
       let aValue, bValue;
       switch (statusFilter.toLowerCase()) {
@@ -130,6 +124,8 @@ const AgentPropertiesManager = () => {
     
   }
   
+  const hasNoRecords = Array.isArray(filteredAndSortedProperties) && filteredAndSortedProperties?.length === 0;
+
   // Pagination
   const totalPages = Math.ceil(
     filteredAndSortedProperties.length / propertiesPerPage
@@ -201,10 +197,10 @@ const AgentPropertiesManager = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="NEWEST">Newest</SelectItem>
                     <SelectItem value="ALPHABETICAL_ORDER">A-Z</SelectItem>
                     <SelectItem value="OLDEST">Oldest</SelectItem>
                     {/* <SelectItem value="pending">Pending</SelectItem> */}
-                    <SelectItem value="NEWEST">Newest</SelectItem>
                     <SelectItem value="PRICE">Price</SelectItem>
                   </SelectContent>
                 </Select>
@@ -244,18 +240,18 @@ const AgentPropertiesManager = () => {
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
               <div className="relative">
                 <img
-                  src={property.photoUrls?.[0]}
+                  src={property?.propertyImages?.[0]?.image?.url}
                   alt={property.title}
                   className="w-full h-56 object-cover"
                 />
-                {/* {property.isBoosted && (
+                {property.isBoosted && (
                     <div className="absolute top-2 right-2">
                     <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                         <Zap className="h-3 w-3 mr-1" />
                         Boosted
                     </Badge>
                     </div>
-                )} */}
+                )}
                 <div className="absolute top-2 left-2">
                   {getStatusBadge(property.upFor)}
                 </div>
@@ -315,7 +311,7 @@ const AgentPropertiesManager = () => {
                         {/* Edit */}
                       </Button>
                     </div>
-                      <Button size="sm" className="bg-green-800 text-white"
+                      <Button size="sm" className="bg-green-800 text-white disabled:bg-gray-400"
                       disabled={property?.isBoosted}
                       onClick={() => {
                         setProperty(property);
@@ -387,8 +383,8 @@ const AgentPropertiesManager = () => {
         )}
 
         {/* No Results */}
-        {filteredAndSortedProperties.length === 0 && (
-          <Card>
+        {hasNoRecords && (
+          <Card >
             <CardContent className="p-8 text-center">
               <p className="text-muted-foreground">
                 No properties found matching your criteria.
@@ -397,7 +393,8 @@ const AgentPropertiesManager = () => {
           </Card>
         )}
         </div>
-        <PropertyListingDialog open={uploadProperty} onOpenChange={() => setUploadProperty(false)}/>
+
+        <PropertyListingDialog open={uploadProperty} onOpenChange={() => {setUploadProperty(false); setReload(!reload);}}/>
         <PropertyEditForm 
           property={property} 
           isOpen={editProperty} 

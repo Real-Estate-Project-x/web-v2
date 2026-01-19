@@ -12,24 +12,9 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { toast } from "sonner";
+import { AgencyScheduleInterface } from "../../../utils/interfaces";
+import { reformatDate } from "@/lib/utils";
 
-type Availability = {
-  date: string
-  openWindows: [
-    {
-        agencyId : string,
-        date : string,
-        dateCreated : string,
-        dateUpdated : string,
-        endDateTime:string,
-        id:string,
-        isBooked:boolean,
-        startDateTime:string,
-        status:boolean,
-        timeSlot:string
-    }
-  ]
-}
 
 type SelectedSlot = {
   date: string
@@ -38,27 +23,25 @@ type SelectedSlot = {
 
 interface Props {
  // availability: Availability[]
-  onSelect: (slot: SelectedSlot) => void
+  //onSelect: (slot: SelectedSlot) => void
   propertyId: string
 }
 
 export default function AgentAvailabilityPicker({
  // availability,
-  onSelect,
   propertyId
 }: Props) {
   const [selected, setSelected] = useState<SelectedSlot | null>(null)
   const [availabilityId, setAvailabilityId] = useState<string>("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [medium, setMedium] = useState<"IN_PERSON" | "VIRTUAL">("IN_PERSON");
-  const [timeWindows, setTimeWindows] = useState<Availability[]>([]);
+  const [medium, setMedium] = useState<string>("IN_PERSON");
+  const [timeWindows, setTimeWindows] = useState<AgencyScheduleInterface[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleSelect = (date: string, time: string) => {
     const slot = { date, time }
     setSelected(slot)
-    onSelect(slot)
   }
 
   const getMaxDate = (date: string) => {
@@ -66,6 +49,10 @@ export default function AgentAvailabilityPicker({
     const d = new Date(date)
     d.setDate(d.getDate() + 14)
     return d.toISOString().split("T")[0]
+  }
+
+  const handleInputChange = (value : string) => {
+    setMedium(value);
   }
 
   const onSubMitHandler = async (e : any) => {
@@ -100,9 +87,6 @@ export default function AgentAvailabilityPicker({
     }
   }
 
-  console.log({timeWindows});
-
-
   return (
     <div className="space-y-4">
         <form onSubmit={onSubMitHandler}>
@@ -115,14 +99,14 @@ export default function AgentAvailabilityPicker({
                 </div>
                 <section className="flex items-center mb-4 gap-4">
                     <div className="flex items-center gap-2">
-                        <RadioGroupItem value="IN_PERSON" id="new"  defaultChecked={true}
-                        onChange={() => setMedium("IN_PERSON")}/>
-                        <Label htmlFor="new">In Person</Label>
+                        <input type="radio" value={"IN_PERSON"} id="in_person" defaultChecked={true} name="radio" 
+                        onChange={(e:any) => handleInputChange(e.target.value)}/>
+                        <label htmlFor="in_person">IN_PERSON</label>
                     </div>
                     <div className="flex items-center gap-2">
-                        <RadioGroupItem value="VIRTUAL" id="old" 
-                         onChange={() => setMedium("VIRTUAL")}/>
-                        <Label htmlFor="old">Virtual</Label>
+                        <input type="radio" value={"VIRTUAL"} id="virtual" name="radio"
+                        onChange={(e:any) => handleInputChange(e.target.value)}/>
+                        <label htmlFor="virtual">VIRTUAL</label>
                     </div>
                 </section>
                
@@ -149,20 +133,6 @@ export default function AgentAvailabilityPicker({
                     />
                 </div>
             </div>
-           {/* <Calendar
-            mode="single"
-            selected={startDate}
-            onSelect={setStartDate}
-            disabled={(date) => {
-                if (!startDate) return false
-
-                const maxDate = addDays(startDate, 14)
-
-                return (
-                isBefore(date, startDate) ||
-                isAfter(date, maxDate)
-                )
-            }} /> */}
 
             <Button type="submit" variant="default" className=" p-2 mt-2 w-56 disabled:bg-slate-300" disabled={loading}>
                 {loading ? 'Loading...' : 'Submit'}
@@ -221,6 +191,8 @@ export default function AgentAvailabilityPicker({
         onClose={() => setSelected(null)}
         selected={selected}
         availabilityWindowId={availabilityId}
+        propertyId={propertyId}
+        medium={medium}
       />
     </div>
   )
@@ -231,13 +203,12 @@ type DialogProps = {
     onClose : () => void;
     selected : SelectedSlot | null;
     availabilityWindowId : string;
+    propertyId : string;
+    medium :  string;
 }
 
-const BookViewingDialog = ({ isOpen, onClose, selected, availabilityWindowId }: DialogProps) => {
+const BookViewingDialog = ({ isOpen, onClose, selected, availabilityWindowId, propertyId, medium }: DialogProps) => {
     const [loading, setLoading] = useState(false);
-
-    const reformatDate = selected ?  selected?.date?.split('/')  : [];
-    const reformattedDateString = reformatDate.length === 3 ? `${reformatDate[2]}-${reformatDate[1]}-${reformatDate[0]}` : '';
 
     const onBookHandler = async () => {
         setLoading(true);
@@ -245,12 +216,37 @@ const BookViewingDialog = ({ isOpen, onClose, selected, availabilityWindowId }: 
         try{
             const bookingResponse = await axiosInstance.get(`agency-availability/verify-time-slot-availability/${availabilityWindowId}`);
             if(bookingResponse?.data?.success){
-                toast.success(bookingResponse?.data?.message);
-                onClose();
+                if(medium === "IN_PERSON"){
+                    await axiosInstance.post(`agent-property-viewing/in-person`, {
+                        propertyId,
+                        availabilityWindowId
+                    }).then(response => {
+                        if(response?.data?.success){
+                            toast.success(response?.data?.message);
+                            onClose();
+                        }
+                    }).catch(err => {
+                        console.log({err});
+                        setLoading(false);
+                    })
+                }else if(medium === "VIRTUAL"){
+                    // initiate payment
+                    try{
+                        const initiatePaymentResponse = await axiosInstance.post('agent-property-viewing/virtual/initiate',{
+                            propertyId,
+                            availabilityWindowId
+                        });
+                        console.log({initiatePaymentResponse});
+                    }catch(err : any){
+                        toast.error(err?.response?.data?.message)
+                    }
+                    
+                }
             }
             setLoading(false);
-        }catch(error){
+        }catch(error : any){
             console.error('Error verifying time slot availability:', error);
+            toast.error(error?.response?.data?.message)
             setLoading(false);
         }
         
@@ -259,21 +255,20 @@ const BookViewingDialog = ({ isOpen, onClose, selected, availabilityWindowId }: 
     return(
         // dialog for booking viewing slot
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[400px] bg-white">
+            <DialogContent className="sm:max-w-[400px] bg-white" aria-describedby="">
                 <DialogHeader>
-                    <section className="text-base">
-                        <p className="text-base font-normal">Do you want to book a viewing for</p> 
-
-                        <p className="pt-3 pb-1 font-medium text-sm">{
-                            new Date(reformattedDateString).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                weekday  :"long",
-                                month : "short"
-                            })
-                        } </p>
-                        <p className="py-1 font-medium text-sm">Time = {selected?.time} </p>
-                    </section>
+                    <DialogTitle>
+                        <p className="text-lg font-medium">Do you want to book a viewing for</p> 
+                    </DialogTitle>
                 </DialogHeader>
+
+                <section className="text-base">
+
+                    <p className="pt-3 pb-1 font-normal text-base"><span className="font-medium">Date</span> :
+                     &nbsp;{selected?.date && format(reformatDate(selected?.date), "EEEE, MMMM d, yyyy")} 
+                    </p>
+                    <p className="py-1 font-normal text-base"><span className="font-medium">Time</span> : {selected?.time} </p>
+                </section>
 
                 <DialogFooter>
                     <Button type="button" className="w-full my-2 disabled:bg-slate-300 cursor-pointer" disabled={loading}

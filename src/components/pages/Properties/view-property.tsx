@@ -108,8 +108,6 @@ const PropertyDetails = () => {
 
         }).then(response => {
 
-          console.log(response);
-
           if(!response.data.success){
             toast.error(response.data.message);
             return;
@@ -160,9 +158,9 @@ const PropertyDetails = () => {
   };
 
 
-  const onSelect = (e : any) => {
-    console.log({e})
-  }
+  // const onSelect = (e : any) => {
+  //   console.log({e})
+  // }
   
   useEffect(() => { 
     axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id') as string}`)
@@ -229,8 +227,8 @@ const PropertyDetails = () => {
                               />
                               {index === 0 && (
                                 <>
-                                  <Badge className="absolute top-4 left-4 bg-[#0253CC] px-4 py-2 rounded-full">{propertyData.property.propertyType?.name}</Badge>
-                                  {propertyData.property.isNewBuilding && <Badge className="absolute p-2 rounded-full top-4 left-16 bg-green-500 hover:bg-green-600">New</Badge>}
+                                  <Badge className="absolute top-4 left-4 bg-[#0253CC] px-4 py-2 rounded-full capitalize">{propertyData.property.propertyType?.name}</Badge>
+                                  {propertyData.property.isNewBuilding && <Badge className="absolute p-2 rounded-full top-4 left-40 bg-green-500 hover:bg-green-600">New</Badge>}
                                   <Badge className="absolute top-4 right-4 bg-white text-[#102A43] p-2 rounded-full">{formatPrice(propertyData.property.price || 0)}</Badge>
                                 </>
                               )}
@@ -351,7 +349,7 @@ const PropertyDetails = () => {
                       </div>
                     }
                     {isUserLoggedIn() &&
-                      <AgentAvailabilityPicker propertyId={propertyData?.property?.id as string} onSelect={onSelect}/>
+                      <AgentAvailabilityPicker propertyId={propertyData?.property?.id as string}/>
                     }
                     {/* Video tag section*/}
                     {propertyData?.property?.videoUrl && 
