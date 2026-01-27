@@ -1,5 +1,5 @@
 'use client';
-import { Bed, Heart, MapPin, Star, StarHalf, Wifi, Dumbbell, WashingMachine, MessageCircle, Video, Eye } from "lucide-react";
+import { Bed, Heart, MapPin, Star, StarHalf, Wifi, Dumbbell, WashingMachine, MessageCircle, Video, Eye, CheckCircle, Check, BadgeCheck } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +23,8 @@ import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { hasAmenities, hasFeatures, isUserLoggedIn } from "@/lib/utils";
 import AgentAvailabilityPicker from "@/components/shared/agent-availability-component";
+import { features } from "process";
+import { Checkbox } from "@radix-ui/react-checkbox";
 
 
 type TourFormData = {
@@ -157,10 +159,6 @@ const PropertyDetails = () => {
     return stars;
   };
 
-
-  // const onSelect = (e : any) => {
-  //   console.log({e})
-  // }
   
   useEffect(() => { 
     axiosInstance.get(`property/customer-listings/detail/${searchParams.get('id') as string}`)
@@ -292,7 +290,7 @@ const PropertyDetails = () => {
                     </div>
 
                     {/* Amenities Section */}
-                    {hasAmenities(propertyData) && 
+                    {hasAmenities(propertyData?.property) && 
                       <div>
                         <h2 className="text-xl md:text-2xl font-semibold mb-3">Amenities</h2>
                         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -328,23 +326,44 @@ const PropertyDetails = () => {
                     }
 
                     {/* Features */}
-                    {hasFeatures(propertyData) && 
+                    {hasFeatures(propertyData?.property) && 
                       <div>
                         <h2 className="text-xl md:text-2xl font-semibold mb-3">Features</h2>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols gap-2">
                           {propertyData?.property?.hasCarParking&& (
-                            <div className="flex items-center text-gray-600 text-sm md:text-base">
-                              <span className="mr-2">•</span>
-                              {"Car Parking"}
+                            <div className="w-fit flex items-center text-gray-600 text-sm md:text-base">
+                              <span className="mr-2">
+                                <BadgeCheck className="bg-green-700 text-white rounded-full"/>
+                              </span>
+                              {"Has Car Parking"}
                             </div>
                           )}
                           {propertyData?.property?.hasKidsPlayArea && (
-                            <div className="flex items-center p-3 bg-white rounded-lg shadow-sm border">
-                              <span className="mr-2">•</span>
-                              <span className="text-sm md:text-base">{"Kids Play Area"}</span>
+                            <div className="w-fit flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                              <span className="mr-2">
+                                <BadgeCheck className="bg-green-700 text-white rounded-full"/>
+                              </span>
+                              <span className="text-sm md:text-base">{"Has Kids Area"}</span>
+                            </div>
+                          )}
+
+                          {propertyData?.property?.isPetFriendly && (
+                            <div className="w-fit flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                              <span className="mr-2">
+                                <BadgeCheck className="bg-green-700 text-white rounded-full"/>
+                              </span>
+                              <span className="text-sm md:text-base">{"Is Pet Friendly"}</span>
                             </div>
                           )}
                         
+                          {propertyData?.property?.isNewBuilding && (
+                            <div className="w-fit flex items-center p-3 bg-white rounded-lg shadow-sm border">
+                              <span className="mr-2">
+                                <BadgeCheck className="bg-green-700 text-white rounded-full"/>
+                              </span>
+                              <span className="text-sm md:text-base">{"New Building"}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     }

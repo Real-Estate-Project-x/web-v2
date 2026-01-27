@@ -1,7 +1,7 @@
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { PropertyInterface } from "../../utils/interfaces";
+import { PropertyInterface, ViewPropertyInterface } from "../../utils/interfaces";
 import { getLocalStorageField } from "../../utils/helpers";
 
 export function cn(...inputs: ClassValue[]) {
@@ -37,17 +37,21 @@ export const returnHeaders = (ip = "104.28.204.233", longitude = "7.520406", lat
 };
 
 export function hasAmenities(data : Partial<PropertyInterface>) : boolean{
-  if(data && data?.hasWifi || data?.hasCctv || data?.hasLaundry || data?.hasGym ){
-    return true
-  }
-  return false;
+  return Boolean(
+    data?.hasWifi || 
+    data?.hasCctv || 
+    data?.hasLaundry || 
+    data?.hasGym 
+  );
 }
 
 export function hasFeatures(data : Partial<PropertyInterface>) : boolean {
-  if(data && data?.hasCarParking || data?.hasKidsPlayArea || data?.isPetFriendly || data?.isNewBuilding){
-    return true;
-  }
-  return false;
+  return Boolean(
+    data?.hasCarParking || 
+    data?.hasKidsPlayArea || 
+    data?.isPetFriendly || 
+    data?.isNewBuilding
+  )
 }
 
 export function isUserLoggedIn() : boolean{
