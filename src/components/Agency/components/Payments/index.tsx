@@ -1,13 +1,18 @@
-
-'use client';
+"use client";
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
+import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -16,15 +21,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { 
-  DollarSign, 
-  TrendingUp, 
-  Calendar, 
-  User, 
+import {
+  DollarSign,
+  TrendingUp,
+  Calendar,
+  User,
   Filter,
   Search,
   Download,
-  CreditCard
+  CreditCard,
 } from "lucide-react";
 
 interface PayoutEntry {
@@ -55,7 +60,7 @@ const Payouts = () => {
       commission: 12000,
       salePrice: 2400000,
       status: "paid",
-      payoutDate: "2024-06-15"
+      payoutDate: "2024-06-15",
     },
     {
       id: "2",
@@ -64,7 +69,7 @@ const Payouts = () => {
       viewingDate: "2024-06-08",
       commission: 9000,
       salePrice: 1800000,
-      status: "processing"
+      status: "processing",
     },
     {
       id: "3",
@@ -73,7 +78,7 @@ const Payouts = () => {
       viewingDate: "2024-06-12",
       commission: 16000,
       salePrice: 3200000,
-      status: "pending"
+      status: "pending",
     },
     {
       id: "4",
@@ -83,7 +88,7 @@ const Payouts = () => {
       commission: 14750,
       salePrice: 2950000,
       status: "paid",
-      payoutDate: "2024-06-12"
+      payoutDate: "2024-06-12",
     },
     {
       id: "5",
@@ -92,8 +97,8 @@ const Payouts = () => {
       viewingDate: "2024-06-01",
       commission: 20500,
       salePrice: 4100000,
-      status: "pending"
-    }
+      status: "pending",
+    },
   ];
 
   const getStatusColor = (status: string) => {
@@ -110,16 +115,23 @@ const Payouts = () => {
   };
 
   const filteredAndSortedPayouts = payoutEntries
-    .filter(entry => {
-      const matchesSearch = entry.propertyAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    .filter((entry) => {
+      const matchesSearch =
+        entry.propertyAddress
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         entry.clientName.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "all" || entry.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "all" || entry.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       switch (sortBy) {
         case "date":
-          return new Date(b.viewingDate).getTime() - new Date(a.viewingDate).getTime();
+          return (
+            new Date(b.viewingDate).getTime() -
+            new Date(a.viewingDate).getTime()
+          );
         case "commission":
           return b.commission - a.commission;
         case "client":
@@ -142,10 +154,19 @@ const Payouts = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, sortBy, itemsPerPage]);
 
-  const totalEarnings = payoutEntries.reduce((sum, entry) => sum + entry.commission, 0);
-  const pendingPayouts = payoutEntries.filter(e => e.status === "pending").reduce((sum, entry) => sum + entry.commission, 0);
-  const paidPayouts = payoutEntries.filter(e => e.status === "paid").reduce((sum, entry) => sum + entry.commission, 0);
-  const processingPayouts = payoutEntries.filter(e => e.status === "processing").reduce((sum, entry) => sum + entry.commission, 0);
+  const totalEarnings = payoutEntries.reduce(
+    (sum, entry) => sum + entry.commission,
+    0
+  );
+  const pendingPayouts = payoutEntries
+    .filter((e) => e.status === "pending")
+    .reduce((sum, entry) => sum + entry.commission, 0);
+  const paidPayouts = payoutEntries
+    .filter((e) => e.status === "paid")
+    .reduce((sum, entry) => sum + entry.commission, 0);
+  const processingPayouts = payoutEntries
+    .filter((e) => e.status === "processing")
+    .reduce((sum, entry) => sum + entry.commission, 0);
 
   const handleCashout = () => {
     // This would integrate with a payment system
@@ -158,17 +179,20 @@ const Payouts = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold mb-2">Payouts & Earnings</h1>
-              <p className="text-muted-foreground">Track your commission earnings and manage payouts</p>
+              <h1 className="text-2xl font-semibold mb-2">
+                Payouts & Earnings
+              </h1>
+              <p className="text-muted-foreground">
+                Track your commission earnings and manage payouts
+              </p>
             </div>
-            <Button 
-              onClick={handleCashout} 
+            <Button
+              onClick={handleCashout}
               className="bg-green-600 hover:bg-green-700 text-white"
               disabled={pendingPayouts === 0}
             >
@@ -182,44 +206,56 @@ const Payouts = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Earnings
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalEarnings.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                ${totalEarnings.toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground">All time</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Payouts</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Pending Payouts
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">${pendingPayouts.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                ${pendingPayouts.toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground">Ready to cashout</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Processing</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">${processingPayouts.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-yellow-600">
+                ${processingPayouts.toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground">In progress</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Paid Out</CardTitle>
               <Download className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${paidPayouts.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-green-600">
+                ${paidPayouts.toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground">Completed</p>
             </CardContent>
           </Card>
@@ -244,7 +280,7 @@ const Payouts = () => {
                   className="pl-10"
                 />
               </div>
-              
+
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by status" />
@@ -256,7 +292,7 @@ const Payouts = () => {
                   <SelectItem value="paid">Paid</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sort by" />
@@ -269,7 +305,10 @@ const Payouts = () => {
                 </SelectContent>
               </Select>
 
-              <Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(value) => setItemsPerPage(Number(value))}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Items per page" />
                 </SelectTrigger>
@@ -280,13 +319,16 @@ const Payouts = () => {
                   <SelectItem value="50">50 per page</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <Button variant="outline" onClick={() => {
-                setSearchTerm("");
-                setStatusFilter("all");
-                setSortBy("date");
-                setItemsPerPage(5);
-              }}>
+
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("all");
+                  setSortBy("date");
+                  setItemsPerPage(5);
+                }}
+              >
                 Clear Filters
               </Button>
             </div>
@@ -296,7 +338,9 @@ const Payouts = () => {
         {/* Results Info */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredAndSortedPayouts.length)} of {filteredAndSortedPayouts.length} results
+            Showing {startIndex + 1} to{" "}
+            {Math.min(endIndex, filteredAndSortedPayouts.length)} of{" "}
+            {filteredAndSortedPayouts.length} results
           </p>
           {totalPages > 1 && (
             <p className="text-sm text-muted-foreground">
@@ -313,23 +357,27 @@ const Payouts = () => {
                 <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No payouts found</h3>
                 <p className="text-muted-foreground text-center">
-                  {searchTerm || statusFilter !== "all" 
+                  {searchTerm || statusFilter !== "all"
                     ? "Try adjusting your filters or search terms"
-                    : "You don't have any commission earnings yet"
-                  }
+                    : "You don't have any commission earnings yet"}
                 </p>
               </CardContent>
             </Card>
           ) : (
             currentPageData.map((entry) => (
-              <Card key={entry.id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={entry.id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     {/* Property and Commission Info */}
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h3 className="text-lg font-semibold mb-1">{entry.propertyAddress}</h3>
+                          <h3 className="text-lg font-semibold mb-1">
+                            {entry.propertyAddress}
+                          </h3>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                             <span className="flex items-center gap-1">
                               <User className="h-4 w-4" />
@@ -341,21 +389,26 @@ const Payouts = () => {
                             </span>
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Sale Price: <span className="font-medium">${entry.salePrice.toLocaleString()}</span>
+                            Sale Price:{" "}
+                            <span className="font-medium">
+                              ${entry.salePrice.toLocaleString()}
+                            </span>
                           </div>
                         </div>
                         <Badge className={getStatusColor(entry.status)}>
-                          {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          {entry.status.charAt(0).toUpperCase() +
+                            entry.status.slice(1)}
                         </Badge>
                       </div>
-                      
+
                       <div className="text-2xl font-bold text-green-600 mb-2">
                         ${entry.commission.toLocaleString()}
                       </div>
-                      
+
                       {entry.payoutDate && (
                         <p className="text-sm text-muted-foreground">
-                          Paid on {new Date(entry.payoutDate).toLocaleDateString()}
+                          Paid on{" "}
+                          {new Date(entry.payoutDate).toLocaleDateString()}
                         </p>
                       )}
                     </div>
@@ -367,10 +420,14 @@ const Payouts = () => {
                         Receipt
                       </Button>
                       {entry.status === "pending" && (
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           className="bg-green-600 hover:bg-green-700"
-                          onClick={() => alert(`Processing payout for $${entry.commission.toLocaleString()}`)}
+                          onClick={() =>
+                            alert(
+                              `Processing payout for $${entry.commission.toLocaleString()}`
+                            )
+                          }
                         >
                           <CreditCard className="h-4 w-4 mr-2" />
                           Cash Out
@@ -390,18 +447,22 @@ const Payouts = () => {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
+                  <PaginationPrevious
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
                       if (currentPage > 1) handlePageChange(currentPage - 1);
                     }}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    className={
+                      currentPage === 1
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
                   />
                 </PaginationItem>
-                
+
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  let pageNumber;
+                  let pageNumber: number;
                   if (totalPages <= 5) {
                     pageNumber = i + 1;
                   } else if (currentPage <= 3) {
@@ -411,7 +472,7 @@ const Payouts = () => {
                   } else {
                     pageNumber = currentPage - 2 + i;
                   }
-                  
+
                   return (
                     <PaginationItem key={pageNumber}>
                       <PaginationLink
@@ -428,21 +489,26 @@ const Payouts = () => {
                     </PaginationItem>
                   );
                 })}
-                
+
                 {totalPages > 5 && currentPage < totalPages - 2 && (
                   <PaginationItem>
                     <PaginationEllipsis />
                   </PaginationItem>
                 )}
-                
+
                 <PaginationItem>
-                  <PaginationNext 
+                  <PaginationNext
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      if (currentPage < totalPages) handlePageChange(currentPage + 1);
+                      if (currentPage < totalPages)
+                        handlePageChange(currentPage + 1);
                     }}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    className={
+                      currentPage === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
                   />
                 </PaginationItem>
               </PaginationContent>

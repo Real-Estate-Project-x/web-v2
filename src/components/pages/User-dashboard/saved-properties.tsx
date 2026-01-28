@@ -11,15 +11,21 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { toast } from "sonner";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 export const DashboardFavorites = () => {
   const [loading, setLoading] = useState(false);
   const [totalFavs, setTotalFavs] = useState(0);
   const [favProperties, setFavProperties] = useState([]);
+  const [pagination, setPagination] = useState<any>(null);
 
   useEffect(() => {
-    fetchSavedProperties();
+    loadData(1);
   }, []);
+
+  const loadData = async (page: number) => {
+    await fetchSavedProperties(page);
+  };
 
   const fetchSavedProperties = async (pageNumber = 1, pageSize = 10) => {
     try {
@@ -27,10 +33,12 @@ export const DashboardFavorites = () => {
       const url = `favourite-property?pageNumber=${pageNumber}&pageSize=${pageSize}`;
       const result = await axiosInstance.get(url);
       if (result?.data?.success) {
-        console.log({ result, rest: result.data.data });
         const { data, paginationControl } = result.data;
         setFavProperties(data);
         setTotalFavs(paginationControl.totalCount);
+        setPagination(paginationControl);
+
+        return { data, paginationControl };
       }
     } catch (ex) {
       console.error(ex);
@@ -109,6 +117,18 @@ export const DashboardFavorites = () => {
           </Card>
         ))}
       </div>
+
+      {pagination?.currentPage && (
+        <div className="w-full flex justify-center px-6 py-8">
+          <DynamicPagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            hasNext={pagination.hasNext}
+            hasPrevious={pagination.hasPrevious}
+            onPageChange={loadData}
+          />
+        </div>
+      )}
     </div>
   );
 };
