@@ -60,6 +60,12 @@ const DashboardLayout = ({
                 onClick={() => setActiveSection("schedule")}
               />
               <SidebarItem
+                icon={<Calendar size={20} />}
+                label="Saved Searches"
+                isActive={activeSection === "saved-searches"}
+                onClick={() => setActiveSection("saved-searches")}
+              />
+              <SidebarItem
                 icon={<User size={20} />}
                 label="Select Agent"
                 isActive={activeSection === "agents"}
