@@ -196,65 +196,72 @@ export const PropertyList: FC<Props> = ({ array }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
-      {array && array.map((property) => (
-        <div key={property?.id}>
-          <Card
-            key={property?.id}
-            className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
-            onClick={() => router.push(`/properties/view?id=${property?.slug}`)}
-          >
-            <div className="relative h-48 overflow-hidden">
-              <img
-                src={property?.propertyImages?.[0]?.image?.url}
-                alt={property?.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <Badge
-                className={`${
-                  property?.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"
-                } absolute top-4 left-4 hover:bg-real-700 capitalize px-4 py-1.5 rounded-full`}
-              >
-                {property?.upFor.toLowerCase()}
-              </Badge>
-              {property?.isNewBuilding && (
-                <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
-                  New
+      {array &&
+        array.map((property) => (
+          <div key={property?.id}>
+            <Card
+              key={property?.id}
+              className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
+              onClick={() =>
+                router.push(`/properties/view?id=${property?.slug}`)
+              }
+            >
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={property?.propertyImages?.[0]?.image?.url}
+                  alt={property?.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <Badge
+                  className={`${
+                    property?.upFor === "RENT" ? "bg-[#0253CC]" : "bg-green-800"
+                  } absolute top-4 left-4 hover:bg-real-700 capitalize px-4 py-1.5 rounded-full`}
+                >
+                  {property?.upFor.toLowerCase()}
                 </Badge>
-              )}
-              <Badge className="absolute bottom-4 right-4 bg-white text-foreground shadow-lg py-1.5 rounded-xl">
-                {formatPrice(property?.price)}
-              </Badge>
-            </div>
-            <CardContent className="p-5">
-              <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors capitalize">
-                {property?.title}
-              </h3>
-              <div className="flex items-center text-muted-foreground mb-4">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span className="text-sm capitalize">{property?.address}</span>
+                {property?.isNewBuilding && (
+                  <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
+                    New
+                  </Badge>
+                )}
+                <Badge className="absolute bottom-4 right-4 bg-white text-foreground shadow-lg py-1.5 rounded-xl">
+                  {formatPrice(property?.price)}
+                </Badge>
               </div>
-              <div className="flex justify-between text-muted-foreground border-t pt-4">
-                <div className="flex items-center gap-1">
-                  <Bed className="h-4 w-4" />
-                  <span className="text-sm">{property?.noOfBedrooms} beds</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Bath className="h-4 w-4" />
-                  <span className="text-sm">
-                    {property?.noOfToilets} Toilets
+              <CardContent className="p-5">
+                <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors capitalize">
+                  {property?.title}
+                </h3>
+                <div className="flex items-center text-muted-foreground mb-4">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span className="text-sm capitalize">
+                    {property?.address}
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Square className="h-4 w-4" />
-                  <span className="text-sm">
-                    {property?.sizeInSquareFeet} sqft
-                  </span>
+                <div className="flex justify-between text-muted-foreground border-t pt-4">
+                  <div className="flex items-center gap-1">
+                    <Bed className="h-4 w-4" />
+                    <span className="text-sm">
+                      {property?.noOfBedrooms} beds
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Bath className="h-4 w-4" />
+                    <span className="text-sm">
+                      {property?.noOfToilets} Toilets
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Square className="h-4 w-4" />
+                    <span className="text-sm">
+                      {property?.sizeInSquareFeet} sqft
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      ))}
+              </CardContent>
+            </Card>
+          </div>
+        ))}
     </div>
   );
 };
