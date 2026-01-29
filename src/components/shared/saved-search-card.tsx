@@ -5,8 +5,7 @@ interface Props {
   //   propertyId: string;
 }
 
-export default function SavedSearchCard({}: // availability,
-Props) {
+export default function SavedSearchCard({}: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
