@@ -149,7 +149,23 @@ export interface ViewPropertyInterface {
 //   },
 //   similarProperties : []
 // }
-
+type PropertyImages = {
+   dateCreated: string;
+    dateUpdated: string;
+    id:string;
+    image: {
+      cloudFileId: string;
+      dateCreated: string;
+      dateUpdated:string;
+      id: string;
+      mimeType:string;
+      status: boolean;
+      url:string;
+    },
+    imageId: string;
+    propertyId:string;
+    status:boolean;
+}
 export interface PropertyInterface {
   id: string;
   title: string;
@@ -193,25 +209,18 @@ export interface PropertyInterface {
   status: boolean;
   dateCreated: string;
   dateUpdated: string;
-  propertyImages: {
-    dateCreated: string;
-    dateUpdated: string;
-    id:string;
-    image: {
-      cloudFileId: string;
-      dateCreated: string;
-      dateUpdated:string;
-      id: string;
-      mimeType:string;
-      status: boolean;
-      url:string;
-    },
-    imageId: string;
-    propertyId:string;
-    status:boolean;
-  }[];
-  videoUrl: string;
-  architecturalPlanUrls: string[];
+  propertyImages: PropertyImages[];
+  videoId : string;
+  video : {
+    cloudFileId : string;
+    dateCreated : string;
+    dateUpdated : string;
+    id : string;
+    mimeType : string;
+    status : boolean;
+    url : string;
+  };
+  propertyArchPlans: PropertyImages[];
   isNewBuilding: boolean;
   threeDimensionalModelUrl: string;
   geoCoordinates: {

@@ -349,19 +349,19 @@ const AgentPropertyDetailPage = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleShare("facebook", propertyData?.videoUrl)}>
+                    <DropdownMenuItem onClick={() => handleShare("facebook", propertyData?.video?.url)}>
                       <Facebook className="h-4 w-4 mr-2" />
                       Facebook
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("twitter", propertyData?.videoUrl)}>
+                    <DropdownMenuItem onClick={() => handleShare("twitter", propertyData?.video?.url)}>
                       <Twitter className="h-4 w-4 mr-2" />
                       Twitter
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("whatsapp", propertyData?.videoUrl)}>
+                    <DropdownMenuItem onClick={() => handleShare("whatsapp", propertyData?.video?.url)}>
                       <MessageCircleIcon className="h-4 w-4 mr-2" />
                       whatsapp
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("copy",  propertyData?.videoUrl)}>
+                    <DropdownMenuItem onClick={() => handleShare("copy",  propertyData?.video?.url)}>
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Link
                     </DropdownMenuItem>
@@ -374,24 +374,24 @@ const AgentPropertyDetailPage = () => {
                 muted
                 loop
                 playsInline
-                src={propertyData?.videoUrl}
+                src={propertyData?.video?.url}
                 className="w-full h-64 md:h-80 lg:h-96 object-cover rounded-lg"
-                poster={propertyData?.propertyImages?.[0]?.image?.url}
+                poster={propertyData?.propertyImages?.pop()?.image?.url}
               />
 
             {/* architectural plans */}
-            {propertyData?.architecturalPlanUrls &&
+            {(propertyData?.propertyArchPlans && propertyData?.propertyArchPlans?.length > 0) &&
               <Card>
                 <CardContent className="py-2 px-4">
                   <h2 className="text-xl font-semibold">Property Architecture</h2>
 
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {propertyData?.architecturalPlanUrls?.map((arch, index) => (
+                      {propertyData?.propertyArchPlans?.map((arch, index) => (
                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                           <div className="relative group cursor-pointer mt-4">
                             <img
-                              src={arch}
+                              src={arch?.image?.url}
                               alt={"Architectural Plan " + (index + 1)}
                               className="w-full h-40 object-cover rounded-lg"
                             />

@@ -69,6 +69,7 @@ export const getLocalStorageFieldRaw = (key: string) => {
 export const deleteLocalStorageField = (key: string) =>
   localStorage.removeItem(key);
 
+
 export const pickUserId = () => {
   const userInfo = decryptData(
     getLocalStorageField("userInfo"),
