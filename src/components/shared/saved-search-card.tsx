@@ -23,7 +23,12 @@ export default function SavedSearchCard({ search }: Props) {
             <div>
               <h3 className="text-lg font-semibold text-gray-800">
                 {/* For Rent • Duplex */}
-                {search.dateCreated}
+                {new Date(search.dateCreated).toLocaleString("en-GB", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
               </h3>
 
               {/* <!-- Search criteria badges --> */}
@@ -50,9 +55,11 @@ export default function SavedSearchCard({ search }: Props) {
                   </span>
                 )}
 
-                {/* <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Within 2km of location
-                </span> */}
+                {search.xKmOfStartLocation && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Within {search.xKmOfStartLocation}km of location
+                  </span>
+                )}
 
                 {search.propertyType && (
                   <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
