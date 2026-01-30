@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import SavedSearchCard from "@/components/shared/saved-search-card";
@@ -10,7 +9,7 @@ export const DashboardSavedSearch = () => {
   const [searches, setSearches] = useState([]);
   const [pagination, setPagination] = useState<any>(null);
 
-  const fetchData = async (pageNumber = 1, pageSize = 2) => {
+  const fetchData = async (pageNumber = 1, pageSize = 10) => {
     const url = `/saved-search/user-saved-searches/list?pageNumber=${pageNumber}&pageSize=${pageSize}`;
     const result = await axiosInstance.get(url);
 
@@ -25,8 +24,7 @@ export const DashboardSavedSearch = () => {
   };
 
   const loadData = async (page: number) => {
-    const result = await fetchData(page);
-    console.log({ result });
+    await fetchData(page);
   };
 
   useEffect(() => {
