@@ -154,3 +154,7 @@
   color: white;
   border-color: #2563eb;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}

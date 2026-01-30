@@ -1,12 +1,18 @@
+import { NAIRA_SIGN } from "@/lib/constants";
+import { formatNumber } from "@/lib/helpers";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
-  //   propertyId: string;
+  search: any;
 }
 
-export default function SavedSearchCard({}: Props) {
+export default function SavedSearchCard({ search }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    console.log({ search });
+  }, []);
 
   return (
     <>
@@ -20,75 +26,118 @@ export default function SavedSearchCard({}: Props) {
           >
             <div>
               <h3 className="text-lg font-semibold text-gray-800">
-                For Rent • Duplex
+                {/* For Rent • Duplex */}
+                {search.dateCreated}
               </h3>
 
               {/* <!-- Search criteria badges --> */}
               <div className="flex flex-wrap gap-2 mt-2">
-                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
-                  3 Bedrooms
-                </span>
-                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
-                  2 Kitchens
-                </span>
-                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
-                  2 Toilets
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  For Rent
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Within 2km of location
-                </span>
-                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
-                  Bungerlow
-                </span>
+                {search.noOfBedrooms && (
+                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+                    {search.noOfBedrooms} Bedrooms
+                  </span>
+                )}
+                {search.noOfKitchens && (
+                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+                    {search.noOfKitchens} Kitchens
+                  </span>
+                )}
+                {search.noOfToilets && (
+                  <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
+                    2 Toilets
+                  </span>
+                )}
 
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: Gym
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: Wifi
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: Parking space
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: Kids Play Area
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: Laundry
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: CCTV Surviallance
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  From: Olatobi Agency
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Floor Size: 100 sqFt - 300 sqFT
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Pricing: #100,000 - #800,00
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Is: New Building
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Is: Pet Friendly
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  From: Olatobi Agency
-                </span>
-                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
-                  Has: Architectural Plans
-                </span>
+                {search.upFor && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    For: {search.upFor}
+                  </span>
+                )}
+
+                {/* <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Within 2km of location
+                </span> */}
+
+                {search.propertyType && (
+                  <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
+                    {search.propertyType.name}
+                  </span>
+                )}
+
+                {"hasGym" in search && search.hasGym && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Gym
+                  </span>
+                )}
+
+                {"hasWifi" in search && search.hasWifi && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Wifi
+                  </span>
+                )}
+
+                {"hasCarParking" in search && search.hasCarParking && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Parking space
+                  </span>
+                )}
+
+                {"hasKidsPlayArea" in search && search.hasKidsPlayArea && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Kids Play Area
+                  </span>
+                )}
+
+                {"hasLaundry" in search && search.hasLaundry && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Laundry
+                  </span>
+                )}
+
+                {"hasCctv" in search && search.hasCctv && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: CCTV Surviallance
+                  </span>
+                )}
+
+                {search.agency && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    From: {search.agency.name}
+                  </span>
+                )}
+
+                {search.startPriceRange && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Pricing: {NAIRA_SIGN}
+                    {formatNumber(search.startPriceRange)}- {NAIRA_SIGN}
+                    {formatNumber(search.endPriceRange)}
+                  </span>
+                )}
+
+                {search.roomSpaceSizeStartRange && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Floor Size: {search.roomSpaceSizeStartRange} sqFt -{" "}
+                    {search.roomSpaceSizeEndRange} sqFT
+                  </span>
+                )}
+
+                {"isNewBuilding" in search && search.isNewBuilding && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Is: New Building
+                  </span>
+                )}
+
+                {"isPetFriendly" in search && search.isPetFriendly && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Is: Pet Friendly
+                  </span>
+                )}
               </div>
             </div>
 
             {/* <!-- Dropdown Icon --> */}
             <svg
-              className={`w-15 h-15 mt-1 text-gray-500 transition-transform ${
+              className={`cursor-pointer w-15 h-15 mt-1 text-gray-500 transition-transform ${
                 isOpen ? "rotate-180" : ""
               }`}
               fill="none"
@@ -97,8 +146,8 @@ export default function SavedSearchCard({}: Props) {
               viewBox="0 0 24 24"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M19 9l-7 7-7-7"
               />
             </svg>
