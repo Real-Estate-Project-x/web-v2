@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { X, Video } from "lucide-react";
+import { X, Video, UploadIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -42,6 +42,7 @@ import { LoaderProcessor } from "@/components/shared/loader-cards";
 import axios from "axios";
 import { CountryStatesInterface, PropertyTypesInterface } from "../../../../../../utils/interfaces";
 import { getLocalStorageFieldRaw } from "../../../../../../utils/helpers";
+import { LowResolutionPrompt } from "./imageResolution-prompt";
 
 const additionalCostSchema = z.object({
   title: z.string().optional().or(z.literal("")), //.min(1,""),
@@ -53,7 +54,7 @@ const propertySchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(100),
   address: z.string().min(5, "Address is required"),
   upFor: z.enum(["SALE", "RENT"]),
-  propertyCategory: z.enum(["RESIDENTIAL", "COMMERCIAL"]),
+  propertyCategory: z.enum(["RESIDENTIAL", "COMMERCIAL_SHOP", "OFFICE"]),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000),
   photoIds: z.array(z.string()).min(1, "At least one photo is required"),
   price: z.string().regex(/^\d+$/, "Price must contain only digits").min(5, "Price must be at least 5 digits"), // z.number().min(0, "Price must be positive"),
@@ -95,6 +96,7 @@ const propertySchema = z.object({
   hasCctv: z.boolean(),
   hasGym: z.boolean(),
   isNewBuilding: z.boolean(),
+  videoId : z.string().optional().or(z.literal(null))
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -110,11 +112,19 @@ export default function PropertyListingDialog({
 }: PropertyListingDialogProps) {
     const [activeTab, setActiveTab] = useState("basic");
     const [images, setImages] = useState<File[]>([]);
-    //const [videos, setVideos] = useState<File[]>([]);
+    const [imageUploadErr, setImageUploadError] = useState({
+      isError : false,
+      message : ""
+    });
+
+    const [videos, setVideos] = useState<File[]>([]);
     const [architechturalImages, setArchitechturalImages] = useState<File[]>([]);
-    const [imagesUrl, setImagesUrl] = useState<string[]>([]);
-    //const [videosUrl, setVideosUrl] = useState<string[]>([]);
-    const [architechturalImagesUrl, setArchitechturalImagesUrl] = useState<string[]>([]);
+    const [videoUploadErr, setVideoUploaderError] = useState({
+      isError :false,
+      message : ""
+    });
+    const [videoLoading , setVideoLoading] = useState(false);
+
     const [isLoading, setIsLoading] = useState(false);
     const [propertTypes, setPropertyTypes] = useState<PropertyTypesInterface[]>([] as PropertyTypesInterface[]);
     const [countryStates, setCountryStates] =  useState<CountryStatesInterface[]>([]);
@@ -153,6 +163,7 @@ export default function PropertyListingDialog({
         hasCctv: false,
         hasGym: false,
         isNewBuilding: false,
+        videoId : null
       },
     });
 
@@ -176,7 +187,7 @@ export default function PropertyListingDialog({
         setArchitechturalImages(prev => [...prev, ...validFiles]);
       }
       else{
-        //setVideos(validFiles);
+        setVideos(validFiles);
       }
     };
   
@@ -186,42 +197,66 @@ export default function PropertyListingDialog({
       }else if( type === 'architecture') {
         setArchitechturalImages(prev => prev.filter((_, i) => i !== index));
       }else {
-        // setVideos(prev => prev.filter((_, i) => i !== index));
+        setVideos(prev => prev.filter((_, i) => i !== index));
       }
     };
-    const newUploadFiles = (array : any, type : 'image' | 'video'|'architecture') => {
-
-      axios.post(`${process.env.NEXT_PUBLIC_API_URL}upload-files`, {
-        files : array
-      }, {headers : {
-        'Content-Type' : 'multipart/form-data'
-      }}).then(res => {
-        switch(type){
-          case 'image' : 
-            setImagesUrl(res.data?.data);
-            form.setValue('photoIds', res.data?.data?.map((item : any) => item.id), {
-              shouldValidate: true,
-              shouldDirty : true
-            });
-            
-          break;
-          // case 'video' : 
-          //   setVideosUrl(res.data?.data);
-          //   //form.setValue('videoId', res.data?.data?.map((item : any) => item.id));
-          // break;
-          case 'architecture' : 
-            setArchitechturalImagesUrl(res.data?.data);
-            form.setValue('architecturalPlanIds',res.data?.data?.map((item : any) => item.id));
-          break;
-          default : 
-            console.log('');
-          break;
+    const newUploadFiles = async (array : any, type : 'image'|'architecture') => {
+      try{
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}property/upload-images`, {
+          files : array
+        }, {headers : {
+          'Content-Type' : 'multipart/form-data'
+        }});
+        if(response?.data?.success){
+            switch(type){
+              case 'image' : 
+                form.setValue('photoIds', response.data?.data?.map((item : any) => item.id), {
+                  shouldValidate: true,
+                  shouldDirty : true
+                });
+                
+              break;
+              case 'architecture' : 
+                form.setValue('architecturalPlanIds',response.data?.data?.map((item : any) => item.id));
+              break;
+              default : 
+                console.log('');
+              break;
+            }
         }
-
-      }).catch(err => {
-        toast.error(err?.response?.data?.message);
-      });
+      }catch(err : any){
+        const message = err?.response?.data?.message;
+        setImageUploadError({...imageUploadErr, isError : true, message});
+      }finally{
+        setTimeout(() => {
+          setImageUploadError({...imageUploadErr, isError : false, message : ""})
+        }, 5000);
+      }
+     
     }
+    const uploadVideoFile = async(videoFile : any) => {
+      setVideoLoading(true);
+      try{
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}property/upload-video`, {
+          file : videoFile?.[0]
+        }, {headers : {
+          'Content-Type' : 'multipart/form-data'
+        }});
+        if(response?.data?.success){
+          //setVideosUrl(res.data?.data);
+          form.setValue('videoId', response.data?.data?.[0]?.id);
+        }
+      }catch(err : any){
+        const message = err?.response?.data?.message;
+        setVideoUploaderError({...videoUploadErr, isError : true, message});
+      }finally{
+        setVideoLoading(false);
+        setTimeout(() => {
+          setVideoUploaderError({...videoUploadErr, isError : false, message : ""});
+        }, 5000);
+      } 
+    }
+
     const onSubmit = (data: PropertyFormData) => {
       setIsLoading(true);
       // agency id should be added automatically from agents information
@@ -237,7 +272,7 @@ export default function PropertyListingDialog({
           latitude : parseFloat(data.geoCoordinates.latitude),
           longitude : parseFloat(data.geoCoordinates.longitude)
         },
-        videoId:null
+        videoId: data?.videoId ?? null
         
       };
       try {
@@ -291,13 +326,13 @@ export default function PropertyListingDialog({
       }
     },[images]);
 
-  //   useEffect(() => {
-  //     if (videos) {
-  //       const formData = new FormData();
-  //       videos.forEach(file => formData.append('files[]', file));
-  //       newUploadFiles(videos, 'video');
-  //     }
-  // },[videos]);
+    useEffect(() => {
+      if (videos) {
+        const formData = new FormData();
+        videos.forEach(file => formData.append('files[]', file));
+        uploadVideoFile(videos);
+      }
+  },[videos]);
 
   useEffect(() => {
     if (architechturalImages.length > 0) {
@@ -308,6 +343,7 @@ export default function PropertyListingDialog({
   },[architechturalImages]);
 
   return (
+    
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby={undefined} className="
         w-[95vw]
@@ -426,7 +462,8 @@ export default function PropertyListingDialog({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="RESIDENTIAL">Residential</SelectItem>
-                              <SelectItem value="COMMERCIAL">Commercial</SelectItem>
+                              <SelectItem value="COMMERCIAL_SHOP">Commercial</SelectItem>
+                              <SelectItem value="OFFICE">Office&nbsp;Space</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -482,7 +519,7 @@ export default function PropertyListingDialog({
                               placeholder="500000"
                               required
                               {...field}
-                             onChange={(e) => field.onChange(e.target.value)}
+                            onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -811,181 +848,180 @@ export default function PropertyListingDialog({
                 </TabsContent>
 
                 <TabsContent value="media" className="space-y-4 mt-0">
-                    {/* Images */}
+                  {/* Images */}
+                  <div className="mt-2">
+                    <Label>Property Images</Label>
+                    <FormDescription>
+                      Upload Property Images (You can upload multiple images)
+                    </FormDescription>
+                    <Card className="mt-2 border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                      <CardContent className="p-6">
+                        <FormField
+                          control={form.control}
+                          rules={{required : "Please Upload at least one Image"}}
+                          name="photoIds"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="text-center">
+                                  <Label htmlFor="images" className="cursor-pointer">
+                                    <Image className="mx-auto h-12 w-12 text-muted-foreground" />
+                                  </Label>
+                                  <Input
+                                    id="images"
+                                    type="file"
+                                    multiple
+                                    accept="image/png, image/jpeg, image/gif image/jpg"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const files = e.target.files;
+                                      handleFileUpload(files, 'image');
+                                    }}
+                                  />
+                                  <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 2MB each</p>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                      </CardContent>
+                    </Card>
+                  
+                    {images.length > 0 && (
+                      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {(images as File[]).map((file, index) => (
+                            <div key={index} className="relative">
+                            <img
+                              src={URL.createObjectURL(file as File)}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-20 object-cover rounded border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute -top-2 -right-2 h-6 w-6"
+                              onClick={() => removeFile(index, 'image')}>
+                                <X className="h-3 w-3" />
+                            </Button>
+                            </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {/* Videos */}
+                  <div>
+                    <Label>Property Video (Optional)</Label>
+                    <FormDescription>
+                      Upload Property Video
+                    </FormDescription>
                     <div className="mt-2">
-                      <Label>Property Images</Label>
-                      <FormDescription>
-                        Upload Property Images (You can upload multiple images)
-                      </FormDescription>
-                      <Card className="mt-2 border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                      <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
                         <CardContent className="p-6">
                           <FormField
-                            control={form.control}
-                            rules={{required : "Please Upload at least one Image"}}
-                            name="photoIds"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <div className="text-center">
-                                    <Label htmlFor="images" className="cursor-pointer">
-                                      <Image className="mx-auto h-12 w-12 text-muted-foreground" />
-                                    </Label>
-                                    <Input
-                                      id="images"
-                                      type="file"
-                                      multiple
-                                      accept="image/png, image/jpeg, image/gif image/jpg"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const files = e.target.files;
-                                        handleFileUpload(files, 'image');
-                                        //field.onChange(imagesUrl); // update form value manually
-                                      }}
-                                    />
-                                    <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 2MB each</p>
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
+                          control={form.control}
+                          // rules={{required : "Video is required"}}
+                          name="videoId"
+                          render={({ field }) => (
+                            <FormItem>
+                              
+                              <FormControl>
+                                <div className="text-center">
+                                  <Label htmlFor="videos" className="cursor-pointer">
+                                    {videoLoading ? <UploadIcon className="mx-auto h-12 w-12 text-muted-foreground "/> :  <Video className="mx-auto h-12 w-12 text-muted-foreground cursor-pointer" />}
+                                  </Label>
+                                  <Input
+                                    id="videos"
+                                    type="file"
+                                    accept=".mp4,.mkv"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const files = e.target.files;
+                                      handleFileUpload(files, 'video');
+                                    }}
+                                  />
+                                  
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    {videoLoading ? "Uploading...." : `${videos ? videos?.[0]?.name : "only .mp4, .mkv allowed and Size should not be greater than 10mb"}`}
+                                  </p>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                           />
-                          
                         </CardContent>
                       </Card>
-                    
-                      {images.length > 0 && (
-                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {(images as File[]).map((file, index) => (
-                              <div key={index} className="relative">
-                              <img
-                                src={URL.createObjectURL(file as File)}
-                                alt={`Upload ${index + 1}`}
-                                className="w-full h-20 object-cover rounded border"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="icon"
-                                className="absolute -top-2 -right-2 h-6 w-6"
-                                onClick={() => removeFile(index, 'image')}>
-                                  <X className="h-3 w-3" />
-                              </Button>
-                              </div>
-                          ))}
-                        </div>
-                      )}
+                        
                     </div>
-                    {/* Videos */}
-                    {/* <div>
-                      <Label>Property Video</Label>
+                  </div>
+                  {/* Architechture */}
+                  <div className="space-y-2">
+                  <FormLabel>Architectural Plans (Optional)</FormLabel>
                       <FormDescription>
-                        Upload Property Video
+                      Upload floor plans and architectural drawings
                       </FormDescription>
                       <div className="mt-2">
-                        <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
-                          <CardContent className="p-6">
-                            <FormField
-                            control={form.control}
-                            // rules={{required : "Video is required"}}
-                            name="videoId"
-                            render={({ field }) => (
-                              <FormItem>
-                                
-                                <FormControl>
-                                  <div className="text-center">
-                                    <Label htmlFor="videos" className="cursor-pointer">
-                                      <Video className="mx-auto h-12 w-12 text-muted-foreground cursor-pointer" />
-                                    </Label>
-                                    <Input
-                                      id="videos"
-                                      type="file"
-                                      accept=".mp4,.mkv"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const files = e.target.files;
-                                        handleFileUpload(files, 'video');
-                                        field.onChange(videosUrl); // update form value manually
-                                      }}
-                                    />
-                                    
-                                    <p className="text-xs text-muted-foreground mt-2">{videos ? videos?.[0]?.name : "only .mp4, .mkv allowed and Size should not be greater than 10mb"}</p>
+                          <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                            <CardContent className="p-6">
+                              <FormField
+                                control={form.control}
+                                name="architecturalPlanIds"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <div className="text-center">
+                                          <Label htmlFor="architecture" className="cursor-pointer">
+                                          <Image className="mx-auto h-12 w-12 text-muted-foreground" />
+                                          </Label>
+                                          <Input
+                                          id="architecture"
+                                          type="file"
+                                          multiple
+                                          accept="image/jpeg, application/pdf"
+                                          className="hidden"
+                                          onChange={(e) => {
+                                            const files = e.target.files;
+                                            handleFileUpload(files, 'architecture');
+                                            //field.onChange(architechturalImagesUrl); // update form value manually
+                                          }}
+                                        />
+                                        <p className="text-xs text-muted-foreground mt-2">PNG, JPG, PDF up to 2MB each</p>
+                                      </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              </CardContent>
+                          </Card>
+                      
+                          {architechturalImages.length > 0 && (
+                              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {(architechturalImages as File[]).map((file, index) => (
+                                  <div key={index} className="relative">
+                                  <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={`Upload ${index + 1}`}
+                                    className="w-full h-20 object-cover rounded border"
+                                  />
+                                  <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      className="absolute -top-2 -right-2 h-6 w-6"
+                                      onClick={() => removeFile(index, 'architecture')}
+                                  >
+                                      <X className="h-3 w-3" />
+                                  </Button>
                                   </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                            />
-                          </CardContent>
-                        </Card>
-                          
+                              ))}
+                              </div>
+                          )}
                       </div>
-                    </div> */}
-                    {/* Architechture */}
-                    <div className="space-y-2">
-                    <FormLabel>Architectural Plans(optional)</FormLabel>
-                        <FormDescription>
-                        Upload floor plans and architectural drawings
-                        </FormDescription>
-                        <div className="mt-2">
-                            <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
-                              <CardContent className="p-6">
-                                <FormField
-                                  control={form.control}
-                                  name="architecturalPlanIds"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormControl>
-                                        <div className="text-center">
-                                            <Label htmlFor="architecture" className="cursor-pointer">
-                                            <Image className="mx-auto h-12 w-12 text-muted-foreground" />
-                                            </Label>
-                                            <Input
-                                            id="architecture"
-                                            type="file"
-                                            multiple
-                                            accept="image/png, image/jpeg, application/pdf"
-                                            className="hidden"
-                                            onChange={(e) => {
-                                              const files = e.target.files;
-                                              handleFileUpload(files, 'architecture');
-                                              //field.onChange(architechturalImagesUrl); // update form value manually
-                                            }}
-                                            //onChange={(e) => handleFileUpload(e.target.files, 'architecture')}
-                                          />
-                                          <p className="text-xs text-muted-foreground mt-2">PNG, JPG, PDF up to 2MB each</p>
-                                        </div>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                </CardContent>
-                            </Card>
-                        
-                            {architechturalImages.length > 0 && (
-                                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                                {(architechturalImages as File[]).map((file, index) => (
-                                    <div key={index} className="relative">
-                                    <img
-                                        src={URL.createObjectURL(file)}
-                                        alt={`Upload ${index + 1}`}
-                                        className="w-full h-20 object-cover rounded border"
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        size="icon"
-                                        className="absolute -top-2 -right-2 h-6 w-6"
-                                        onClick={() => removeFile(index, 'architecture')}
-                                    >
-                                        <X className="h-3 w-3" />
-                                    </Button>
-                                    </div>
-                                ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                  </div>
                 </TabsContent>
               </ScrollArea>
             </Tabs>
@@ -1035,8 +1071,10 @@ export default function PropertyListingDialog({
             </div>
           </form>
         </Form>
+        <LowResolutionPrompt show={imageUploadErr?.isError} message={imageUploadErr?.message}/>
       </DialogContent>
       {isLoading && <LoaderProcessor/>}
     </Dialog>
+  
   );
 }

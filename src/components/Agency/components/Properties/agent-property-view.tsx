@@ -125,7 +125,7 @@ const AgentPropertyDetailPage = () => {
       });
     }
   },[]);
-
+  
   useEffect(() => {
     setIsLoading(true);
     axiosInstance.get(`/property/customer-listings/detail/${id}`)
@@ -137,7 +137,6 @@ const AgentPropertyDetailPage = () => {
       console.log({err});
     });
   },[isTaken, isBoosted]);
-
   if(isLoading) {
     return <LoaderViewProperty/>
   }
@@ -204,9 +203,9 @@ const AgentPropertyDetailPage = () => {
             {/* Image Slider */}
             <div className="relative">
               <Carousel className="w-full">
-                <CarouselContent>
-                  {propertyData?.propertyImages?.map((image, index) => (
-                    <CarouselItem key={index}>
+                <CarouselContent> 
+                  {propertyData?.propertyImages?.map((image, index) => 
+                    <CarouselItem key={image.id}>
                       <div className="relative">
                         <img
                           src={image?.image?.url}
@@ -230,7 +229,7 @@ const AgentPropertyDetailPage = () => {
                         </div>
                       </div>
                     </CarouselItem>
-                  ))}
+                  )}
                 </CarouselContent>
                 <CarouselPrevious className="left-4" />
                 <CarouselNext className="right-4" />
