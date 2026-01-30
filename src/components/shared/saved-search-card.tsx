@@ -1,7 +1,7 @@
-import { NAIRA_SIGN } from "@/lib/constants";
-import { formatNumber } from "@/lib/helpers";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { NAIRA_SIGN } from "@/lib/constants";
+import { formatNumber } from "@/lib/helpers";
 
 interface Props {
   search: any;
@@ -9,10 +9,6 @@ interface Props {
 
 export default function SavedSearchCard({ search }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    console.log({ search });
-  }, []);
 
   return (
     <>
@@ -155,49 +151,40 @@ export default function SavedSearchCard({ search }: Props) {
 
           {/* <!-- Dropdown Content --> */}
           {isOpen && (
-            <div id="search-1" className="border-t bg-gray-50">
+            <div className="border-t bg-gray-50">
               <ul className="divide-y">
-                {/* <!-- Property Item --> */}
-                <li className="p-4 flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium text-gray-800">
-                      3 Bedroom Duplex – Lekki
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      ₦2,500,000 / year • 3 Beds • 2 Kitchens
-                    </p>
-                  </div>
-                  <Link
-                    href="#"
-                    target="_blank"
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    View
-                  </Link>
-                </li>
-
-                <li className="p-4 flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium text-gray-800">
-                      Luxury Duplex – Ajah
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      ₦3,200,000 / year • 3 Beds • 2 Kitchens
-                    </p>
-                  </div>
-                  <Link
-                    href="#"
-                    target="_blank"
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    View
-                  </Link>
-                </li>
-
-                {/* <!-- Empty State <!-- */}
-                <li className="p-4 text-sm text-gray-500 text-center">
-                  No matching properties yet
-                </li>
+                {(search.savedSearchResults as any[]).length > 0 ? (
+                  search.savedSearchResults.map(({ property }: any) => (
+                    <li
+                      key={property.id}
+                      className="p-4 flex justify-between items-start"
+                    >
+                      <div>
+                        <h4 className="font-medium text-gray-800">
+                          {property.title} – {property.state.name}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          {property.description}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {NAIRA_SIGN}
+                          {formatNumber(property.grandTotalPrice)} / year
+                        </p>
+                      </div>
+                      <Link
+                        href={`/properties/view?id=${property.slug}`}
+                        target="_blank"
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        View
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li className="p-4 text-sm text-gray-500 text-center">
+                    No matching properties yet
+                  </li>
+                )}
               </ul>
             </div>
           )}
