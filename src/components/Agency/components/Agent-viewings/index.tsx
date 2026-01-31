@@ -35,7 +35,8 @@ import { format } from "date-fns";
 import { reformatDate } from "@/lib/utils";
 import { RescheduleViewingDialog } from "./dialogs/Reschedule-viewing";
 import { AgencyId } from "@/lib/constants";
-import { AgencyScheduleInterface } from "../../../../../utils/interfaces";
+import { AgencyScheduleInterface, PaginationControlInterface } from "../../../../../utils/interfaces";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const Viewings = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,7 +45,9 @@ const Viewings = () => {
   const agencyId = getLocalStorageFieldRaw("agentId");
   const [sortBy, setSortBy] = useState<string>("");
   const [schedules, setSchedules] = useState<AgencyScheduleInterface[]>([]);
-
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case "confirmed":
@@ -62,20 +65,25 @@ const Viewings = () => {
     }
   };
 
-  useEffect(() => {
-    async function getViewings() {
-      try {
-        const viewingsResponse = await axiosInstance.get(
-          `/agent-property-viewing/agency/viewing-list/${agencyId}?filter=${statusFilter}`
-        );
-        if (viewingsResponse?.data?.success) {
-          setViewings(viewingsResponse?.data?.data);
-        }
-      } catch (err: any) {
-        toast.error(err?.response?.data?.message);
+  const fetchAgentViewings = async (pageNumber = 1, pageSize = 10) =>{
+    try {
+      const viewingsResponse = await axiosInstance.get(
+        `/agent-property-viewing/agency/viewing-list/${agencyId}?filter=${statusFilter}&pageNumber=${pageNumber}&pageSize=${pageSize}`
+      );
+      if (viewingsResponse?.data?.success) {
+        setViewings(viewingsResponse?.data?.data);
+        setPagination(viewingsResponse?.data?.paginationControl);
       }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
     }
-    getViewings();
+  }
+
+  const loadData = async (page : number) => {
+    await fetchAgentViewings(page);
+  }
+  useEffect(() => {
+    loadData(1);
   }, [agencyId, statusFilter]);
 
   useEffect(() => {
@@ -413,6 +421,15 @@ const Viewings = () => {
           )}
 
           {/* Add Pagination to this page */}
+          {pagination?.currentPage  &&
+            <DynamicPagination
+              currentPage={pagination?.currentPage}
+              totalPages={pagination?.totalPages}
+              hasNext={pagination?.hasNext}
+              hasPrevious={pagination?.hasPrevious}
+              onPageChange={loadData} 
+            />
+          }
         </div>
       </div>
     </div>

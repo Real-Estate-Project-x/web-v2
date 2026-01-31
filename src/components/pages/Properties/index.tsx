@@ -13,13 +13,14 @@ import { Bath, Bed, MapPin, Search, Square } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { PropertyInterface } from "../../../../utils/interfaces";
+import { PaginationControlInterface, PropertyInterface } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
-import { Pagination } from "@/components/shared/pagination";
+// import { Pagination } from "@/components/shared/pagination";
 import LoadingCard from "@/components/shared/loader-cards";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { getCookie } from "@/lib/helpers";
+// import { getCookie } from "@/lib/helpers";
 import { Card, CardContent } from "@/components/ui/card";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 type Props = {
   array: PropertyInterface[];
@@ -271,24 +272,38 @@ const Properties = () => {
   const [copyData, setCopyData] = useState<PropertyInterface[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [type, setType] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(() => {
-    const savedPage = getCookie("page");
-    return savedPage ? Number(savedPage) : 1;
-  });
-  const recordsPerPage: number = 10;
-  const lastIndex: number = currentPage * recordsPerPage;
-  const firstIndex: number = lastIndex - recordsPerPage;
-  const records = properties?.slice(firstIndex, lastIndex);
-  const nPage = Math.ceil(properties?.length / recordsPerPage);
-  const numbers = Array.from({ length: nPage }, (_, i) => i + 1).slice();
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
+
+  // const [currentPage, setCurrentPage] = useState<number>(() => {
+  //   const savedPage = getCookie("page");
+  //   return savedPage ? Number(savedPage) : 1;
+  // });
+  // const recordsPerPage: number = 10;
+  // const lastIndex: number = currentPage * recordsPerPage;
+  // const firstIndex: number = lastIndex - recordsPerPage;
+  // const records = properties?.slice(firstIndex, lastIndex);
+  // const nPage = Math.ceil(properties?.length / recordsPerPage);
+  // const numbers = Array.from({ length: nPage }, (_, i) => i + 1).slice();
 
   useEffect(() => {
+    loadData(1);
+  }, []);
+
+  const loadData = async (page: number) => {
+    await fetchProperties(page);
+  };
+
+
+  async function fetchProperties(pageNumber = 1, pageSize =10){
     axiosInstance
-      .get(`property`)
+      .get(`property?pageNumber=${pageNumber}&pageSize=${pageSize}`)
       .then((response) => {
         if (response.data.success) {
           setProperties(response.data.data);
           setCopyData(response.data.data);
+          setPagination(response?.data?.paginationControl);
         }
         setIsLoading(false);
       })
@@ -296,7 +311,7 @@ const Properties = () => {
         setIsLoading(false);
         console.error("Error fetching properties:", error);
       });
-  }, []);
+  }
 
   return (
     <React.Fragment>
@@ -330,16 +345,25 @@ const Properties = () => {
             </p>
           </div>
         ) : (
-          <PropertyList array={records} />
+          <PropertyList array={properties} />
         )}
 
-        {numbers.length > 1 && (
+        {/* {numbers.length > 1 && (
           <Pagination
             _data={numbers}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />
-        )}
+        )} */}
+        {pagination?.currentPage  &&
+          <DynamicPagination
+            currentPage={pagination?.currentPage}
+            totalPages={pagination?.totalPages}
+            hasNext={pagination?.hasNext}
+            hasPrevious={pagination?.hasPrevious}
+            onPageChange={loadData} 
+          />
+        }
       </div>
 
       <Footer />

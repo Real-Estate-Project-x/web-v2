@@ -6,11 +6,12 @@ import Navbar from "../Home/Nav";
 import AgentFilters from "./filters";
 import AgentCard from "./Agent-Card";
 import Footer from "../Home/Footer";
-import { AgentInitialObject, AgentInterface } from "../../../../utils/interfaces";
+import { AgentInitialObject, AgentInterface, PaginationControlInterface } from "../../../../utils/interfaces";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { AgentLoaderCard } from "@/components/shared/loader-cards";
 import { getCookie } from "@/lib/helpers";
 import { Pagination } from "@/components/shared/pagination";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const Agents = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -21,27 +22,32 @@ const Agents = () => {
   const [errorMsg, setErrorObj] = useState<{msg : string, flag : boolean}>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [dataState, setDataState] = useState<AgentInterface[]>([{...AgentInitialObject}] as AgentInterface[]);
-  const [currentPage, setCurrentPage] = useState<number>(() => {
-    const savedPage = getCookie('page');
-    return savedPage ? Number(savedPage) : 1;
-  });
-  const recordsPerPage : number = 10;
-  const lastIndex : number = currentPage * recordsPerPage;
-  const firstIndex : number = lastIndex - recordsPerPage;
-  const records = data?.slice(firstIndex, lastIndex);
-  const nPage = Math.ceil(data?.length / recordsPerPage);
-  const numbers = Array.from({ length: nPage }, (_, i) => i + 1).slice();
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
+  // const [currentPage, setCurrentPage] = useState<number>(() => {
+  //   const savedPage = getCookie('page');
+  //   return savedPage ? Number(savedPage) : 1;
+  // });
+  // const recordsPerPage : number = 10;
+  // const lastIndex : number = currentPage * recordsPerPage;
+  // const firstIndex : number = lastIndex - recordsPerPage;
+  // const records = data?.slice(firstIndex, lastIndex);
+  // const nPage = Math.ceil(data?.length / recordsPerPage);
+  // const numbers = Array.from({ length: nPage }, (_, i) => i + 1).slice();
 
-  useEffect(() => {
+
+  async function fetchAgents(pageNumber = 1, pageSize =10){
     setIsLoading(true);
 
-    axiosInstance.get(`agency/customer-listings/agents-list`)
+    axiosInstance.get(`agency/customer-listings/agents-list?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     .then((response) => {
       if(response.data.success){
+
         setData(response.data.data);
         setDataState(response.data.data);
-      }else{
-        setErrorObj({...errorMsg, flag : true, msg : response.data.message});
+        setPagination(response?.data?.paginationControl);
+
       }
       setIsLoading(false);
 
@@ -50,7 +56,16 @@ const Agents = () => {
       setIsLoading(false);
     })
     
-  },[]);
+  }
+
+   const loadData = async (page: number) => {
+    await fetchAgents(page);
+  };
+
+
+  useEffect(() => {
+    loadData(1);
+  }, []);
 
   useEffect(() => {
       if(searchTerm === "") {
@@ -144,9 +159,9 @@ const Agents = () => {
 
             {/* Agents Grid/List */}
             <section className="py-8">
-              <div className="container mx-auto px-4">
+              <div className="container mx-auto px-4 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {records && records?.map((agent) => (
+                  {data && data?.map((agent) => (
                     <AgentCard key={agent?.agency?.id} agent={agent} />
                   ))}
                 </div>
@@ -160,8 +175,18 @@ const Agents = () => {
                     </div>
                   </div>
                 )}
-                {numbers.length > 1 && <Pagination _data={numbers} currentPage={currentPage} setCurrentPage={setCurrentPage}/>}
+                {/* {numbers.length > 1 && <Pagination _data={numbers} currentPage={currentPage} setCurrentPage={setCurrentPage}/>} */}
+                
               </div>
+              {pagination?.currentPage  &&
+                  <DynamicPagination
+                    currentPage={pagination?.currentPage}
+                    totalPages={pagination?.totalPages}
+                    hasNext={pagination?.hasNext}
+                    hasPrevious={pagination?.hasPrevious}
+                    onPageChange={loadData} 
+                  />
+                }
             </section>
           </>
         }

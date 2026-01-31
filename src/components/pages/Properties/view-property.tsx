@@ -12,6 +12,14 @@ import {
   Video,
   Eye,
   BadgeCheck,
+  Car,
+  CheckCircle2,
+  Baby,
+  DoorClosed,
+  MinusCircle,
+  PawPrint,
+  Building2,
+  Cctv,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -42,6 +50,7 @@ import {
 } from "../../../../utils/interfaces";
 import {
   formatPrice,
+  getLocalStorageFieldRaw,
   pickUserId,
 } from "../../../../utils/helpers";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
@@ -60,13 +69,13 @@ const PropertyMap = dynamic(
   {ssr : false}
 );
 
-type TourFormData = {
-  name: string;
-  email: string;
-  time: string;
-  date: string;
-  message: string;
-};
+// type TourFormData = {
+//   name: string;
+//   email: string;
+//   time: string;
+//   date: string;
+//   message: string;
+// };
 
 const PropertyDetails = () => {
   const searchParams = useSearchParams();
@@ -89,15 +98,15 @@ const PropertyDetails = () => {
   });
 
   // Form for tour request
-  const tourForm = useForm<TourFormData>({
-    defaultValues: {
-      name: "",
-      email: "",
-      time: "",
-      date: "",
-      message: "",
-    },
-  });
+  // const tourForm = useForm<TourFormData>({
+  //   defaultValues: {
+  //     name: "",
+  //     email: "",
+  //     time: "",
+  //     date: "",
+  //     message: "",
+  //   },
+  // });
 
   // Form for comment submission
   const commentForm = useForm<{ comment: string; rating: number }>({
@@ -107,14 +116,18 @@ const PropertyDetails = () => {
     },
   });
 
-  const onSubmitTourRequest = (data: TourFormData) => {
-    console.log("Tour request submitted:", data);
-    toast.success("Tour request submitted successfully!");
-    tourForm.reset();
-  };
+  // const onSubmitTourRequest = (data: TourFormData) => {
+  //   console.log("Tour request submitted:", data);
+  //   toast.success("Tour request submitted successfully!");
+  //   tourForm.reset();
+  // };
 
   const onSubmitComment = (data: { comment: string; rating: number }) => {
     // if a user is not logged in and has not viewed the apartment, user cannot make a comment
+    // if(!isUserLoggedIn() && !propertyData?.isViewed){
+    //   toast.info("Only logged-in users who have viewed this apartment can leave comments.");
+    //   return;
+    // }
     setIsLoading(true);
     axiosInstance
       .post(`agent-property-viewing/rate-viewing`, {
@@ -229,9 +242,9 @@ const PropertyDetails = () => {
   // };
 
   useEffect(() => {
+    const slug = searchParams.get("id");
+    const userId = pickUserId();
     const fetchData = async () => {
-      const slug = searchParams.get("id");
-      const userId = pickUserId();
       let url = `property/customer-listings/detail/${slug}`;
       if (userId) {
         url += `?userId=${userId}`;
@@ -258,9 +271,37 @@ const PropertyDetails = () => {
         console.error("Error fetching properties:", error);
       }
     };
-
-    fetchData();
+    if(slug || userId) fetchData();
   }, []);
+
+  // useEffect(() => {
+  //   // on refresh this component reloads and triggers this api call to verify user payment
+  //   const viewingId = getLocalStorageFieldRaw("viewingId") as string;
+  //   const paymentReference = getLocalStorageFieldRaw("payRef") as string;
+
+  //   const VerifyVirtualPayment = async () => {
+  //     try {
+  //       const paymentConfirmationResponse = await axiosInstance.post(`/agent-property-viewing/virtual/confirm`,{
+  //         viewingId,
+  //         paymentReference
+  //       });
+  //       console.log({paymentConfirmationResponse});
+  //       if(paymentConfirmationResponse?.data?.success){
+  //         toast.success(paymentConfirmationResponse?.data?.message);
+  //       }
+  //     } catch (error : any) {
+  //       console.log({error});
+  //       toast.error("Payment Did not go through",{description : error?.response?.data?.message});
+  //     }finally{
+  //       localStorage.removeItem("viewingId");
+  //       localStorage.removeItem("payRef");
+  //     }
+  //   }
+  //   if(viewingId && paymentReference){
+  //     VerifyVirtualPayment();
+  //   }
+  // },[]);
+
   const ratingConstant = propertyData?.property?.bluepoddRating
     ? propertyData.property.bluepoddRating
     : 0;
@@ -433,101 +474,108 @@ const PropertyDetails = () => {
                 </div>
 
                 {/* Amenities Section */}
-                {hasAmenities(propertyData?.property) && (
-                  <div>
-                    <h2 className="text-xl md:text-2xl font-semibold mb-3">
-                      Property Amenities
-                    </h2>
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                      {propertyData?.property?.hasWifi && (
-                        <div className="flex items-center p-3 w-fit bg-white rounded-lg shadow-sm border">
-                          <Wifi className="h-5 w-5 mr-2 text-real-600" />
-                          <span className="text-sm md:text-base">Wi-Fi</span>
-                        </div>
-                      )}
-                      {propertyData?.property?.hasGym && (
-                        <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
-                          <Dumbbell className="h-5 w-5 mr-2 text-real-600" />
-                          <span className="text-sm md:text-base">Gym</span>
-                        </div>
-                      )}
-                      {propertyData?.property?.hasLaundry && (
-                        <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
-                          <WashingMachine className="h-5 w-5 mr-2 text-real-600" />
-                          <span className="text-sm md:text-base">
-                            Laundry&nbsp;services
-                          </span>
-                        </div>
-                      )}
+                <div>
+                  <h2 className="text-xl md:text-2xl font-semibold mb-3">
+                    Property Amenities
+                  </h2>
+                  <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasWifi 
+                      ? "bg-green-50 text-green-700" 
+                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <Wifi className="w-5 h-5"/>
+                      </span>
+                      <p>{"Wi-fi"}</p>
+                      {propertyData?.property?.hasWifi ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
 
-                      {propertyData?.property?.hasCctv && (
-                        <div className="flex items-center w-fit p-3 bg-white rounded-lg shadow-sm border">
-                          <Video className="h-5 w-5 mr-2 text-real-600" />
-                          <span className="text-sm md:text-base">CCtv</span>
-                        </div>
-                      )}
+                    </div>
+
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasGym 
+                      ? "bg-green-50 text-green-700" 
+                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <Dumbbell className="w-5 h-5"/>
+                      </span>
+                      <p>{"Gym"}</p>
+                      {propertyData?.property?.hasGym ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      
+                    </div>
+                    
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasLaundry 
+                      ? "bg-green-50 text-green-700" 
+                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <WashingMachine className="w-5 h-5"/>
+                      </span>
+                      <p>{"Laundry Services"}</p>
+                      {propertyData?.property?.hasLaundry ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      
+                    </div>
+
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasCctv 
+                      ? "bg-green-50 text-green-700" 
+                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <Cctv className="w-5 h-5"/>
+                      </span>
+                      <p>{"CCtv"}</p>
+                      {propertyData?.property?.hasCctv ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      
                     </div>
                   </div>
-                )}
+                </div>
 
                 {/* Features */}
-                {hasFeatures(propertyData?.property) && (
-                  <div>
-                    <h2 className="text-xl md:text-2xl font-semibold mb-3">
-                      Property Features
-                    </h2>
-                    <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                      {propertyData?.property?.hasCarParking && (
-                        <div className="w-fit flex items-center text-gray-600 text-sm md:text-base">
-                          <span className="mr-2">
-                            <BadgeCheck className="bg-green-700 text-white rounded-full"/>
-                          </span>
-                          {"Car Parking"}
-                        </div>
-                      )}
-                      {propertyData?.property?.hasKidsPlayArea && (
-                        <div className="w-fit flex items-center p-3 bg-white rounded-lg shadow-sm border">
-                          <span className="mr-2">
-                            <BadgeCheck className="bg-green-700 text-white rounded-full"/>
-                          </span>
-                          <span className="text-sm md:text-base">
-                            {"Kids Area"}
-                          </span>
-                        </div>
-                      )}
-                      {propertyData?.property?.isPetFriendly && (
-                        <div className="w-fit flex items-center p-3 bg-white rounded-lg shadow-sm border">
-                          <span className="mr-2">
-                            <BadgeCheck className="bg-green-700 text-white rounded-full"/>
-                          </span>
-                          <span className="text-sm md:text-base">
-                            {"Pet Friendly"}
-                          </span>
-                        </div>
-                      )}
-                      {propertyData?.property?.isNewBuilding && (
-                        <div className="w-fit flex items-center p-3 bg-white rounded-lg shadow-sm border">
-                          <span className="mr-2">
-                            <BadgeCheck className="bg-green-700 text-white rounded-full"/>
-                          </span>
-                          <span className="text-sm md:text-base">
-                            {"New Building"}
-                          </span>
-                        </div>
-                      )}
+                <div>
+                  <h2 className="text-xl md:text-2xl font-semibold mb-3">
+                    Property Features
+                  </h2>
+                  <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasCarParking ? "bg-green-50 text-green-700" : "text-gray-600 bg-slate-500"} text-sm`}>
+                      <span className="">
+                        <Car className="w-5 h-5"/>
+                      </span>
+                      <p>{"Car Parking"}</p>
+                      {propertyData?.property?.hasCarParking ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
                     </div>
+                  
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasKidsPlayArea ? "bg-green-50 text-green-700" : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <Baby className="w-5 h-5"/>
+                      </span>
+                      <p>{"Kids Area"}</p>
+                      {propertyData?.property?.hasKidsPlayArea ? <CheckCircle2 className="w-4 h-4 mt-1" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                    </div>
+                    
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.isPetFriendly ? "bg-green-50 text-green-700" : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <PawPrint className="w-5 h-5"/>
+                      </span>
+                      <p>{"Pet Friendly"}</p>
+                      {propertyData?.property?.isPetFriendly ? <CheckCircle2 className="w-4 h-4 mt-1" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                    </div>
+
+                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.isNewBuilding ? "bg-green-50 text-green-700" : "text-gray-600 bg-gray-200"} text-sm`}>
+                      <span className="">
+                        <Building2 className="w-5 h-5"/>
+                      </span>
+                      <p>{"New Building"}</p>
+                      {propertyData?.property?.isNewBuilding ? <CheckCircle2 className="w-4 h-4 mt-1" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                    </div>
+
                   </div>
-                )}
-                {isUserLoggedIn() && (
+                </div>
+                {/* {isUserLoggedIn() && ( */}
                   <AgentAvailabilityPicker
                     propertyId={propertyData?.property?.id as string}
                   />
-                )}
+                {/* )} */}
                 {/* Video tag section*/}
                 {propertyData?.property?.video && (
                   <div className="my-4">
                     <p className="py-2 font-medium">Watch Property Video</p>
-                    <video width="600" height="360" controls>
+                    <video width="100%" height="360" controls>
                       <source
                         src={propertyData?.property?.video?.url}
                         type={propertyData?.property?.video?.mimeType}
@@ -598,7 +646,7 @@ const PropertyDetails = () => {
 
                 {/* Comments Section */}
                 <div>
-                  {comments?.length > 0 && (
+                  {comments?.length > 0 ? (
                     <>
                       <h2 className="text-xl md:text-2xl font-semibold mb-3">
                         Reviews & Comments
@@ -622,18 +670,17 @@ const PropertyDetails = () => {
                             </CardContent>
                           </Card>
                         ))}
-
-                        {comments.length === 0 && (
-                          <p className="text-gray-500 italic">
-                            No reviews yet. Be the first to leave a review!
-                          </p>
-                        )}
                       </div>
                     </>
-                  )}
+                  ) : (
+                    <p className="text-gray-500 italic my-4">
+                      No reviews yet. Be the first to leave a review!
+                    </p>
+                  )
+                }
                 
                     {/* Add new comment form */}
-                    {propertyData?.isViewed && 
+                    {/* {propertyData?.isViewed &&  */}
                       <Card>
                         <CardContent className="px-6">
                           <h3 className="text-lg font-semibold mb-4">
@@ -690,7 +737,7 @@ const PropertyDetails = () => {
                           </FormProvider>
                         </CardContent>
                       </Card>
-                    }
+                    {/* } */}
                   </div>
               
 
