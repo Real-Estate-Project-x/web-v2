@@ -15,10 +15,8 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { PaginationControlInterface, PropertyInterface } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
-// import { Pagination } from "@/components/shared/pagination";
 import LoadingCard from "@/components/shared/loader-cards";
 import { axiosInstance } from "@/lib/axios-interceptor";
-// import { getCookie } from "@/lib/helpers";
 import { Card, CardContent } from "@/components/ui/card";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
