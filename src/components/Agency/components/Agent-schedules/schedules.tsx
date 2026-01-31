@@ -19,7 +19,8 @@ import {
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { getLocalStorageFieldRaw } from "../../../../../utils/helpers";
 import { ScheduleDialog } from "./dialog/schedule-viewing";
-import { AgencyScheduleInterface } from "../../../../../utils/interfaces";
+import { AgencyScheduleInterface, PaginationControlInterface } from "../../../../../utils/interfaces";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 
 const AgentSchedule = () => {
@@ -28,7 +29,9 @@ const AgentSchedule = () => {
   const [schedules, setSchedules] = useState<AgencyScheduleInterface[]>([] as AgencyScheduleInterface[]);
   const [timeSlotId , setTimeSlotId] = useState<string>('');
   const [refresh, setRefresh] = useState<boolean>(false);
-
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
   // const handleTimeSlotToggle = (time: string) => {
   //   setSelectedTimeSlots(prev => 
   //     prev.includes(time) 
@@ -88,33 +91,38 @@ const AgentSchedule = () => {
   // const scheduledDates = schedules.map(s => format(s.date, "yyyy-MM-dd"));
   const agencyId = getLocalStorageFieldRaw('agentId');
   
-  useEffect(() => {
-    async function getSchedules(){
-      try{
-        const schedules = await axiosInstance.get(`/agency-availability/open-windows/${agencyId}`);
-         
-          if(schedules?.data?.success){
-            if(schedules?.data?.data?.length > 0){
-              //const data = schedules?.data?.data;
-                const formattedData = schedules?.data?.data?.map((s : AgencyScheduleInterface) =>{
-                  const reformattedDate = reformatDate(s.date);
-                  return{
-                    ...s,
-                    date : reformattedDate
-                  }
-                });
-              setSchedules(formattedData);
-              return
-            }
-            setSchedules([] as AgencyScheduleInterface[]);
-            
+  const fetchSchedules = async (pageNumber = 1, pageSize = 10) =>{
+   try{
+      const schedules = await axiosInstance.get(`/agency-availability/open-windows/${agencyId}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+        
+        if(schedules?.data?.success){
+          setPagination(schedules?.data?.paginationControl);
+          if(schedules?.data?.data?.length > 0){
+            //const data = schedules?.data?.data;
+              const formattedData = schedules?.data?.data?.map((s : AgencyScheduleInterface) =>{
+                const reformattedDate = reformatDate(s.date);
+                return{
+                  ...s,
+                  date : reformattedDate
+                }
+              });
+            setSchedules(formattedData);
+            return
           }
-        } catch(err){
-          console.log({err});
-      }
+          setSchedules([] as AgencyScheduleInterface[]);
+          
+        }
+      } catch(err){
+      console.log({err});
     }
-    getSchedules();
-    
+  }
+
+  const loadData = async (page : number) => {
+    await fetchSchedules(page);
+  }
+
+  useEffect(() => {
+   loadData(1);
   },[refresh]);
 
 
@@ -358,6 +366,16 @@ const AgentSchedule = () => {
                 </Card>
               ))
             )}
+
+            {pagination?.currentPage  &&
+              <DynamicPagination
+                currentPage={pagination?.currentPage}
+                totalPages={pagination?.totalPages}
+                hasNext={pagination?.hasNext}
+                hasPrevious={pagination?.hasPrevious}
+                onPageChange={loadData} 
+              />
+            }
           {/* </TabsContent>
         </Tabs> */}
       </div>
