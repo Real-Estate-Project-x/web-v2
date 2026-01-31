@@ -9,13 +9,10 @@ import {
   Dumbbell,
   WashingMachine,
   MessageCircle,
-  Video,
   Eye,
-  BadgeCheck,
   Car,
   CheckCircle2,
   Baby,
-  DoorClosed,
   MinusCircle,
   PawPrint,
   Building2,
@@ -50,13 +47,11 @@ import {
 } from "../../../../utils/interfaces";
 import {
   formatPrice,
-  getLocalStorageFieldRaw,
   pickUserId,
 } from "../../../../utils/helpers";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
 import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { hasAmenities, hasFeatures, isUserLoggedIn } from "@/lib/utils";
 import AgentAvailabilityPicker from "@/components/shared/agent-availability-component";
 import ReportModal from "./Dialogs/report-property";
 import dynamic from "next/dynamic";
