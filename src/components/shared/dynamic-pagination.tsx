@@ -16,7 +16,7 @@ export function DynamicPagination({
   return (
     <div
       className="pagination"
-      style={{ display: "flex", gap: 8, alignItems: "center" }}
+      style={{ display: "flex", gap: 8, justifyContent : "center", alignItems: "center" }}
     >
       <button
         disabled={!hasPrevious}

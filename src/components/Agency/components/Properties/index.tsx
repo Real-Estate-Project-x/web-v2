@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import PropertyEditForm from "./dialogs/edit-property";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { AgentDatabaseInterface } from "../../../../../utils/interfaces";
+import { AgentDatabaseInterface, PaginationControlInterface } from "../../../../../utils/interfaces";
 import {
   convertDateCreatedToGetNumberOfDays,
   formatPrice,
@@ -43,14 +43,15 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-select";
 import { BoostPropertyPrompt } from "./agent-property-view";
 import { toast } from "sonner";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [statusFilter, setStatusFilter] = useState("NEWEST");
-  const [currentPage, setCurrentPage] = useState(1);
+  //const [currentPage, setCurrentPage] = useState(1);
   const [isBoosted, setIsBoosted] = useState(false);
-  const propertiesPerPage = 6;
+  //const propertiesPerPage = 6;
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
@@ -59,6 +60,9 @@ const AgentPropertiesManager = () => {
   const router = useRouter();
   const [reload, setReload] = useState<boolean>(false);
   const agencyId = getLocalStorageFieldRaw('agentId');
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
 
   useEffect(() => {
 
@@ -79,16 +83,24 @@ const AgentPropertiesManager = () => {
 
   },[]);
 
-  useEffect(() => {
-
-    if(!agencyId) return;
-
-    axiosInstance.get(`/agency/${agencyId}/properties?sortBy=${statusFilter}`)
+  const fetchAgentProperties = async (pageNumber = 1, pageSize = 10) =>{
+    axiosInstance.get(`/agency/${agencyId}/properties?sortBy=${statusFilter}&pageNumber=${pageNumber}&pageSize=${pageSize}`)
     .then((response) => {
      setProperties(response.data.data);
+     setPagination(response?.data?.paginationControl);
     }).catch((err) => {
       console.log({err});
     });
+  }
+
+  const loadData = async (page : number) => {
+    await fetchAgentProperties(page);
+  }
+
+  useEffect(() => {
+
+    if(!agencyId) return;
+    loadData(1);
 
   },[isBoosted, agencyId, reload, statusFilter]);
 
@@ -127,14 +139,14 @@ const AgentPropertiesManager = () => {
   const hasNoRecords = Array.isArray(filteredAndSortedProperties) && filteredAndSortedProperties?.length === 0;
 
   // Pagination
-  const totalPages = Math.ceil(
-    filteredAndSortedProperties.length / propertiesPerPage
-  );
-  const startIndex = (currentPage - 1) * propertiesPerPage;
-  const currentProperties = filteredAndSortedProperties()?.slice(
-    startIndex,
-    startIndex + propertiesPerPage
-  );
+  // const totalPages = Math.ceil(
+  //   filteredAndSortedProperties.length / propertiesPerPage
+  // );
+  // const startIndex = (currentPage - 1) * propertiesPerPage;
+  // const currentProperties = filteredAndSortedProperties()?.slice(
+  //   startIndex,
+  //   startIndex + propertiesPerPage
+  // );
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -236,7 +248,7 @@ const AgentPropertiesManager = () => {
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentProperties && currentProperties?.map((property, index) => (
+          {filteredAndSortedProperties && filteredAndSortedProperties()?.map((property, index) => (
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
               <div className="relative">
                 <img
@@ -328,7 +340,7 @@ const AgentPropertiesManager = () => {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {/* {totalPages > 1 && (
           <div className="flex justify-center">
             <Pagination>
               <PaginationContent>
@@ -380,7 +392,16 @@ const AgentPropertiesManager = () => {
               </PaginationContent>
             </Pagination>
           </div>
-        )}
+        )} */}
+        {pagination?.currentPage  &&
+          <DynamicPagination
+            currentPage={pagination?.currentPage}
+            totalPages={pagination?.totalPages}
+            hasNext={pagination?.hasNext}
+            hasPrevious={pagination?.hasPrevious}
+            onPageChange={loadData} 
+          />
+        }
 
         {/* No Results */}
         {hasNoRecords && (

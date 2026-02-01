@@ -3475,7 +3475,7 @@ react-leaflet@^5.0.0:
 
 react-paystack@^6.0.0:
   version "6.0.0"
-  resolved "https://registry.npmjs.org/react-paystack/-/react-paystack-6.0.0.tgz"
+  resolved "https://registry.npmjs.org/react-paystack/-/react-paystack-6.0.0.tgz#6f0cc3c8dd9ac3b1a5aefa212ee57471f0c3e147"
   integrity sha512-GTeVK3P3BONo0rQ82oNE/vk6kJYugii+Irti8qxTmwWLcvKe8UXEWqVWNUtjfZ3U2cXVnWid6lkg0/O/G1MfAw==
   dependencies:
     "@paystack/inline-js" "^2.19.2"
