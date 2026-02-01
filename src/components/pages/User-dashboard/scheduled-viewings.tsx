@@ -23,7 +23,7 @@ export const DashboardSchedule = () => {
     fetchData();
   }, []);
 
-  const fetchData = async (filter = PropertyViewingFilter.ALL) => {
+  const fetchData = async (filter = PropertyViewingFilter.TODAY) => {
     const url = `/agent-property-viewing/customer/viewing-list?filter=${filter}`;
     const result = await axiosInstance.get(url);
     if (result?.data?.success) {
