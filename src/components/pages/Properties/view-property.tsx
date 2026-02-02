@@ -45,10 +45,7 @@ import {
   PropertyInterface,
   ViewPropertyInterface,
 } from "../../../../utils/interfaces";
-import {
-  formatPrice,
-  pickUserId,
-} from "../../../../utils/helpers";
+import { formatPrice, pickUserId } from "../../../../utils/helpers";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
 import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
@@ -59,10 +56,7 @@ import dynamic from "next/dynamic";
 // using use client specified client component not server but importing dynamically and disabling ssr makes the component wait until window is up b4 running
 // voila problem solved
 
-const PropertyMap = dynamic(
-  () => import("./property-map"),
-  {ssr : false}
-);
+const PropertyMap = dynamic(() => import("./property-map"), { ssr: false });
 
 // type TourFormData = {
 //   name: string;
@@ -227,7 +221,6 @@ const PropertyDetails = () => {
     return stars;
   };
 
-
   // const getInfoFromLocalStorage = () => {
   //   const encryptionKey = String(
   //     process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY
@@ -266,7 +259,7 @@ const PropertyDetails = () => {
         console.error("Error fetching properties:", error);
       }
     };
-    if(slug || userId) fetchData();
+    if (slug || userId) fetchData();
   }, []);
 
   // useEffect(() => {
@@ -321,7 +314,10 @@ const PropertyDetails = () => {
                       ({ratingConstant})
                     </span>
                   </div>
-                 <ReportModal propertyId={(propertyData?.property?.id)as string} agencyId={(propertyData?.property?.agencyId) as string}/>
+                  <ReportModal
+                    propertyId={propertyData?.property?.id as string}
+                    agencyId={propertyData?.property?.agencyId as string}
+                  />
                 </div>
               </div>
               <div className="flex items-center text-gray-600 mb-4">
@@ -334,86 +330,93 @@ const PropertyDetails = () => {
                   ).toLowerCase()}
                 </p>
               </div>
-               <Tabs defaultValue="images" className="space-y-6">
-                  <TabsList className="grid w-full lg:w-[400px] grid-cols-2">
-                    <TabsTrigger value="images">Images</TabsTrigger>
-                    <TabsTrigger value="map">Map</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="images" className="space-y-6">
-                    {/* Property Image Slider */}
-                    <div className="relative">
-                      <Carousel className="w-full">
-                        <CarouselContent>
-                          {propertyData.property?.propertyImages?.map(
-                            (image, index) => (
-                              <CarouselItem key={index}>
-                                <div className="relative">
-                                  <img
-                                    src={image?.image?.url}
-                                    alt={`${propertyData.property.title} - Image ${
-                                      index + 1
-                                    }`}
-                                    className="w-full h-[350px] sm:h-[400px] md:h-[500px] object-cover rounded-lg"
-                                  />
-                                  {index === 0 && (
-                                    <>
-                                      <Badge className="absolute top-4 left-4 bg-[#0253CC] px-4 py-2 rounded-full capitalize">
-                                        {propertyData.property.propertyType?.name}
+              <Tabs defaultValue="images" className="space-y-6">
+                <TabsList className="grid w-full lg:w-[400px] grid-cols-2">
+                  <TabsTrigger value="images">Images</TabsTrigger>
+                  <TabsTrigger value="map">Map</TabsTrigger>
+                </TabsList>
+                <TabsContent value="images" className="space-y-6">
+                  {/* Property Image Slider */}
+                  <div className="relative">
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        {propertyData.property?.propertyImages?.map(
+                          (image, index) => (
+                            <CarouselItem key={index}>
+                              <div className="relative">
+                                <img
+                                  src={image?.image?.url}
+                                  alt={`${
+                                    propertyData.property.title
+                                  } - Image ${index + 1}`}
+                                  className="w-full h-[350px] sm:h-[400px] md:h-[500px] object-cover rounded-lg"
+                                />
+                                {index === 0 && (
+                                  <>
+                                    <Badge className="absolute top-4 left-4 bg-[#0253CC] px-4 py-2 rounded-full capitalize">
+                                      {propertyData.property.propertyType?.name}
+                                    </Badge>
+                                    {propertyData.property.isNewBuilding && (
+                                      <Badge className="absolute p-2 rounded-full top-4 left-40 bg-green-500 hover:bg-green-600">
+                                        New
                                       </Badge>
-                                      {propertyData.property.isNewBuilding && (
-                                        <Badge className="absolute p-2 rounded-full top-4 left-40 bg-green-500 hover:bg-green-600">
-                                          New
-                                        </Badge>
+                                    )}
+                                    <Badge className="absolute top-4 right-4 bg-white text-[#102A43] p-2 rounded-full">
+                                      {formatPrice(
+                                        propertyData.property.price || 0
                                       )}
-                                      <Badge className="absolute top-4 right-4 bg-white text-[#102A43] p-2 rounded-full">
-                                        {formatPrice(
-                                          propertyData.property.price || 0
-                                        )}
-                                      </Badge>
-                                    </>
-                                  )}
-                                </div>
-                              </CarouselItem>
-                            )
-                          )}
-                        </CarouselContent>
-                        <CarouselPrevious className="left-4" />
-                        <CarouselNext className="right-4" />
-                      </Carousel>
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                            </CarouselItem>
+                          )
+                        )}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-4" />
+                      <CarouselNext className="right-4" />
+                    </Carousel>
 
-                      {/* Save Property Button */}
-                      <Button
-                        variant={isFavourite ? "default" : "outline"}
-                        size="icon"
-                        className={`absolute bottom-4 right-4 rounded-full z-10 ${
+                    {/* Save Property Button */}
+                    <Button
+                      variant={isFavourite ? "default" : "outline"}
+                      size="icon"
+                      className={`absolute bottom-4 right-4 rounded-full z-10 ${
+                        isFavourite
+                          ? "bg-real-600 hover:bg-real-700"
+                          : "bg-white hover:bg-gray-100"
+                      }`}
+                      onClick={handleSaveProperty}
+                      title={
+                        isFavourite
+                          ? "Remove from bookmarks"
+                          : "Bookmark property"
+                      }
+                    >
+                      <Heart
+                        className={`h-5 w-5 ${
                           isFavourite
-                            ? "bg-real-600 hover:bg-real-700"
-                            : "bg-white hover:bg-gray-100"
+                            ? "fill-white text-white"
+                            : "text-real-600"
                         }`}
-                        onClick={handleSaveProperty}
-                        title={
-                          isFavourite ? "Remove from bookmarks" : "Bookmark property"
-                        }
-                      >
-                        <Heart
-                          className={`h-5 w-5 ${
-                            isFavourite ? "fill-white text-white" : "text-real-600"
-                          }`}
-                        />
-                      </Button>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="map" className="space-y-6">
-                      <PropertyMap
-                        latitude={(propertyData?.property?.geoCoordinates?.latitude) as number}
-                        longitude={(propertyData?.property?.geoCoordinates?.longitude) as number}
-                        title={propertyData?.property?.title}
-                        address={propertyData?.property?.address}
                       />
-
-                  </TabsContent>
-                </Tabs>
-             
+                    </Button>
+                  </div>
+                </TabsContent>
+                <TabsContent value="map" className="space-y-6">
+                  <PropertyMap
+                    latitude={
+                      propertyData?.property?.geoCoordinates?.latitude as number
+                    }
+                    longitude={
+                      propertyData?.property?.geoCoordinates
+                        ?.longitude as number
+                    }
+                    title={propertyData?.property?.title}
+                    address={propertyData?.property?.address}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
 
             <div className="grid grid-cols-1 gap-8">
@@ -474,48 +477,76 @@ const PropertyDetails = () => {
                     Property Amenities
                   </h2>
                   <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasWifi 
-                      ? "bg-green-50 text-green-700" 
-                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.hasWifi
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <Wifi className="w-5 h-5"/>
+                        <Wifi className="w-5 h-5" />
                       </span>
                       <p>{"Wi-fi"}</p>
-                      {propertyData?.property?.hasWifi ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
-
+                      {propertyData?.property?.hasWifi ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
 
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasGym 
-                      ? "bg-green-50 text-green-700" 
-                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.hasGym
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <Dumbbell className="w-5 h-5"/>
+                        <Dumbbell className="w-5 h-5" />
                       </span>
                       <p>{"Gym"}</p>
-                      {propertyData?.property?.hasGym ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
-                      
-                    </div>
-                    
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasLaundry 
-                      ? "bg-green-50 text-green-700" 
-                      : "text-gray-600 bg-gray-200"} text-sm`}>
-                      <span className="">
-                        <WashingMachine className="w-5 h-5"/>
-                      </span>
-                      <p>{"Laundry Services"}</p>
-                      {propertyData?.property?.hasLaundry ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
-                      
+                      {propertyData?.property?.hasGym ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
 
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasCctv 
-                      ? "bg-green-50 text-green-700" 
-                      : "text-gray-600 bg-gray-200"} text-sm`}>
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.hasLaundry
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <Cctv className="w-5 h-5"/>
+                        <WashingMachine className="w-5 h-5" />
+                      </span>
+                      <p>{"Laundry Services"}</p>
+                      {propertyData?.property?.hasLaundry ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
+                    </div>
+
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.hasCctv
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
+                      <span className="">
+                        <Cctv className="w-5 h-5" />
                       </span>
                       <p>{"CCtv"}</p>
-                      {propertyData?.property?.hasCctv ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
-                      
+                      {propertyData?.property?.hasCctv ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -526,45 +557,83 @@ const PropertyDetails = () => {
                     Property Features
                   </h2>
                   <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                    
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasCarParking ? "bg-green-50 text-green-700" : "text-gray-600 bg-slate-500"} text-sm`}>
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.hasCarParking
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-slate-500"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <Car className="w-5 h-5"/>
+                        <Car className="w-5 h-5" />
                       </span>
                       <p>{"Car Parking"}</p>
-                      {propertyData?.property?.hasCarParking ? <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      {propertyData?.property?.hasCarParking ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
-                  
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.hasKidsPlayArea ? "bg-green-50 text-green-700" : "text-gray-600 bg-gray-200"} text-sm`}>
+
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.hasKidsPlayArea
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <Baby className="w-5 h-5"/>
+                        <Baby className="w-5 h-5" />
                       </span>
                       <p>{"Kids Area"}</p>
-                      {propertyData?.property?.hasKidsPlayArea ? <CheckCircle2 className="w-4 h-4 mt-1" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      {propertyData?.property?.hasKidsPlayArea ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
-                    
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.isPetFriendly ? "bg-green-50 text-green-700" : "text-gray-600 bg-gray-200"} text-sm`}>
+
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.isPetFriendly
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <PawPrint className="w-5 h-5"/>
+                        <PawPrint className="w-5 h-5" />
                       </span>
                       <p>{"Pet Friendly"}</p>
-                      {propertyData?.property?.isPetFriendly ? <CheckCircle2 className="w-4 h-4 mt-1" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      {propertyData?.property?.isPetFriendly ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
 
-                    <div className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${propertyData?.property?.isNewBuilding ? "bg-green-50 text-green-700" : "text-gray-600 bg-gray-200"} text-sm`}>
+                    <div
+                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
+                        propertyData?.property?.isNewBuilding
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-600 bg-gray-200"
+                      } text-sm`}
+                    >
                       <span className="">
-                        <Building2 className="w-5 h-5"/>
+                        <Building2 className="w-5 h-5" />
                       </span>
                       <p>{"New Building"}</p>
-                      {propertyData?.property?.isNewBuilding ? <CheckCircle2 className="w-4 h-4 mt-1" /> : <MinusCircle className="w-4 h-4 mt-1"/>}
+                      {propertyData?.property?.isNewBuilding ? (
+                        <CheckCircle2 className="w-4 h-4 mt-1" />
+                      ) : (
+                        <MinusCircle className="w-4 h-4 mt-1" />
+                      )}
                     </div>
-
                   </div>
                 </div>
                 {/* {isUserLoggedIn() && ( */}
-                  <AgentAvailabilityPicker
-                    propertyId={propertyData?.property?.id as string}
-                  />
+                <AgentAvailabilityPicker
+                  propertyId={propertyData?.property?.id as string}
+                />
                 {/* )} */}
                 {/* Video tag section*/}
                 {propertyData?.property?.video && (
@@ -580,40 +649,46 @@ const PropertyDetails = () => {
                 )}
 
                 {/* Architectural Drawings Section */}
-                {(propertyData?.property?.propertyArchPlans && propertyData?.property?.propertyArchPlans?.length > 0) &&  (
-                  <div className="text-sm md:text-base">
-                    <h2 className="text-xl md:text-2xl font-semibold mb-3">
-                      Architectural Drawings
-                    </h2>
-                    <Tabs defaultValue="images">
-                      <TabsList className="mb-4">
-                        <TabsTrigger value="images">Floor Plans</TabsTrigger>
-                        {/* <TabsTrigger value="documents">Documents</TabsTrigger> */}
-                      </TabsList>
+                {propertyData?.property?.propertyArchPlans &&
+                  propertyData?.property?.propertyArchPlans?.length > 0 && (
+                    <div className="text-sm md:text-base">
+                      <h2 className="text-xl md:text-2xl font-semibold mb-3">
+                        Architectural Drawings
+                      </h2>
+                      <Tabs defaultValue="images">
+                        <TabsList className="mb-4">
+                          <TabsTrigger value="images">Floor Plans</TabsTrigger>
+                          {/* <TabsTrigger value="documents">Documents</TabsTrigger> */}
+                        </TabsList>
 
-                      <TabsContent value="images">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {propertyData?.property?.propertyArchPlans?.map((drawing, i: number) => (
-                              <Card key={drawing?.id} className="overflow-hidden">
-                                <div className="h-48 overflow-hidden">
-                                  <img
-                                    src={drawing?.image?.url}
-                                    alt={`Arch Plan-${i}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                {/* <CardContent className="p-3">
+                        <TabsContent value="images">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {propertyData?.property?.propertyArchPlans?.map(
+                              (drawing, i: number) => (
+                                <Card
+                                  key={drawing?.id}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="h-48 overflow-hidden">
+                                    <img
+                                      src={drawing?.image?.url}
+                                      alt={`Arch Plan-${i}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  {/* <CardContent className="p-3">
                                       <div className="flex items-center">
                                         <FileImage className="h-4 w-4 mr-2 text-gray-500" />
                                         <p className="text-sm font-medium">{drawing.title}</p>
                                       </div>
                                     </CardContent> */}
-                              </Card>
-                            ))}
-                        </div>
-                      </TabsContent>
+                                </Card>
+                              )
+                            )}
+                          </div>
+                        </TabsContent>
 
-                      {/* <TabsContent value="documents">
+                        {/* <TabsContent value="documents">
                             <div className="space-y-2">
                               {property.architecturalDrawings
                                 .filter(drawing => drawing.type === "document")
@@ -635,9 +710,9 @@ const PropertyDetails = () => {
                               }
                             </div>
                           </TabsContent> */}
-                    </Tabs>
-                  </div>
-                )}
+                      </Tabs>
+                    </div>
+                  )}
 
                 {/* Comments Section */}
                 <div>
@@ -671,70 +746,68 @@ const PropertyDetails = () => {
                     <p className="text-gray-500 italic my-4">
                       No reviews yet. Be the first to leave a review!
                     </p>
-                  )
-                }
-                
-                    {/* Add new comment form */}
-                    {/* {propertyData?.isViewed &&  */}
-                      <Card>
-                        <CardContent className="px-6">
-                          <h3 className="text-lg font-semibold mb-4">
-                            Leave a Review
-                          </h3>
-                          <FormProvider {...commentForm}>
-                            <form
-                              onSubmit={commentForm.handleSubmit(onSubmitComment)}
-                              className="space-y-4"
-                            >
-                              <div className="flex items-center mb-4">
-                                <span className="mr-2 text-sm">Your Rating:</span>
-                                <div className="flex">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                      key={star}
-                                      type="button"
-                                      onClick={() => setRating(star)}
-                                      className="focus:outline-none cursor-pointer"
-                                    >
-                                      <Star
-                                        className={`h-6 w-6 ${
-                                          rating >= star
-                                            ? "fill-amber-400 text-amber-400"
-                                            : "text-gray-300"
-                                        }`}
-                                      />
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
+                  )}
 
-                              <FormItem>
-                                <FormLabel>Comment</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    {...commentForm.register("comment")}
-                                    placeholder="Share your experience with this property..."
-                                    className="min-h-[100px]"
-                                    required
+                  {/* Add new comment form */}
+                  {/* {propertyData?.isViewed &&  */}
+                  <Card>
+                    <CardContent className="px-6">
+                      <h3 className="text-lg font-semibold mb-4">
+                        Leave a Review
+                      </h3>
+                      <FormProvider {...commentForm}>
+                        <form
+                          onSubmit={commentForm.handleSubmit(onSubmitComment)}
+                          className="space-y-4"
+                        >
+                          <div className="flex items-center mb-4">
+                            <span className="mr-2 text-sm">Your Rating:</span>
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setRating(star)}
+                                  className="focus:outline-none cursor-pointer"
+                                >
+                                  <Star
+                                    className={`h-6 w-6 ${
+                                      rating >= star
+                                        ? "fill-amber-400 text-amber-400"
+                                        : "text-gray-300"
+                                    }`}
                                   />
-                                </FormControl>
-                              </FormItem>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-                              <Button
-                                type="submit"
-                                className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8] disabled:cursor-default disabled:bg-gray-200"
-                                disabled={rating > 0 && isLoading}
-                              >
-                                <MessageCircle className="mr-2 h-4 w-4" />
-                                Submit Review
-                              </Button>
-                            </form>
-                          </FormProvider>
-                        </CardContent>
-                      </Card>
-                    {/* } */}
-                  </div>
-              
+                          <FormItem>
+                            <FormLabel>Comment</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                {...commentForm.register("comment")}
+                                placeholder="Share your experience with this property..."
+                                className="min-h-[100px]"
+                                required
+                              />
+                            </FormControl>
+                          </FormItem>
+
+                          <Button
+                            type="submit"
+                            className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8] disabled:cursor-default disabled:bg-gray-200"
+                            disabled={rating > 0 && isLoading}
+                          >
+                            <MessageCircle className="mr-2 h-4 w-4" />
+                            Submit Review
+                          </Button>
+                        </form>
+                      </FormProvider>
+                    </CardContent>
+                  </Card>
+                  {/* } */}
+                </div>
 
                 {/* Request Tour Section */}
                 {/* <div className="bg-white h-[32rem] md:h-96 p-6 rounded-lg shadow-sm border mt-8">
@@ -933,7 +1006,12 @@ const PropertyDetails = () => {
                               </Badge>
                               <Badge
                                 className="absolute bottom-4 right-4 bg-white text-[#102A43] cursor-pointer h-8 w-8"
-                                onClick={() =>router.replace(`/properties/view/?id=${similarProperty.id}`)}>
+                                onClick={() =>
+                                  router.replace(
+                                    `/properties/view/?id=${similarProperty.id}`
+                                  )
+                                }
+                              >
                                 <Eye className="w-20 h-20" />
                               </Badge>
                             </div>
