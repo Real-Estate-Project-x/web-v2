@@ -99,7 +99,7 @@ const AgentPropertiesManager = () => {
 
   useEffect(() => {
 
-    if(!agencyId) return;
+    //if(!agencyId) return;
     loadData(1);
 
   },[isBoosted, agencyId, reload, statusFilter]);

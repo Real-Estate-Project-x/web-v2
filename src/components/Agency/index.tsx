@@ -52,8 +52,8 @@ export const agentDashboardData = [
     { href: "/agent-dashboard/users", label: "Users", id:"users", icon: Users2 },
     { href: "/agent-dashboard/viewings", label: "Viewings", id:"viewings", icon: SearchIcon },
     {href : "/agent-dashboard/schedule", label:'Schedule', id:"schedule", icon:Calendar},
-    { href: "/agent-dashboard/payment", label: "Payouts", id:"payouts", icon: WalletCards },
-    {href : "/agent-dashboard/notifications", label:'Notifications', id:"notifications", icon:Bell},
+    // { href: "/agent-dashboard/payment", label: "Payouts", id:"payouts", icon: WalletCards },
+    // {href : "/agent-dashboard/notifications", label:'Notifications', id:"notifications", icon:Bell},
     {href : "/agent-dashboard/settings", label:'Settings',id : "settings", icon : Settings},
     // {href : "/agent-dashboard/profile", label:'Profile',id : "profile", icon : Avatar},
     // { href: "/agent-dashboard/profile", label: '',  icon : <Avatar className="h-10 w-10">

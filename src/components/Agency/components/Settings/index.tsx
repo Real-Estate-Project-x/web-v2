@@ -77,7 +77,7 @@ const Settings = () => {
             </Card>
 
             {/* Notification Settings */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5" />
@@ -132,10 +132,10 @@ const Settings = () => {
                   />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Appearance Settings */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="h-5 w-5" />
@@ -157,10 +157,10 @@ const Settings = () => {
                   />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Regional Settings */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-5 w-5" />
@@ -201,10 +201,10 @@ const Settings = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Security Settings */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5" />
@@ -233,10 +233,10 @@ const Settings = () => {
                   <Button variant="outline">View Sessions</Button>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Billing Settings */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
@@ -260,7 +260,7 @@ const Settings = () => {
                   <Button variant="outline">Cancel Subscription</Button>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Save Changes */}
             <div className="flex justify-end">
