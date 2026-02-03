@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PropertyViewingFilter } from "@/lib/constants";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import ScheduledViewingCard from "@/components/shared/scheduled-viewing-card";
+import { toast } from "sonner";
 
 export const DashboardSchedule = () => {
   const [viewings, setViewings] = useState<any[]>([]);
@@ -22,6 +23,7 @@ export const DashboardSchedule = () => {
     if (result?.data?.success) {
       setViewings(result.data.data);
     }
+    0;
   };
 
   const loadData = async (filter = PropertyViewingFilter.TODAY) => {
@@ -30,8 +32,27 @@ export const DashboardSchedule = () => {
     fetchData(filter);
   };
 
-  const rescheduleViewing = async (viewing: any, reason: string) => {
-    console.log({ viewing, reason });
+  const rescheduleViewing = async (
+    viewing: any,
+    reason: string,
+    newWindowId: string
+  ) => {
+    const url = "/agent-property-viewing/reschedule-viewing";
+    const payload = {
+      reason,
+      viewingId: viewing.id,
+      newAvailabilityWindowId: newWindowId,
+    };
+    try {
+      const result = await axiosInstance.post(url, payload);
+      if (result?.data?.success) {
+        toast.success(result.data.message);
+      }
+    } catch (ex: any) {
+      toast(
+        ex.response?.data?.message || "An error occurred. Please try again."
+      );
+    }
   };
 
   return (
