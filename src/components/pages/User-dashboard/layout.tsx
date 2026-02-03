@@ -66,12 +66,6 @@ const DashboardLayout = ({
                 onClick={() => setActiveSection("saved-searches")}
               />
               <SidebarItem
-                icon={<User size={20} />}
-                label="Select Agent"
-                isActive={activeSection === "agents"}
-                onClick={() => setActiveSection("agents")}
-              />
-              <SidebarItem
                 icon={<Settings size={20} />}
                 label="Settings"
                 isActive={activeSection === "settings"}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardAgents } from "./Agent/agents";
 import { AgentMessages } from "./Agent/message-agent";
 import { AgentProperties } from "./Agent/properties";
 import DashboardLayout from "./layout";
@@ -50,8 +49,6 @@ const Dashboard = () => {
         return <DashboardSchedule />;
       case "saved-searches":
         return <DashboardSavedSearch />;
-      case "agents":
-        return <DashboardAgents onSelectAgent={handleSelectAgent} />;
       case "agent-properties":
         return selectedAgent ? (
           <AgentProperties
