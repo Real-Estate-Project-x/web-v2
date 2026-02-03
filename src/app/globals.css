@@ -162,3 +162,7 @@
 .active-tab-btn {
   border-bottom: 2px solid #000;
 }
+
+.text-area-no-resize {
+  resize: none;
+}
