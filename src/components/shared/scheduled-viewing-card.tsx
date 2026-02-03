@@ -33,8 +33,8 @@ export default function ScheduledViewingCard({
     const tomorrow = addDays(new Date(), 1);
     const twoWeeks = addWeeks(tomorrow, 2);
     const payload = {
-      propertyId: viewing.propertyId,
       medium: viewing.medium,
+      propertyId: viewing.propertyId,
       limitTo: {
         start: format(tomorrow, "dd/MM/yyyy"),
         end: format(twoWeeks, "dd/MM/yyyy"),
