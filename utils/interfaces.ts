@@ -150,22 +150,39 @@ export interface ViewPropertyInterface {
 //   similarProperties : []
 // }
 type PropertyImages = {
-   dateCreated: string;
+  dateCreated: string;
+  dateUpdated: string;
+  id: string;
+  image: {
+    cloudFileId: string;
+    dateCreated: string;
     dateUpdated: string;
-    id:string;
-    image: {
-      cloudFileId: string;
-      dateCreated: string;
-      dateUpdated:string;
-      id: string;
-      mimeType:string;
-      status: boolean;
-      url:string;
-    },
-    imageId: string;
-    propertyId:string;
-    status:boolean;
-}
+    id: string;
+    mimeType: string;
+    status: boolean;
+    url: string;
+  };
+  imageId: string;
+  propertyId: string;
+  status: boolean;
+};
+type PropertyArchPlans = {
+  dateCreated: string;
+  dateUpdated: string;
+  id: string;
+  architecturalPlan: {
+    cloudFileId: string;
+    dateCreated: string;
+    dateUpdated: string;
+    id: string;
+    mimeType: string;
+    status: boolean;
+    url: string;
+  };
+  imageId: string;
+  propertyId: string;
+  status: boolean;
+};
 export interface PropertyInterface {
   id: string;
   title: string;
@@ -205,22 +222,22 @@ export interface PropertyInterface {
   isPropertyBlocked: boolean;
   isPropertyBoosted: boolean;
   isPropertyTaken: boolean;
-  isPetFriendly : boolean;
+  isPetFriendly: boolean;
   status: boolean;
   dateCreated: string;
   dateUpdated: string;
   propertyImages: PropertyImages[];
-  videoId : string;
-  video : {
-    cloudFileId : string;
-    dateCreated : string;
-    dateUpdated : string;
-    id : string;
-    mimeType : string;
-    status : boolean;
-    url : string;
+  videoId: string;
+  video: {
+    cloudFileId: string;
+    dateCreated: string;
+    dateUpdated: string;
+    id: string;
+    mimeType: string;
+    status: boolean;
+    url: string;
   };
-  propertyArchPlans: PropertyImages[];
+  propertyArchPlans: PropertyArchPlans[];
   isNewBuilding: boolean;
   threeDimensionalModelUrl: string;
   geoCoordinates: {
@@ -532,7 +549,7 @@ export interface AgentDatabaseInterface {
   hasGym: boolean;
   hasKidsPlayArea: boolean;
   isNewBuilding: boolean;
-  isBoosted ?: boolean;
+  isBoosted?: boolean;
   isPetFriendly: boolean;
   isPropertyBlocked: boolean;
   isPropertyBoosted: boolean;
@@ -542,22 +559,22 @@ export interface AgentDatabaseInterface {
   status: boolean;
   dateCreated: string;
   dateUpdated: string;
-    propertyImages: {
+  propertyImages: {
     dateCreated: string;
     dateUpdated: string;
-    id:string;
+    id: string;
     image: {
       cloudFileId: string;
       dateCreated: string;
-      dateUpdated:string;
+      dateUpdated: string;
       id: string;
-      mimeType:string;
+      mimeType: string;
       status: boolean;
-      url:string;
-    },
+      url: string;
+    };
     imageId: string;
-    propertyId:string;
-    status:boolean;
+    propertyId: string;
+    status: boolean;
   }[];
   videoUrl: string;
   architecturalPlanUrls: string[];
@@ -670,25 +687,22 @@ export interface AgencyInterface {
   agencyPhoneNumber: string;
 }
 
+export interface AgencyViewingsInterface {}
 
-export interface AgencyViewingsInterface{
-  
-} 
-
-export interface AgencyScheduleInterface{
-  date:string;
+export interface AgencyScheduleInterface {
+  date: string;
   openWindows: {
-    agencyId : string,
-    date : string,
-    dateCreated : string,
-    dateUpdated: string,
-    endDateTime : string,
-    id : string,
-    isBooked: boolean,
-    startDateTime : string,
-    status : boolean,
-    timeSlot: string
-  }[]
+    agencyId: string;
+    date: string;
+    dateCreated: string;
+    dateUpdated: string;
+    endDateTime: string;
+    id: string;
+    isBooked: boolean;
+    startDateTime: string;
+    status: boolean;
+    timeSlot: string;
+  }[];
 }
 
 export interface PaginationControlInterface {
