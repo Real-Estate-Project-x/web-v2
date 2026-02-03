@@ -206,10 +206,17 @@ export default function ScheduledViewingCard({
                 className="w-full overflow-x-auto scroll-smooth"
                 style={{ height: "400px" }}
               >
-                <AvailabilitySchedule
-                  data={availabilityWindows}
-                  onSelect={(window) => setAvailabilityWindowId(window.id)}
-                />
+                {availabilityWindows?.length > 0 ? (
+                  <AvailabilitySchedule
+                    data={availabilityWindows}
+                    onSelect={(window) => setAvailabilityWindowId(window.id)}
+                  />
+                ) : (
+                  <h1>
+                    This agent does not have any open windows. You cannot
+                    reschedule
+                  </h1>
+                )}
               </div>
 
               <div className="flex justify-center gap-3 pt-2">
@@ -223,7 +230,10 @@ export default function ScheduledViewingCard({
 
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  disabled={availabilityWindows?.length <= 0}
+                  className={`
+                  px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700
+                  ${availabilityWindows.length > 0 ? "" : "cursor-disabled"}`}
                 >
                   Submit
                 </button>

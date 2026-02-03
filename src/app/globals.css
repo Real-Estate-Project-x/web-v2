@@ -159,10 +159,18 @@
   cursor: pointer;
 }
 
+.cursor-disabled {
+  cursor: not-allowed;
+}
+
+button:disabled {
+  background: #ddd;
+}
+
 .active-tab-btn {
   border-bottom: 2px solid #000;
 }
 
 .text-area-no-resize {
-  resize: none;
+  resize: none !important;
 }
