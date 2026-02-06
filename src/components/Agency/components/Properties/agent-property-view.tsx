@@ -390,7 +390,7 @@ const AgentPropertyDetailPage = () => {
                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                           <div className="relative group cursor-pointer mt-4">
                             <img
-                              src={arch?.image?.url}
+                              src={arch?.architecturalPlan?.url}
                               alt={"Architectural Plan " + (index + 1)}
                               className="w-full h-40 object-cover rounded-lg"
                             />

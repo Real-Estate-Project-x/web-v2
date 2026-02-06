@@ -561,7 +561,7 @@ const PropertyDetails = () => {
                       className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
                         propertyData?.property?.hasCarParking
                           ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-slate-500"
+                          : "text-gray-600 bg-gray-200"
                       } text-sm`}
                     >
                       <span className="">
@@ -750,7 +750,7 @@ const PropertyDetails = () => {
 
                   {/* Add new comment form */}
                   {/* {propertyData?.isViewed &&  */}
-                  <Card>
+                  <Card className={`mb-6 ${!propertyData?.isViewed ? "opacity-50 bg-gray-100" : ""}`}>
                     <CardContent className="px-6">
                       <h3 className="text-lg font-semibold mb-4">
                         Leave a Review
@@ -768,7 +768,8 @@ const PropertyDetails = () => {
                                   key={star}
                                   type="button"
                                   onClick={() => setRating(star)}
-                                  className="focus:outline-none cursor-pointer"
+                                  className="focus:outline-none cursor-pointer disabled:cursor-default"
+                                  disabled={propertyData?.isViewed ? false : true}
                                 >
                                   <Star
                                     className={`h-6 w-6 ${
@@ -788,8 +789,9 @@ const PropertyDetails = () => {
                               <Textarea
                                 {...commentForm.register("comment")}
                                 placeholder="Share your experience with this property..."
-                                className="min-h-[100px]"
+                                className="min-h-[100px] disabled:cursor-not-allowed disabled:bg-gray-100"
                                 required
+                                disabled={propertyData?.isViewed ? false : true}
                               />
                             </FormControl>
                           </FormItem>
@@ -797,7 +799,7 @@ const PropertyDetails = () => {
                           <Button
                             type="submit"
                             className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8] disabled:cursor-default disabled:bg-gray-200"
-                            disabled={rating > 0 && isLoading}
+                            disabled={(rating > 0 && isLoading) || (!propertyData?.isViewed ? true : false)}
                           >
                             <MessageCircle className="mr-2 h-4 w-4" />
                             Submit Review
