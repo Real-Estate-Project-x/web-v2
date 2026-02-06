@@ -1,0 +1,247 @@
+import Link from "next/link";
+import { toast } from "sonner";
+import { useState } from "react";
+import { addDays, addWeeks, format } from "date-fns";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import AvailabilitySchedule from "./availability-schedule";
+import { formatPrettyDateTime } from "../../../utils/helpers";
+
+interface Props {
+  viewing: any;
+  isPast: boolean;
+  onReschedule?: (viewing: any, reason: string, newWindowId: string) => void;
+}
+
+export default function ScheduledViewingCard({
+  viewing,
+  isPast,
+  onReschedule,
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [availabilityWindowId, setAvailabilityWindowId] = useState("");
+  const [availabilityWindows, setAvailabilityWindows] = useState<any[]>([]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOpen(false);
+    onReschedule?.(viewing, reason, availabilityWindowId);
+  };
+
+  const fetchAvailabilityWindows = async () => {
+    const url = "/agency-availability/display-availability";
+    const tomorrow = addDays(new Date(), 1);
+    const twoWeeks = addWeeks(tomorrow, 2);
+    const payload = {
+      medium: viewing.medium,
+      propertyId: viewing.propertyId,
+      limitTo: {
+        start: format(tomorrow, "dd/MM/yyyy"),
+        end: format(twoWeeks, "dd/MM/yyyy"),
+      },
+    };
+
+    try {
+      const result = await axiosInstance.post(url, payload);
+      if (result?.data?.success) {
+        setAvailabilityWindows(result.data.data);
+      }
+    } catch (ex: any) {
+      toast(
+        ex.response?.data?.message || "An error occurred. Please try again."
+      );
+    }
+  };
+
+  const openModal = async () => {
+    setOpen(true);
+    await fetchAvailabilityWindows();
+  };
+
+  return (
+    <>
+      <div className="bg-white rounded-xl shadow-sm border p-5 mb-10 space-y-4">
+        {/* <!-- Header --> */}
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm text-gray-500">Viewing Date</p>
+            <p className="font-semibold text-gray-900">
+              {formatPrettyDateTime(viewing.availabilityWindow.startDateTime)}
+            </p>
+          </div>
+
+          {/* <!-- Viewing Type Badge --> */}
+          {viewing.medium === "VIRTUAL" ? (
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+          bg-blue-100 text-blue-700"
+            >
+              Virtual
+            </span>
+          ) : (
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+              bg-green-100 text-green-700"
+            >
+              In-Person
+            </span>
+          )}
+        </div>
+
+        {/* <!-- Property Link --> */}
+        <div>
+          <Link
+            href={`/properties/view?id=${viewing.property.slug}`}
+            className="text-indigo-600 font-medium hover:underline"
+          >
+            {viewing.property.title}
+          </Link>
+        </div>
+
+        {/* <!-- Agency Info --> */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-gray-500">Agency</p>
+            <p className="font-medium text-gray-800">
+              {viewing.property.agency.name}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-500">Contact</p>
+            <p className="font-medium text-gray-800">
+              {viewing.property.agency.agencyPhoneNumber}
+            </p>
+            {viewing.property.agency?.whatsappNumber && (
+              <>
+                <p className="text-gray-500 pt-5">Whatsapp</p>
+                <p className="font-medium text-gray-800">
+                  <Link
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href={`https://wa.me/${viewing.property.agency.whatsappNumber}`}
+                  >
+                    {viewing.property.agency.whatsappNumber}
+                  </Link>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {isPast ? (
+          <div className="bg-gray-50 rounded-xl border p-5 opacity-75">
+            <p className="text-sm text-gray-500">
+              Viewing completed on{" "}
+              {formatPrettyDateTime(viewing.availabilityWindow.endDateTime)}
+            </p>
+          </div>
+        ) : (
+          <div>
+            {viewing.medium === "VIRTUAL" && (
+              <div className="bg-gray-50 border rounded-lg p-4 space-y-2">
+                <p className="text-sm font-medium text-gray-700">
+                  Virtual Viewing Link
+                </p>
+                <Link
+                  href={viewing.meetingLink}
+                  target="_blank"
+                  className="inline-flex items-center gap-2 text-indigo-600 hover:underline text-sm"
+                >
+                  🔗 Join Google Meet
+                </Link>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Link
+                href={`/properties/view?id=${viewing.property.slug}`}
+                className="cursor-pointer px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg"
+              >
+                View More
+              </Link>
+              <button
+                type="button"
+                onClick={() => openModal()}
+                className="cursor-pointer px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg"
+              >
+                Reschedule
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setOpen(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+              Reschedule Viewing
+            </h2>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Reason
+              </label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Enter reason for rescheduling..."
+                rows={4}
+                className="text-area-no-resize w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pick new time
+              </label>
+              <div
+                className="w-full overflow-x-auto scroll-smooth"
+                style={{ height: "400px" }}
+              >
+                {availabilityWindows?.length > 0 ? (
+                  <AvailabilitySchedule
+                    data={availabilityWindows}
+                    onSelect={(window) => setAvailabilityWindowId(window.id)}
+                  />
+                ) : (
+                  <h1>
+                    This agent does not have any open windows. You cannot
+                    reschedule
+                  </h1>
+                )}
+              </div>
+
+              <div className="flex justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={availabilityWindows?.length <= 0}
+                  className={`
+                  px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700
+                  ${availabilityWindows.length > 0 ? "" : "cursor-disabled"}`}
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

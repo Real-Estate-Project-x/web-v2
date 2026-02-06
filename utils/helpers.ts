@@ -61,14 +61,14 @@ export const convertDateCreatedToGetNumberOfDays = (dateCreated: string) => {
 export const setLocalStorageField = <T>(key: string, data: T) =>
   localStorage.setItem(key, JSON.stringify(data));
 
-export const getLocalStorageField = (key: string) => JSON.parse(localStorage.getItem(key) as string);
+export const getLocalStorageField = (key: string) =>
+  JSON.parse(localStorage.getItem(key) as string);
 export const getLocalStorageFieldRaw = (key: string) => {
-  if(typeof window === 'undefined') return null;
-  return localStorage.getItem(key)?.split('\"')?.[1];
-}
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(key)?.split('"')?.[1];
+};
 export const deleteLocalStorageField = (key: string) =>
   localStorage.removeItem(key);
-
 
 export const pickUserId = () => {
   const userInfo = decryptData(
@@ -98,4 +98,34 @@ export const checkForRequiredFields = (
   }
 };
 
+export const formatPrettyDateTime = (dateInput: Date | string) => {
+  const date = new Date(dateInput);
 
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  const weekday = date.toLocaleString("en-GB", { weekday: "long" });
+  const month = date.toLocaleString("en-GB", { month: "long" });
+
+  const time = date.toLocaleString("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${weekday}, ${day}${getOrdinal(day)} ${month} · ${time}`;
+};
+
+export const getOrdinal = (day: number) => {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};

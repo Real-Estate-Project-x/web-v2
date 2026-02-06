@@ -671,7 +671,7 @@ const PropertyDetails = () => {
                                 >
                                   <div className="h-48 overflow-hidden">
                                     <img
-                                      src={drawing?.image?.url}
+                                      src={drawing?.architecturalPlan?.url}
                                       alt={`Arch Plan-${i}`}
                                       className="w-full h-full object-cover"
                                     />
