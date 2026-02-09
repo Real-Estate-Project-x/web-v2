@@ -81,7 +81,7 @@ const VerifyAccountForm: React.FC = () => {
       onSubmit={handleSubmit}
       className="flex flex-col gap-6 min-w-[400px] w-full max-w-sm md:max-w-lg"
     >
-      <h1 className="text-2xl font-semibold">Verify account</h1>
+      <h1 className="text-2xl font-semibold">Verify Account</h1>
 
       <div className="flex gap-3">
         {otp.map((digit, index) => (

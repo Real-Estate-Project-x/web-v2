@@ -35,12 +35,15 @@ import { format } from "date-fns";
 import { reformatDate } from "@/lib/utils";
 import { RescheduleViewingDialog } from "./dialogs/Reschedule-viewing";
 import { AgencyId } from "@/lib/constants";
-import { AgencyScheduleInterface, PaginationControlInterface } from "../../../../../utils/interfaces";
+import {
+  AgencyScheduleInterface,
+  PaginationControlInterface,
+} from "../../../../../utils/interfaces";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const Viewings = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [viewings, setViewings] = useState<any[]>([]);
   const agencyId = getLocalStorageFieldRaw("agentId");
   const [sortBy, setSortBy] = useState<string>("");
@@ -65,7 +68,7 @@ const Viewings = () => {
     }
   };
 
-  const fetchAgentViewings = async (pageNumber = 1, pageSize = 10) =>{
+  const fetchAgentViewings = async (pageNumber = 1, pageSize = 10) => {
     try {
       const viewingsResponse = await axiosInstance.get(
         `/agent-property-viewing/agency/viewing-list/${agencyId}?filter=${statusFilter}&pageNumber=${pageNumber}&pageSize=${pageSize}`
@@ -77,11 +80,11 @@ const Viewings = () => {
     } catch (err: any) {
       toast.error(err?.response?.data?.message);
     }
-  }
+  };
 
-  const loadData = async (page : number) => {
+  const loadData = async (page: number) => {
     await fetchAgentViewings(page);
-  }
+  };
   useEffect(() => {
     loadData(1);
   }, [agencyId, statusFilter]);
@@ -216,17 +219,7 @@ const Viewings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative col-span-1 md:col-span-2">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search by property or client..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filter by status" />
@@ -238,35 +231,6 @@ const Viewings = () => {
                   <SelectItem value="PAST">Past</SelectItem>
                 </SelectContent>
               </Select>
-
-              <div className="flex items-center gap-2">
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="VIRTUAL">
-                      Virtual&nbsp;Viewings
-                    </SelectItem>
-                    <SelectItem value="IN_PERSON">
-                      In-person&nbsp;Viewings
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  variant="outline"
-                  className="w-fit"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("All");
-                    setSortBy("");
-                  }}
-                >
-                  <Trash />
-                  {/* Clear Filters */}
-                </Button>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -421,15 +385,15 @@ const Viewings = () => {
           )}
 
           {/* Add Pagination to this page */}
-          {pagination?.currentPage  &&
+          {pagination?.currentPage && (
             <DynamicPagination
               currentPage={pagination?.currentPage}
               totalPages={pagination?.totalPages}
               hasNext={pagination?.hasNext}
               hasPrevious={pagination?.hasPrevious}
-              onPageChange={loadData} 
+              onPageChange={loadData}
             />
-          }
+          )}
         </div>
       </div>
     </div>
