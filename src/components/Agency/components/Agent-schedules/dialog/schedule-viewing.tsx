@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
+import { toast } from "sonner";
+import { format } from "date-fns";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { axiosInstance } from "@/lib/axios-interceptor"
-import { toast } from "sonner"
-import { format } from "date-fns"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 const TIME_WINDOWS = [
   "7:00am - 8:00am",
@@ -29,27 +29,21 @@ const TIME_WINDOWS = [
   "4:00pm - 5:00pm",
   "5:00pm - 6:00pm",
   "6:00pm - 7:00pm",
-  "7:00pm - 8:00pm"
+  "7:00pm - 8:00pm",
 ];
 
 type Props = {
-  refresh : React.Dispatch<React.SetStateAction<boolean>>
-
-}
-export function ScheduleDialog({refresh} : Props) {
-
+  refresh: React.Dispatch<React.SetStateAction<boolean>>;
+};
+export function ScheduleDialog({ refresh }: Props) {
   const [schedule, setSchedule] = useState<
     { date: string; openWindows: string[] }[]
-  >([{ date: "", openWindows: [] }])
+  >([{ date: "", openWindows: [] }]);
   const [hours, setHours] = useState<string[]>(TIME_WINDOWS);
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
-  const updateWindow = (
-    index: number,
-    window: string,
-    checked: boolean
-  ) => {
+  const updateWindow = (index: number, window: string, checked: boolean) => {
     setSchedule((prev) =>
       prev.map((item, i) =>
         i === index
@@ -61,65 +55,65 @@ export function ScheduleDialog({refresh} : Props) {
             }
           : item
       )
-    )
-  }
+    );
+  };
 
-  const getAvailabilityHours = async() => {
-    try{
-      const response = await axiosInstance.get('agency-availability/generate-hourly-windows');
+  const getAvailabilityHours = async () => {
+    try {
+      const response = await axiosInstance.get(
+        "agency-availability/generate-hourly-windows"
+      );
       setHours(response.data.data);
-    }catch(err) {
+    } catch (err) {
       console.error("Error fetching availability hours:", err);
     }
-  }
+  };
 
-  const onSubmitSetSchedule = async (e : React.FormEvent) => {
+  const onSubmitSetSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const formattedSchedule = schedule.map(item => ({
-      date: format(new Date(item.date), 'dd/MM/yyyy'),
-      openWindows: item.openWindows
+    const formattedSchedule = schedule.map((item) => ({
+      date: format(new Date(item.date), "yyyy-MM-dd"),
+      openWindows: item.openWindows,
     }));
 
-    try{
-      const response = await axiosInstance.post('agency-availability', { schedule: formattedSchedule });
-      if(response.data.success){
-        toast.success("Schedule submitted successfully"); 
+    try {
+      const response = await axiosInstance.post("agency-availability", {
+        schedule: formattedSchedule,
+      });
+      if (response.data.success) {
+        toast.success("Schedule submitted successfully");
         setLoading(false);
         setOpen(false);
         setSchedule([{ date: "", openWindows: [] }]);
         refresh(true);
       }
-    }catch(err : any) {
+    } catch (err: any) {
       toast.error(err?.response?.data?.message || "Error submitting schedule");
       setLoading(false);
-     // console.error("Error submitting schedule:", err);
+      // console.error("Error submitting schedule:", err);
     }
-  }
+  };
 
   useEffect(() => {
     getAvailabilityHours();
-  },[]);
-
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild >
+      <DialogTrigger asChild>
         <Button onClick={() => setOpen(true)}>Set Schedule</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg bg-white h-screen overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl w-full bg-white h-screen overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Viewing Schedule</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {schedule.map((item, index) => (
-            <div
-              key={index}
-              className="space-y-3 rounded-lg border p-3"
-            >
+            <div key={index} className="space-y-3 rounded-lg border p-3">
               {/* Date */}
               <div className="space-y-1">
                 <Label>Date</Label>
@@ -130,9 +124,7 @@ export function ScheduleDialog({refresh} : Props) {
                   onChange={(e) =>
                     setSchedule((prev) =>
                       prev.map((s, i) =>
-                        i === index
-                          ? { ...s, date: e.target.value }
-                          : s
+                        i === index ? { ...s, date: e.target.value } : s
                       )
                     )
                   }
@@ -142,19 +134,12 @@ export function ScheduleDialog({refresh} : Props) {
               {/* Time windows */}
               <Label>Select available time Slots</Label>
               <div className="space-y-2 grid grid-cols-3 gap-1">
-              
                 {hours?.map((window) => (
-                  <div
-                    key={window}
-                    className="flex items-center gap-2 mt-4">
+                  <div key={window} className="flex items-center gap-2 mt-4">
                     <Checkbox
                       checked={item.openWindows.includes(window)}
                       onCheckedChange={(checked) =>
-                        updateWindow(
-                          index,
-                          window,
-                          Boolean(checked)
-                        )
+                        updateWindow(index, window, Boolean(checked))
                       }
                     />
                     <Label>{window}</Label>
@@ -167,10 +152,7 @@ export function ScheduleDialog({refresh} : Props) {
           <Button
             variant="secondary"
             onClick={() =>
-              setSchedule((prev) => [
-              ...prev,
-              { date: "", openWindows: [] },
-              ])
+              setSchedule((prev) => [...prev, { date: "", openWindows: [] }])
             }
           >
             Add Another Date
@@ -179,11 +161,12 @@ export function ScheduleDialog({refresh} : Props) {
           <Button
             className="w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
             onClick={onSubmitSetSchedule}
-            disabled={loading}>
+            disabled={loading}
+          >
             Save Schedule
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
