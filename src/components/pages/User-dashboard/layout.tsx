@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import {
   Home,
+  LogOut,
   Settings,
   User,
   Heart,
@@ -19,6 +20,9 @@ import {
   Calendar,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { deleteCookie } from "@/lib/helpers";
+import { deleteLocalStorageField } from "../../../../utils/helpers";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -31,6 +35,20 @@ const DashboardLayout = ({
   activeSection,
   setActiveSection,
 }: DashboardLayoutProps) => {
+  const router = useRouter();
+
+  const logout = () => {
+    removeStoredKeys();
+    router.push("/login");
+  };
+
+  const removeStoredKeys = () => {
+    // remove items from short_term storage
+    deleteLocalStorageField("token");
+    deleteLocalStorageField("userInfo");
+    deleteCookie("access_token");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-1">
@@ -76,13 +94,24 @@ const DashboardLayout = ({
               <Link href="/">
                 <Button
                   variant="link"
-                  className="w-full justify-start font-medium bg-gradient-to-r from-[#1E3A8A] to-[#0253CC] bg-clip-text text-transparent"
+                  className="cursor-pointer w-full justify-start font-medium bg-gradient-to-r from-[#1E3A8A] to-[#0253CC] bg-clip-text text-transparent"
                   size="sm"
                 >
                   <Home className="mr-1 h-4 w-4 text-blue-900" />
                   Back to Home
                 </Button>
               </Link>
+
+              <Button
+                type="button"
+                variant="link"
+                onClick={logout}
+                className="cursor-pointer w-full justify-start font-medium bg-gradient-to-r from-[#1E3A8A] to-[#0253CC] bg-clip-text text-transparent"
+                size="sm"
+              >
+                <LogOut className="mr-1 h-4 w-4 text-red-900" />
+                <span className="text-red-900">Logout</span>
+              </Button>
             </div>
           </div>
         </aside>
