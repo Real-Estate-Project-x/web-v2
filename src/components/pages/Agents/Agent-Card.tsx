@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
   const agent = data?.agency;
   const firstNameInitials = agent?.name?.split(" ")?.[0];
   const lastNameInitials = agent?.name?.split(" ")?.[1];
+
+  useEffect(() => {}, []);
 
   return (
     <Card className="group h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
