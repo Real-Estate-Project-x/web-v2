@@ -297,20 +297,19 @@ const Properties = () => {
   };
 
   async function fetchProperties(pageNumber = 1, pageSize = 10) {
-    axiosInstance
-      .get(`property?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-      .then((response) => {
-        if (response.data.success) {
-          setProperties(response.data.data);
-          setCopyData(response.data.data);
-          setPagination(response?.data?.paginationControl);
-        }
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.error("Error fetching properties:", error);
-      });
+    const url = `/property/customer-listings/featured-properties/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data.success) {
+        setProperties(response.data.data);
+        setCopyData(response.data.data);
+        setPagination(response?.data?.paginationControl);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error fetching properties:", error);
+    }
   }
 
   return (
