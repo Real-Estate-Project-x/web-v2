@@ -40,11 +40,11 @@ import {
 } from "@/components/ui/select";
 import {
   AgencyInterface,
+  PaginationControlInterface,
   PropertyInterface,
 } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
-
-const ITEMS_PER_PAGE = 6;
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const AgentProperties = () => {
   const searchParams = useSearchParams();
@@ -58,8 +58,33 @@ const AgentProperties = () => {
   const [propertyType, setPropertyType] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [bedroomFilter, setBedroomFilter] = useState("all");
+  const [properties, setProperties] = useState([]);
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
 
   const allProperties = agency && agency?.properties ? agency?.properties : []; //agent ? generatePropertiesForAgent(agent.id) : [];
+
+  const loadData = async (page: number) => {
+    await fetchProperties(page);
+  };
+
+  const fetchProperties = async (pageNumber = 1, pageSize = 3) => {
+    const url = `/property/customer-listings/by-agency/${id}?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data.success) {
+        const {
+          data: { data, paginationControl },
+        } = response;
+        setProperties(data);
+        setPagination(paginationControl);
+      }
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+      throw error;
+    }
+  };
 
   // Filter properties based on search and filters
   const filteredProperties = allProperties.filter(
@@ -94,13 +119,6 @@ const AgentProperties = () => {
     }
   );
 
-  const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProperties = filteredProperties.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
-
   // Reset to page 1 when filters change
   const handleFilterChange = (
     setter: React.Dispatch<React.SetStateAction<string>>,
@@ -118,22 +136,19 @@ const AgentProperties = () => {
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-    axiosInstance
-      .get(`/agency/${id}`)
-      .then((response) => {
-        setAgency(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching agency:", error);
-      });
+  const fetchAgencyRecord = async (agencyId: string) => {
+    const url = `/agency/${agencyId}`;
+    const response = await axiosInstance.get(url);
+    if (response.data?.success) {
+      setAgency(response.data.data);
+    }
+  };
 
-    // axiosInstance.get(`/agency/${id}/properties`)
-    // .then((response) => {
-    //   console.log('Fetched properties:', response.data);
-    // }).catch((error) => {
-    //   console.error("Error fetching properties:", error);
-    // })
+  useEffect(() => {
+    if (id) {
+      fetchAgencyRecord(id);
+    }
+    loadData(1);
   }, []);
 
   if (!agency) {
@@ -251,7 +266,7 @@ const AgentProperties = () => {
               <div className="flex items-center gap-3">
                 <Building className="h-6 w-6 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground capitalize">
-                  Properties by {agency?.name}
+                  Properties by:: {agency?.name}
                 </h2>
               </div>
               <Badge variant="secondary" className="text-sm">
@@ -352,7 +367,7 @@ const AgentProperties = () => {
               </div>
             </div>
 
-            {filteredProperties.length === 0 ? (
+            {properties.length <= 0 ? (
               <div className="text-center py-16">
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto">
                   <Building className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
@@ -380,7 +395,7 @@ const AgentProperties = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {paginatedProperties.map((property) => (
+                  {properties.map((property: any) => (
                     <Card
                       key={property.id}
                       className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
@@ -391,7 +406,8 @@ const AgentProperties = () => {
                       <div className="relative h-48 overflow-hidden">
                         <img
                           src={
-                            property.propertyImages && property.propertyImages.length > 0
+                            property.propertyImages &&
+                            property.propertyImages.length > 0
                               ? property.propertyImages?.[0]?.image?.url
                               : "https://via.placeholder.com/400x300?text=No+Image"
                           }
@@ -437,57 +453,20 @@ const AgentProperties = () => {
                     </Card>
                   ))}
                 </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-10">
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious
-                            onClick={() =>
-                              setCurrentPage((p) => Math.max(1, p - 1))
-                            }
-                            className={
-                              currentPage === 1
-                                ? "pointer-events-none opacity-50"
-                                : "cursor-pointer"
-                            }
-                          />
-                        </PaginationItem>
-                        {Array.from(
-                          { length: totalPages },
-                          (_, i) => i + 1
-                        ).map((page) => (
-                          <PaginationItem key={page}>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(page)}
-                              isActive={currentPage === page}
-                              className="cursor-pointer"
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                          <PaginationNext
-                            onClick={() =>
-                              setCurrentPage((p) => Math.min(totalPages, p + 1))
-                            }
-                            className={
-                              currentPage === totalPages
-                                ? "pointer-events-none opacity-50"
-                                : "cursor-pointer"
-                            }
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
               </>
             )}
           </div>
+
+          {/* Pagination */}
+          {pagination?.currentPage && (
+            <DynamicPagination
+              currentPage={pagination?.currentPage}
+              totalPages={pagination?.totalPages}
+              hasNext={pagination?.hasNext}
+              hasPrevious={pagination?.hasPrevious}
+              onPageChange={loadData}
+            />
+          )}
         </section>
       </main>
 

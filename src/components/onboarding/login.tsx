@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
+import { setCookie } from "@/lib/helpers";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import {
   decryptData,
   setLocalStorageField,
 } from "../../../utils/helpers";
-import { setCookie } from "@/lib/helpers";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);

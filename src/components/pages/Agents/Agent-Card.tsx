@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Star, MapPin, Mail, PhoneCall, ArrowRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, MapPin, Mail, TrendingUp, PhoneCall } from "lucide-react";
 import { AgentInterface } from "../../../../utils/interfaces";
-import { useRouter } from "next/navigation";
 
 interface AgentCardProps {
   agent: AgentInterface;
@@ -20,10 +21,7 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
   const lastNameInitials = agent?.name?.split(" ")?.[1];
 
   return (
-    <Card
-      onClick={() => router.push(`/agents/properties?id=${agent.id}`)}
-      className="group h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white"
-    >
+    <Card className="group h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start gap-4 mb-6">
@@ -141,9 +139,15 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
             <p>{agent.email}</p>
           </div>
 
-          <Button variant="outline" size="sm" className="px-3">
-            <TrendingUp className="h-4 w-4" />
-          </Button>
+          <Link href={`/agents/properties?id=${agent.id}`}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="px-3 cursor-pointer "
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

@@ -13,7 +13,10 @@ import { Bath, Bed, MapPin, Search, Square } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { PaginationControlInterface, PropertyInterface } from "../../../../utils/interfaces";
+import {
+  PaginationControlInterface,
+  PropertyInterface,
+} from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
 import LoadingCard from "@/components/shared/loader-cards";
 import { axiosInstance } from "@/lib/axios-interceptor";
@@ -293,8 +296,7 @@ const Properties = () => {
     await fetchProperties(page);
   };
 
-
-  async function fetchProperties(pageNumber = 1, pageSize =10){
+  async function fetchProperties(pageNumber = 1, pageSize = 10) {
     axiosInstance
       .get(`property?pageNumber=${pageNumber}&pageSize=${pageSize}`)
       .then((response) => {
@@ -346,22 +348,15 @@ const Properties = () => {
           <PropertyList array={properties} />
         )}
 
-        {/* {numbers.length > 1 && (
-          <Pagination
-            _data={numbers}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
-        )} */}
-        {pagination?.currentPage  &&
+        {pagination?.currentPage && (
           <DynamicPagination
             currentPage={pagination?.currentPage}
             totalPages={pagination?.totalPages}
             hasNext={pagination?.hasNext}
             hasPrevious={pagination?.hasPrevious}
-            onPageChange={loadData} 
+            onPageChange={loadData}
           />
-        }
+        )}
       </div>
 
       <Footer />

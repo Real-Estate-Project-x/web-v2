@@ -15,8 +15,13 @@ export function DynamicPagination({
 }: PaginationProps) {
   return (
     <div
-      className="pagination"
-      style={{ display: "flex", gap: 8, justifyContent : "center", alignItems: "center" }}
+      className="pagination pt-10"
+      style={{
+        display: "flex",
+        gap: 8,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
       <button
         disabled={!hasPrevious}
