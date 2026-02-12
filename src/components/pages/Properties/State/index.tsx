@@ -1,14 +1,18 @@
 "use client";
+
 import { FC, useState, Fragment, useEffect } from "react";
 import Footer from "../../Home/Footer";
 import Navbar from "../../Home/Nav";
 import { PropertyFilter, PropertyList } from "..";
 import LoadingCard from "@/components/shared/loader-cards";
-import { Pagination } from "@/components/shared/pagination";
-import { PropertyInterface } from "../../../../../utils/interfaces";
+import {
+  PaginationControlInterface,
+  PropertyInterface,
+} from "../../../../../utils/interfaces";
+import { getCookie } from "@/lib/helpers";
 import { useSearchParams } from "next/navigation";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { getCookie } from "@/lib/helpers";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 export const StatePropertyList: FC = () => {
   const [properties, setStateProperties] = useState<PropertyInterface[]>([]);
@@ -26,22 +30,37 @@ export const StatePropertyList: FC = () => {
   const firstIndex: number = lastIndex - recordsPerPage;
   const records = properties?.slice(firstIndex, lastIndex);
   const nPage = Math.ceil(properties?.length / recordsPerPage);
-  const numbers = Array.from({ length: nPage }, (_, i) => i + 1).slice();
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
+
+  const fetchPropertiesByState = async (pageNumber = 1, pageSize = 10) => {
+    const url = `property/customer-listings/by-state/${stateName}/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data.success) {
+        const {
+          data: { data, paginationControl },
+        } = response;
+        setCopyData(data);
+        setStateProperties(data);
+        setPagination(paginationControl);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error fetching properties:", error);
+      throw error;
+    }
+  };
+
+  const loadData = async (page: number) => {
+    await fetchPropertiesByState(page);
+  };
 
   useEffect(() => {
-    axiosInstance
-      .get(`property/customer-listings/by-state/${stateName}`)
-      .then((response) => {
-        if (response.data.success) {
-          setStateProperties(response.data.data);
-          setCopyData(response.data.data);
-        }
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.error("Error fetching properties:", error);
-      });
+    loadData(1);
   }, []);
 
   return (
@@ -49,7 +68,7 @@ export const StatePropertyList: FC = () => {
       <Navbar />
       <div className="p-4 sm:p-0 container mx-auto mt-24 mb-10">
         <h2 className="text-3xl font-normal text-navy-900 pb-5 pb-4 capitalize">
-          Properties In {stateName}
+          <b>Properties In:: {stateName}</b>
         </h2>
 
         <PropertyFilter
@@ -75,11 +94,13 @@ export const StatePropertyList: FC = () => {
           <PropertyList array={records} />
         )}
 
-        {numbers.length > 1 && (
-          <Pagination
-            _data={numbers}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+        {pagination?.currentPage && (
+          <DynamicPagination
+            currentPage={pagination?.currentPage}
+            totalPages={pagination?.totalPages}
+            hasNext={pagination?.hasNext}
+            hasPrevious={pagination?.hasPrevious}
+            onPageChange={loadData}
           />
         )}
       </div>
