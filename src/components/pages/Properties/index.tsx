@@ -301,9 +301,12 @@ const Properties = () => {
     try {
       const response = await axiosInstance.get(url);
       if (response.data.success) {
-        setProperties(response.data.data);
-        setCopyData(response.data.data);
-        setPagination(response?.data?.paginationControl);
+        const {
+          data: { data, paginationControl },
+        } = response;
+        setCopyData(data);
+        setProperties(data);
+        setPagination(paginationControl);
       }
       setIsLoading(false);
     } catch (error) {
