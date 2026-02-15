@@ -29,7 +29,7 @@ export const ConfirmVirtualViewing = ({
               <div>
                 <p className="text-sm text-gray-600">Virtual Viewing Fee</p>
                 <p className="text-2xl font-bold text-gray-800">
-                  ₦{String(virtualViewingFee.fee).toLocaleString()}
+                  ₦{Number(virtualViewingFee.fee).toLocaleString("en-US")}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
                   This fee covers the scheduled virtual tour session.
