@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { setLocalStorageField } from "../../utils/helpers";
 
 export function deleteCookie(key: string) {
   Cookies.remove(key);
@@ -19,6 +20,10 @@ export function formatNumber(value: number) {
 export function handleLoggingOff() {
   deleteCookie("access_token");
   deleteCookie("refresh_token");
+
+  // Get most recent_url and save to local_storage
+  const currentUrl = window.location.href;
+  setLocalStorageField("last_tracked_url", { currentUrl });
   window.location.href = "/login";
 }
 

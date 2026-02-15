@@ -13,6 +13,8 @@ import {
   encryptData,
   decryptData,
   setLocalStorageField,
+  getLocalStorageField,
+  deleteLocalStorageField,
 } from "../../../utils/helpers";
 
 export default function LoginForm() {
@@ -56,20 +58,29 @@ export default function LoginForm() {
         setTimeout(() => {
           toast.success("Login Successful!");
           setLoading(false);
-          // Navigate to dashboard based on user role
-          switch (decryptedResponse.user.role.name) {
-            default:
-              router.push("/agent-dashboard/properties");
-              break;
-            case "customer":
-              router.push("/user-dashboard");
-              break;
-            case "agent":
-              router.push("/agent-dashboard/properties");
-              break;
-            case "subAgent":
-              router.push("/agent-dashboard/properties");
-              break;
+
+          // on:login, pick this last url and navigate there
+          const key = "last_tracked_url";
+          const lastTrackedUrl = getLocalStorageField(key);
+          if (lastTrackedUrl) {
+            router.push(lastTrackedUrl.currentUrl);
+            deleteLocalStorageField(key);
+          } else {
+            // Navigate to dashboard based on user role
+            switch (decryptedResponse.user.role.name) {
+              default:
+                router.push("/agent-dashboard/properties");
+                break;
+              case "customer":
+                router.push("/user-dashboard");
+                break;
+              case "agent":
+                router.push("/agent-dashboard/properties");
+                break;
+              case "subAgent":
+                router.push("/agent-dashboard/properties");
+                break;
+            }
           }
         }, 2000);
       } else {

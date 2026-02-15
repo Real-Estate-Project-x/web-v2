@@ -10,3 +10,8 @@ export enum PropertyViewingFilter {
   TODAY = "TODAY",
   UPCOMING = "UPCOMING",
 }
+
+export enum ViewingMedium {
+  IN_PERSON = "IN_PERSON",
+  VIRTUAL = "VIRTUAL",
+}

@@ -63,10 +63,12 @@ export const setLocalStorageField = <T>(key: string, data: T) =>
 
 export const getLocalStorageField = (key: string) =>
   JSON.parse(localStorage.getItem(key) as string);
+
 export const getLocalStorageFieldRaw = (key: string) => {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(key)?.split('"')?.[1];
 };
+
 export const deleteLocalStorageField = (key: string) =>
   localStorage.removeItem(key);
 
