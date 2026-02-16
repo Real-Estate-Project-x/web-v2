@@ -52,6 +52,7 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import AgentAvailabilityPicker from "@/components/shared/agent-availability-component";
 import ReportModal from "./Dialogs/report-property";
 import dynamic from "next/dynamic";
+import AgencySnippetCard from "@/components/shared/agency-snippet-card";
 // just importing the propertyMap component led to window not defined issues because it was running on the server b4 the window was up
 // using use client specified client component not server but importing dynamically and disabling ssr makes the component wait until window is up b4 running
 // voila problem solved
@@ -472,164 +473,185 @@ const PropertyDetails = () => {
                 </div>
 
                 {/* Amenities Section */}
-                <div>
-                  <h2 className="text-xl md:text-2xl font-semibold mb-3">
-                    Property Amenities
-                  </h2>
-                  <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.hasWifi
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <Wifi className="w-5 h-5" />
-                      </span>
-                      <p>{"Wi-fi"}</p>
-                      {propertyData?.property?.hasWifi ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
+                <div className="max-w-12xl mx-auto">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* LEFT SIDE — Combined Box */}
+                    <div className="lg:col-span-2 bg-white rounded-2xl p-6 space-y-10">
+                      {/* ===== PROPERTY AMENITIES ===== */}
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-semibold mb-5">
+                          Property Amenities
+                        </h2>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                          {/* WiFi */}
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.hasWifi
+                                ? "bg-green-50 text-green-700"
+                                : "bg-gray-100 text-gray-600"
+                            } text-sm`}
+                          >
+                            <Wifi className="w-5 h-5" />
+                            <p>Wi-Fi</p>
+                            {propertyData?.property?.hasWifi ? (
+                              <CheckCircle2 className="w-4 h-4 opacity-70" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4" />
+                            )}
+                          </div>
+
+                          {/* Gym */}
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.hasGym
+                                ? "bg-green-50 text-green-700"
+                                : "bg-gray-100 text-gray-600"
+                            } text-sm`}
+                          >
+                            <Dumbbell className="w-5 h-5" />
+                            <p>Gym</p>
+                            {propertyData?.property?.hasGym ? (
+                              <CheckCircle2 className="w-4 h-4 opacity-70" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4" />
+                            )}
+                          </div>
+
+                          {/* Laundry */}
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.hasLaundry
+                                ? "bg-green-50 text-green-700"
+                                : "bg-gray-100 text-gray-600"
+                            } text-sm`}
+                          >
+                            <WashingMachine className="w-5 h-5" />
+                            <p>Laundry</p>
+                            {propertyData?.property?.hasLaundry ? (
+                              <CheckCircle2 className="w-4 h-4 opacity-70" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4" />
+                            )}
+                          </div>
+
+                          {/* CCTV */}
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.hasCctv
+                                ? "bg-green-50 text-green-700"
+                                : "bg-gray-100 text-gray-600"
+                            } text-sm`}
+                          >
+                            <Cctv className="w-5 h-5" />
+                            <p>CCTV</p>
+                            {propertyData?.property?.hasCctv ? (
+                              <CheckCircle2 className="w-4 h-4 opacity-70" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="border-t border-gray-100"></div>
+
+                      {/* ===== PROPERTY FEATURES ===== */}
+                      {/* Features */}
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-semibold mb-5">
+                          Property Features
+                        </h2>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.hasCarParking
+                                ? "bg-green-50 text-green-700"
+                                : "text-gray-600 bg-gray-200"
+                            } text-sm`}
+                          >
+                            <span className="">
+                              <Car className="w-5 h-5" />
+                            </span>
+                            <p>{"Car Parking"}</p>
+                            {propertyData?.property?.hasCarParking ? (
+                              <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4 mt-1" />
+                            )}
+                          </div>
+
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.hasKidsPlayArea
+                                ? "bg-green-50 text-green-700"
+                                : "text-gray-600 bg-gray-200"
+                            } text-sm`}
+                          >
+                            <span className="">
+                              <Baby className="w-5 h-5" />
+                            </span>
+                            <p>{"Kids Area"}</p>
+                            {propertyData?.property?.hasKidsPlayArea ? (
+                              <CheckCircle2 className="w-4 h-4 mt-1" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4 mt-1" />
+                            )}
+                          </div>
+
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.isPetFriendly
+                                ? "bg-green-50 text-green-700"
+                                : "text-gray-600 bg-gray-200"
+                            } text-sm`}
+                          >
+                            <span className="">
+                              <PawPrint className="w-5 h-5" />
+                            </span>
+                            <p>{"Pet Friendly"}</p>
+                            {propertyData?.property?.isPetFriendly ? (
+                              <CheckCircle2 className="w-4 h-4 mt-1" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4 mt-1" />
+                            )}
+                          </div>
+
+                          <div
+                            className={`flex justify-between items-center gap-2 p-3 rounded-lg shadow-sm ${
+                              propertyData?.property?.isNewBuilding
+                                ? "bg-green-50 text-green-700"
+                                : "text-gray-600 bg-gray-200"
+                            } text-sm`}
+                          >
+                            <span className="">
+                              <Building2 className="w-5 h-5" />
+                            </span>
+                            <p>{"New Building"}</p>
+                            {propertyData?.property?.isNewBuilding ? (
+                              <CheckCircle2 className="w-4 h-4 mt-1" />
+                            ) : (
+                              <MinusCircle className="w-4 h-4 mt-1" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.hasGym
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <Dumbbell className="w-5 h-5" />
-                      </span>
-                      <p>{"Gym"}</p>
-                      {propertyData?.property?.hasGym ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
-                    </div>
+                    {/* RIGHT SIDE — Agent Card (unchanged) */}
 
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.hasLaundry
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <WashingMachine className="w-5 h-5" />
-                      </span>
-                      <p>{"Laundry Services"}</p>
-                      {propertyData?.property?.hasLaundry ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
-                    </div>
-
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.hasCctv
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <Cctv className="w-5 h-5" />
-                      </span>
-                      <p>{"CCtv"}</p>
-                      {propertyData?.property?.hasCctv ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
+                    <div className="lg:col-span-1">
+                      {propertyData.property.agency && (
+                        <AgencySnippetCard
+                          agency={propertyData.property.agency}
+                        />
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Features */}
-                <div>
-                  <h2 className="text-xl md:text-2xl font-semibold mb-3">
-                    Property Features
-                  </h2>
-                  <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.hasCarParking
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <Car className="w-5 h-5" />
-                      </span>
-                      <p>{"Car Parking"}</p>
-                      {propertyData?.property?.hasCarParking ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1 opacity-70" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
-                    </div>
-
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.hasKidsPlayArea
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <Baby className="w-5 h-5" />
-                      </span>
-                      <p>{"Kids Area"}</p>
-                      {propertyData?.property?.hasKidsPlayArea ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
-                    </div>
-
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.isPetFriendly
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <PawPrint className="w-5 h-5" />
-                      </span>
-                      <p>{"Pet Friendly"}</p>
-                      {propertyData?.property?.isPetFriendly ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
-                    </div>
-
-                    <div
-                      className={`w-auto flex justify-between items-center gap-2 p-3 shadow rounded-lg ${
-                        propertyData?.property?.isNewBuilding
-                          ? "bg-green-50 text-green-700"
-                          : "text-gray-600 bg-gray-200"
-                      } text-sm`}
-                    >
-                      <span className="">
-                        <Building2 className="w-5 h-5" />
-                      </span>
-                      <p>{"New Building"}</p>
-                      {propertyData?.property?.isNewBuilding ? (
-                        <CheckCircle2 className="w-4 h-4 mt-1" />
-                      ) : (
-                        <MinusCircle className="w-4 h-4 mt-1" />
-                      )}
-                    </div>
-                  </div>
-                </div>
                 {/* {isUserLoggedIn() && ( */}
                 <AgentAvailabilityPicker
                   propertyId={propertyData?.property?.id as string}
@@ -750,7 +772,11 @@ const PropertyDetails = () => {
 
                   {/* Add new comment form */}
                   {/* {propertyData?.isViewed &&  */}
-                  <Card className={`mb-6 ${!propertyData?.isViewed ? "opacity-50 bg-gray-100" : ""}`}>
+                  <Card
+                    className={`mb-6 ${
+                      !propertyData?.isViewed ? "opacity-50 bg-gray-100" : ""
+                    }`}
+                  >
                     <CardContent className="px-6">
                       <h3 className="text-lg font-semibold mb-4">
                         Leave a Review
@@ -769,7 +795,9 @@ const PropertyDetails = () => {
                                   type="button"
                                   onClick={() => setRating(star)}
                                   className="focus:outline-none cursor-pointer disabled:cursor-default"
-                                  disabled={propertyData?.isViewed ? false : true}
+                                  disabled={
+                                    propertyData?.isViewed ? false : true
+                                  }
                                 >
                                   <Star
                                     className={`h-6 w-6 ${
@@ -799,7 +827,10 @@ const PropertyDetails = () => {
                           <Button
                             type="submit"
                             className="w-fit float-right bg-[#0253CC] hover:bg-[#1D4ED8] disabled:cursor-default disabled:bg-gray-200"
-                            disabled={(rating > 0 && isLoading) || (!propertyData?.isViewed ? true : false)}
+                            disabled={
+                              (rating > 0 && isLoading) ||
+                              (!propertyData?.isViewed ? true : false)
+                            }
                           >
                             <MessageCircle className="mr-2 h-4 w-4" />
                             Submit Review

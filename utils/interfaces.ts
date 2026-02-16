@@ -191,6 +191,7 @@ export interface PropertyInterface {
   address: string;
   stateId: string;
   agencyId: string;
+  agency: AgencyInterface;
   postedByUserId: string;
   propertyTypeId: string;
   isBoosted?: boolean;

@@ -93,8 +93,10 @@ export default function AgentAvailabilityPicker({
   //   };
 
   useEffect(() => {
-    fetchViewingSlots();
-    finalizeVirtualViewing();
+    if (propertyId) {
+      fetchViewingSlots();
+      finalizeVirtualViewing();
+    }
   }, []);
 
   const submitViewingRequest = async () => {
