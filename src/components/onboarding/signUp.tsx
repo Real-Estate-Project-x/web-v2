@@ -146,11 +146,12 @@ const SignUpForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmitWithDelay}
-      className="flex flex-col gap-6 min-w-[400px] w-full max-w-sm md:max-w-lg"
+      className="flex flex-col gap-6 w-full min-w-auto md:min-w-[400px] max-w-sm md:max-w-xl mt-8 lg:mt-2"
       // style={{ boxShadow: "0 8px 32px rgba(155,135,245,0.15)" }}
     >
-      <h2 className="text-3xl font-playfair font-semibold text-primary mb-1">
+      <h2 className="text-3xl text-start font-playfair font-semibold text-primary mb-1">
         Create your account
+        <p className="text-gray-500 text-base font-normal py-1">Join us and start exploring right away.</p>
       </h2>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -166,7 +167,7 @@ const SignUpForm: React.FC = () => {
               type="text"
               value={form.firstName}
               onChange={handleChange}
-              className="pl-10"
+              className="pl-10 py-5"
               required
               disabled={submitting}
             />
@@ -189,7 +190,7 @@ const SignUpForm: React.FC = () => {
               type="text"
               value={form.lastName}
               onChange={handleChange}
-              className="pl-10"
+              className="pl-10 py-5"
               required
               disabled={submitting}
             />
@@ -209,7 +210,7 @@ const SignUpForm: React.FC = () => {
             placeholder="Enter phone number"
             value={form.phone}
             onChange={(value: any) => setForm({ ...form, phone: value })}
-            className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg mt-1"
+            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg mt-1"
             defaultCountry="NG" // You can set a default country
           />
         </div>
@@ -226,7 +227,7 @@ const SignUpForm: React.FC = () => {
             type="email"
             value={form.email}
             onChange={handleChange}
-            className="pl-10"
+            className="pl-10 py-5"
             autoComplete="email"
             required
             disabled={submitting}
@@ -252,7 +253,7 @@ const SignUpForm: React.FC = () => {
             onChange={handleChange}
             onCopy={(e) => e.preventDefault()} // Prevent copy
             onPaste={(e) => e.preventDefault()} // Prevent paste
-            className="pl-10 pr-10"
+            className="pl-10 pr-10 py-5"
             autoComplete="new-password"
             required
             disabled={submitting}
@@ -287,7 +288,7 @@ const SignUpForm: React.FC = () => {
             onChange={handleChange}
             onCopy={(e) => e.preventDefault()} // Prevent copy
             onPaste={(e) => e.preventDefault()} // Prevent paste
-            className="pl-10 pr-10"
+            className="pl-10 pr-10 py-5"
             autoComplete="new-password"
             required
             disabled={submitting}

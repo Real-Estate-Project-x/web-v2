@@ -14,11 +14,11 @@ export const SelectAccountTypeOnboarding = () => {
                <StepSetUpForOnboarding pathname={pathname} type=""/>
 
                <div className="w-full mx-auto p-6 text-center">
-                    <h1 className="text-4xl font-semibold mb-4">Select Account Type</h1>
-                    <p className="text-lg">Select the account type that best fits your needs</p>
+                    <h1 className="text-3xl md:text-4xl font-semibold mb-4">Select Account Type</h1>
+                    <p className="text-lg text-center">Select the account type that best fits your needs</p>
 
                     <div className="w-full grid md:grid-cols-2 gap-6 my-12">
-                        <div className="w-[90%] border bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-10 text-left cursor-pointer">
+                        <div className=" border bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-10 text-left cursor-pointer">
                            <User className="w-7 h-7"/>
                            <h2 className="text-xl font-semibold py-4">User</h2>
 
@@ -40,7 +40,7 @@ export const SelectAccountTypeOnboarding = () => {
                         
                         </div>
 
-                        <div className="w-[90%] border bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-10 text-left cursor-pointer">
+                        <div className="border bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-10 text-left cursor-pointer">
                            <Briefcase className="w-7 h-7"/>
                            <h2 className="text-xl font-semibold py-4">Agent</h2>
 

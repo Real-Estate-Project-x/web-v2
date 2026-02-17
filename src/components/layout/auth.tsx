@@ -17,10 +17,10 @@ const AuthLayout : FC<props> = ({children}) => {
   
   return (
     <div className="h-screen w-full ">
-      <div className="w-full flex justify-center">
+      {/* <div className="w-full flex justify-center"> */}
         <div className="flex flex-col md:flex-row items-stretch overflow-hidden bg-white/70 backdrop-blur-sm border border-gray-100 w-full">
           {/* Left: Image - hidden on mobile */}
-          <div className="hidden md:block md:w-[45%] relative">
+          {/* <div className="hidden lg:block md:w-[45%] relative">
             <img
               src={HERO_IMG}
               alt="Stylish modern building"
@@ -28,23 +28,27 @@ const AuthLayout : FC<props> = ({children}) => {
               loading="eager"
               style={{ minHeight: 490, borderRight: "1px solid #F1F0FB" }}
             />
-            {/* Add a colored lavender overlay */}
             <div
               className="absolute inset-0 bg-[#E5DEFF]/50"
               aria-hidden
             />
-          </div>
+          </div> */}
           {/* Right: Signup Form */}
-          <div className="flex-grow flex items-start justify-start pb-8 px-6 md:px-10">
+          <div className="w-full flex items-center justify-center pb-8">
             <div className="py-4">
-               {pathname?.includes('signUp') &&
-                  <StepSetUpForOnboarding pathname={pathname} type={type ?? ''}/>
-                }
+              {pathname?.includes('signUp') && <StepSetUpForOnboarding pathname={pathname} type={type ?? ''}/>}
               {children}
             </div>
           </div>
+
+          {/* <div className="py-12 w-full flex justify-center lg:hidden">
+            <div>
+              {pathname?.includes('signUp') && <StepSetUpForOnboarding pathname={pathname} type={type ?? ''}/>}
+              {children}
+            </div>
+          </div> */}
         </div>
-      </div>
+      {/* </div> */}
     </div>
   );
 };

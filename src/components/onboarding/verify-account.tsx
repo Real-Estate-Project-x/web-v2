@@ -81,8 +81,10 @@ const VerifyAccountForm: React.FC = () => {
       onSubmit={handleSubmit}
       className="flex flex-col gap-6 min-w-[400px] w-full max-w-sm md:max-w-lg"
     >
-      <h1 className="text-2xl font-semibold">Verify Account</h1>
-
+      <h2 className="text-3xl text-start font-playfair font-semibold text-primary mb-1">
+        Verify Account
+        <p className="text-gray-500 text-base font-normal py-1">Enter the verification code sent to your email.</p>
+      </h2>
       <div className="flex gap-3">
         {otp.map((digit, index) => (
           <input

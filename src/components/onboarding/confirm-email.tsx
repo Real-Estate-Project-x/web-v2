@@ -56,13 +56,16 @@ export default function ConfirmEmailForm() {
     };
 
   return (
-    <div className="max-w-lg bg-white p-6 lg:px-8 rounded-xl">
+    <div className="max-w-lg bg-white p-6 lg:px-8 rounded-xl min-w-[400px] w-full max-w-sm md:max-w-lg">
         <form
         className="flex flex-col gap-4 animate-fade-in"
         onSubmit={handleSubmit}
         autoComplete="off"
         >
-        <h2 className="text-2xl md:text-2xl font-playfair text-realestatenavy font-bold mb-4 text-left">Enter email to Reset&nbsp;Password</h2>
+        <h2 className="text-3xl text-start font-playfair font-semibold text-primary mb-1">
+          Reset your Password
+          <p className="text-gray-500 text-base font-normal py-1">Enter your email and we’ll send you a Reset Code.</p>
+        </h2>
         <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <Input
@@ -71,7 +74,7 @@ export default function ConfirmEmailForm() {
               placeholder="Email address"
               required
               onChange={handleChange}
-              className="pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+              className="pl-11 pr-4 py-5 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
             />
         </div>
         

@@ -84,7 +84,10 @@ export default function ResetPasswordForm() {
           onSubmit={handleSubmit}
           autoComplete="off"
         >
-        <h2 className="text-2xl md:text-2xl font-playfair text-realestatenavy font-semibold mb-4 text-left">Reset your Password</h2>
+        <h2 className="text-3xl text-start font-playfair font-semibold text-primary mb-1">
+          Reset your Password
+          <p className="text-gray-500 text-base font-normal py-1">Enter your email and we’ll send you a Reset Code.</p>
+        </h2>
         
         <div className="relative mb-2">
             <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />

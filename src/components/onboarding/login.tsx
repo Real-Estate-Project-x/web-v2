@@ -119,15 +119,17 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="max-w-lg bg-white p-6 lg:px-8 rounded-xl">
+    <div className="bg-white p-6 lg:px-8 rounded-xl mt-8 min-w-sm md:min-w-[400px] w-full max-w-sm md:max-w-xl">
       <form
         className="flex flex-col gap-4 animate-fade-in"
         onSubmit={onSubmit}
         autoComplete="off"
       >
-        <h2 className="text-2xl md:text-3xl font-playfair text-realestatenavy font-semibold mb-4 text-left">
-          Sign in to your account
+        <h2 className="text-2xl md:text-3xl text-start font-playfair text-realestatenavy font-semibold text-left">
+         Welcome Back
+         <p className="text-gray-500 text-base font-normal py-1">Sign in to your account</p>
         </h2>
+        
         <div className="relative mb-2">
           <Mail
             className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -139,7 +141,7 @@ export default function LoginForm() {
             placeholder="Email address"
             required
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+            className="pl-11 pr-4 py-5 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
           />
         </div>
         <div className="relative">
@@ -153,7 +155,7 @@ export default function LoginForm() {
             placeholder="Password"
             required
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+            className="pl-11 pr-10 py-5 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
           />
           <button
             type="button"
