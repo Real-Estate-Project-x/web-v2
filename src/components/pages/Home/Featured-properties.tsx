@@ -8,6 +8,7 @@ import { PropertyList } from "../Properties";
 import { FC } from "react";
 import { PropertyInterface } from "../../../../utils/interfaces";
 import LoadingCard from "@/components/shared/loader-cards";
+import Link from "next/link";
 // Mock property data
 // export const properties = [
 //   {
@@ -68,16 +69,19 @@ export const FeaturedProperties :FC<Property> = ({data}) => {
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
-              <div>
+              <div className="text-center md:text-left mb-4 md:mb-0">
                 <h2 className="text-3xl md:text-4xl font-semibold text-navy-900 mb-2">Featured Properties</h2>
-                <p className="text-navy-600 max-w-xl font-light">
+                <p className="text-[#486581] max-w-xl font-normal">
                   Explore our handpicked selection of premium properties that match your lifestyle and preferences.
                 </p>
               </div>
-              <Button variant="outline" className="flex items-center mt-4 md:mt-0 font-md"
+              <Link href="/properties" className="inline-flex items-center justify-center md:justify-end text-sm font-medium text-[#1E3A8A] hover:text-[#0253CC] transition-colors my-4 md:my-0">
+                View All Properties <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              {/* <Button variant="outline" className="flex items-center mt-4 md:mt-0 font-md"
               onClick={() => router.push('/properties')}>
                 View All Properties <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </Button> */}
             </div>
             
             {/* use component below as card */}

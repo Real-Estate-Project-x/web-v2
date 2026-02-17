@@ -20,9 +20,12 @@ const PopularLocations: FC<Location> = ({ data }) => {
       {data && data.length > 0 && (
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-semibold text-navy-900 mb-8">
-              Popular Locations
-            </h2>
+            <div className="mb-4 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-semibold text-navy-900 mb-2">Popular Locations</h2>
+              <p className="text-[#486581] max-w-xl font-normal">
+                Explore sought-after locations trusted by buyers and renters alike.
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {data.slice(0, 3).map((location: LocationsInterface) => (
                 <div

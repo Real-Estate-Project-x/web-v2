@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FC } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, Search, X, Building2, Users2, Contact } from "lucide-react";
+import { Home, Menu, Search, X, Building2, Users2, Contact, LockOpen } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavDataInterface } from "../../../../utils/interfaces";
@@ -56,8 +56,9 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         <Link href="/" className="flex items-center">
           {/* <Home className={`h-8 w-8 mr-2 ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}`} /> */}
-          <h1 className={`text-2xl font-medium hidden sm:inline-block font-serif ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}`}>
-            Blupodd
+          <h1 className={`text-2xl font-medium inline-block font-serif`}>
+           <LogoComponent color={pathname === "/" ? scrolled ? "#1E3A8A" : "#FFFFFF" :"#1E3A8A"}/>
+           
           </h1>
         </Link>
         
@@ -100,35 +101,35 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
       
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className={`md:hidden shadow-lg animate-fade-in border-t ${
-          pathname === "/" ?
-          scrolled 
-            ? "bg-white border-gray-200" 
-            : "bg-black bg-opacity-80 backdrop-blur-md border-gray-700"
-          : "bg-white border-gray-200"
+        <div className={`md:hidden shadow-lg animate-fade-in border-t border-b border-slate-200 ${
+          // pathname === "/" ?
+          // scrolled 
+          //   ? "bg-white border-gray-200" 
+          //   : "bg-black bg-opacity-80 backdrop-blur-md border-gray-700" :
+          "bg-white border-gray-200"
         }`}>
           <div className="container mx-auto px-4 py-3 space-y-3">
             {data.map((navItem) => (
               <Link 
                 key={navItem.href}
                 href={navItem.href} 
-                className={`block py-2 flex items-center gap-1 hover:text-real-300 transition-colors border-b border-slate-200 font-light ${
-                pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"
-              }`}
+                className={`block py-2 flex items-center gap-1 hover:text-real-300 transition-colors border-b border-slate-200 font-normal text-black`}
+                // ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}
               >
                 <navItem.icon size={18} className="inline-block mr-1" />
                 {navItem.label}
               </Link>
             ))}
 
-           <Link href={"/properties/search"}>
+           {/* <Link href={"/properties/search"}>
               <Search size={18} className="text-black"/>
-           </Link>
+           </Link> */}
 
-            <Link href="/login">
-              <Button className="w-full mt-2 hover:bg-blue-800 bg-[#1E3A8A] text-white">
+            <Link href="/login" className="flex flex-row gap-2 items-center pt-2 text-black">
+              {/* <Button className="w-full mt-2 hover:bg-blue-800 bg-[#1E3A8A] text-white"> */}
+                <LockOpen size={18} className="inline-block" />
                 Sign&nbsp;In
-              </Button>
+              {/* </Button> */}
             </Link>
           </div>
         </div>
@@ -139,64 +140,59 @@ const Navbar :FC<NavData> = ({data = defaultNavData}) => {
 
 export default Navbar;
 
-// import { useState } from "react";
-// import { Button } from "@/components/ui/button";
-// import { Home, Menu, X } from "lucide-react";
-// import { useRouter } from "next/navigation";
+export const LogoComponent = ({color} : {color?: string}) => {
+  return(
+    // <div className="flex items-center gap-3 select-none">
+    //   <p className="text-lg font-black tracking-widest text-muted-foreground">
+    //     BL
+    //   </p>
 
-// const Navbar = () => {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const router = useRouter();
-//   return (
-//     <nav className="bg-white border border-b-slate-300 sticky top-0 z-50">
-//       <div className="container mx-auto px-4 flex items-center justify-between h-16">
-//         <div className="flex items-center">
-//           <Home className="h-8 w-8 text-[#1E3A8A] mr-2" />
-//           <h1 className="text-3xl font-light bg-gradient-to-r from-[#1E3A8A] to-[#0253CC] bg-clip-text text-transparent font-serif">Blupodd</h1>
-//             {/* <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0253CC] to-[#00A6FB] bg-clip-text text-transparent">
-//                 Blupodd
-//             </h1> */}
-//         </div>
+    //   <div className="relative flex items-center justify-center w-10 h-10 rounded-xl 
+    //     bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600
+    //     text-white font-extrabold text-lg
+    //     shadow-lg shadow-indigo-500/30
+    //     transition-all duration-300
+    //     hover:scale-110 hover:rotate-3">
         
-//         {/* Desktop Navigation */}
-//         <div className="hidden md:flex items-center space-x-8">
-//           <a href="/" className="text-navy-800 hover:text-[#0253CC] hover:font-normal font-light">Home</a>
-//           <a href="/properties" className="text-navy-800 hover:text-[#0253CC] hover:font-normal font-light">All&nbsp;Properties</a>
-//           <a href="/buy" className="text-navy-800 hover:text-[#0253CC] hover:font-normal font-light">Buy</a>
-//           <a href="/rent" className="text-navy-800 hover:text-[#0253CC] hover:font-normal font-light">Rent</a>
-//           {/* <a href="#" className="text-navy-800 hover:text-[#0253CC] hover:font-normal font-light">Agents</a> */}
-//           <a href="/contact" className="text-navy-800 hover:text-[#0253CC] hover:font-normal font-light">Contact</a>
-//           <Button variant="default" size="sm" className="ml-4 font-light cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]"  onClick={() => router.push('/login')}>Sign&nbsp;In</Button>
-//         </div>
-        
-//         {/* Mobile Menu Button */}
-//         <div className="md:hidden">
-//           <Button 
-//             variant="ghost" 
-//             size="icon" 
-//             onClick={() => setIsMenuOpen(!isMenuOpen)}
-//             aria-label="Toggle menu"
-//           >
-//             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-//           </Button>
-//         </div>
-//       </div>
-      
-//       {/* Mobile Menu */}
-//       {isMenuOpen && (
-//         <div className="md:hidden bg-white shadow-lg animate-fade-in">
-//           <div className="container mx-auto px-4 py-3 space-y-3">
-//             <a href="/" className="block py-2 text-navy-800 hover:text-real-600 font-medium">Home</a>
-//             <a href="/properties" className="block py-2 text-navy-800 hover:text-real-600 font-medium">All&nbsp;Properties</a>
-//             <a href="/buy" className="block py-2 text-navy-800 hover:text-real-600 font-medium">Buy</a>
-//             <a href="/rent" className="block py-2 text-navy-800 hover:text-real-600 font-medium">Rent</a>
-//             <a href="/contact" className="block py-2 text-navy-800 hover:text-real-600 font-medium">Contact</a>
-//             <Button className="w-full mt-2 bg-blue-50 bg-[#1E3A8A]" onClick={() => router.push('/login')}>Sign&nbsp;In</Button>
-//           </div>
-//         </div>
-//       )}
-//     </nav>
-//   );
-// };
+    //     <span className="z-10">U</span>
 
-// export default Navbar;
+    //     {/* Glow Ring */}
+    //     <div className="absolute inset-0 rounded-xl 
+    //     bg-white/10 blur-md opacity-60"></div>
+    //   </div>
+
+    //   <p className="text-lg font-black tracking-widest text-muted-foreground">
+    //     PODD
+    //   </p>
+    // </div>
+
+    <div className="flex items-center gap-3 select-none">
+      <p className={`text-xl font-semibold tracking-[0.4em] text-${color}`}>
+        BL
+      </p>
+      {/* <div className="bg-black px-6 py-4 border-b border-blue-900/40"> */}
+        <div
+          className="relative flex items-center justify-center w-11 h-11 
+            rounded-md
+            bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700
+            text-white font-bold text-lg
+            shadow-lg shadow-blue-900/40
+            border border-blue-400/30
+            transition-all duration-300 hover:scale-105"
+        >
+          <span className="tracking-wide">U</span>
+
+          {/* Architectural shine */}
+          <div className="absolute inset-0 rounded-md bg-white/5 pointer-events-none"></div>
+        </div>
+      {/* </div> */}
+
+      <p className={`text-xl font-semibold tracking-[0.4em] text-${color}`}>
+        PODD
+      </p>
+    </div>
+
+
+
+  );
+}

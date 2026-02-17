@@ -28,9 +28,10 @@ const Services = () => {
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+
+        <div className="text-center md:text-left mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold text-navy-900 mb-4">How We Can Help</h2>
-          <p className="text-navy-600 max-w-2xl mx-auto font-light">
+          <p className="text-[#486581] max-w-2xl font-normal">
             We provide a complete service for the sale, purchase or rental of real estate, and guide you through every step.
           </p>
         </div>

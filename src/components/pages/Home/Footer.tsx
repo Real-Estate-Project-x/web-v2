@@ -1,5 +1,7 @@
 "use client";
 
+import { LogoComponent } from "./Nav";
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -74,8 +76,11 @@ const Footer = () => {
             &copy; {currentYear} Abode Real Estate. All rights reserved.
           </p>
         </div> */}
-        <div className=" border-gray-800 pt-6 text-center">
-          <p>&copy; {currentYear} Blupodd.com. All rights reserved.</p>
+        <div>
+          <LogoComponent/>
+        </div>
+        <div className=" border-gray-800 pt-2 text-center">
+          <p className="mt-4">&copy; {currentYear} Blupodd.com. All rights reserved.</p>
         </div>
       </div>
     </footer>
