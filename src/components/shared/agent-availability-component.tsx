@@ -1,35 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Clock } from "lucide-react";
-import clsx from "clsx";
-import { Label } from "../ui/label";
-import { RadioGroup } from "../ui/radio-group";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { addDays, addWeeks, format } from "date-fns";
-// import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-// import { toast } from "sonner";
-import { AgencyScheduleInterface } from "../../../utils/interfaces";
-//import { BookViewingDialog } from "../pages/Properties/Dialogs/viewBooking-dialog";
-// import { reformatDate } from "@/lib/utils";
-// import { useRouter } from "next/navigation";
-// import { usePaystackPayment } from "react-paystack";
-// import { getLocalStorageFieldRaw } from "../../../utils/helpers";
-
 import dynamic from "next/dynamic";
-import { ErrorDialog } from "./error-dialog";
 import { isUserLoggedIn } from "@/lib/utils";
 import { ViewingMedium } from "@/lib/constants";
 import { toast } from "sonner";
 import { ConfirmVirtualViewing } from "./dialog-confirm-virtual-viewing";
 import {
+  parseDDMMYYYY,
   deleteLocalStorageField,
   getLocalStorageField,
   setLocalStorageField,
 } from "../../../utils/helpers";
+
 // just importing the propertyMap component led to window not defined issues because it was running on the server b4 the window was up
 // using use client specified client component not server but importing dynamically and disabling ssr makes the component wait until window is up b4 running
 // voila problem solved
@@ -44,26 +29,20 @@ export type SelectedSlot = {
   time: string;
 };
 
+interface VirtualViewingPaymentRecord {
+  viewingId: string;
+}
+
 interface Props {
   propertyId: string;
+  paymentReference?: string;
 }
 
 export default function AgentAvailabilityPicker({
-  // availability,
+  paymentReference,
   propertyId,
 }: Props) {
-  const [selected, setSelected] = useState<SelectedSlot | null>(null);
-  const [availabilityId, setAvailabilityId] = useState<string>("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [medium, setMedium] = useState<ViewingMedium>(ViewingMedium.IN_PERSON);
-  const [timeWindows, setTimeWindows] = useState<AgencyScheduleInterface[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorObj] = useState<{ msg: string; flag: boolean }>({
-    msg: "",
-    flag: false,
-  });
-
   const [availableDates, setAvailableDates] = useState<
     {
       date: string;
@@ -76,26 +55,10 @@ export default function AgentAvailabilityPicker({
   const [virtualViewingFee, setVirtualViewingFee] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  //   const handleSelect = (date: string, time: string) => {
-  //     const slot = { date, time };
-  //     setSelected(slot);
-  //   };
-
-  //   const getMaxDate = (date: string) => {
-  //     if (!date) return "";
-  //     const d = new Date(date);
-  //     d.setDate(d.getDate() + 14);
-  //     return d.toISOString().split("T")[0];
-  //   };
-
-  //   const handleInputChange = (value: ViewingMedium) => {
-  //     setMedium(value);
-  //   };
-
   useEffect(() => {
-    if (propertyId) {
-      fetchViewingSlots();
-      finalizeVirtualViewing();
+    fetchViewingSlots();
+    if (propertyId && paymentReference) {
+      finalizeVirtualViewing(paymentReference);
     }
   }, []);
 
@@ -143,16 +106,13 @@ export default function AgentAvailabilityPicker({
     try {
       const result = await submitVirtualViewing(selectedTimeSlot);
       if (result) {
+        const tempData: VirtualViewingPaymentRecord = {
+          viewingId: result.data.id,
+        };
+        setLocalStorageField<VirtualViewingPaymentRecord>("vv_data", tempData);
+
         // Navigate the user to payment page for payment
         window.location.href = result.authorizationUrl;
-
-        const tempData = {
-          viewingId: selectedTimeSlot,
-          authorizationUrl: result.authorizationUrl,
-          reference: result.paymentReference,
-        };
-        setLocalStorageField("vv_data", tempData);
-        console.log({ tempData });
       }
     } catch (error) {
       const errorMessage = "An error occurred";
@@ -163,15 +123,15 @@ export default function AgentAvailabilityPicker({
     }
   };
 
-  const finalizeVirtualViewing = async () => {
+  const finalizeVirtualViewing = async (reference: string) => {
     const key = "vv_data";
-    const viewingData = getLocalStorageField(key);
+    const viewingData = getLocalStorageField<VirtualViewingPaymentRecord>(key);
     if (!viewingData) {
       return;
     }
     const payload = {
+      paymentReference: reference,
       viewingId: viewingData.viewingId,
-      paymentReference: viewingData.reference,
     };
 
     try {
@@ -181,9 +141,14 @@ export default function AgentAvailabilityPicker({
       );
       if (result.success) {
         deleteLocalStorageField(key);
-        toast(result.message, {});
+        const message = result.message ?? "Viewing confirmed successfully";
+        toast(message);
       }
     } catch (error) {
+      const errorMessage = "An error occurred";
+      toast(errorMessage, {
+        description: JSON.stringify(error),
+      });
       throw error;
     }
   };
@@ -263,75 +228,13 @@ export default function AgentAvailabilityPicker({
     try {
       const response = await axiosInstance.post(url, payload);
       if (response.data?.success) {
-        // const {
-        //   data: { data },
-        // } = response;
+        const {
+          data: { data },
+        } = response;
 
-        const data = [
-          {
-            date: "11/14/2026",
-            openWindows: [
-              {
-                id: "3f9c1a42-7b6e-4d8f-9a21-5c7e2b8f4d91",
-                status: true,
-                date: "11/14/2026",
-                timeSlot: "8:00am - 9:00am",
-              },
-              {
-                id: "a7d4e6b9-2c13-4f5a-8e90-1b3c7d9f2a64",
-                status: true,
-                date: "11/14/2026",
-                timeSlot: "9:00am - 10:00am",
-              },
-              {
-                id: "9c2f7e41-5a8b-4c6d-b193-7e2a4f8c1d50",
-                status: true,
-                date: "11/14/2026",
-                timeSlot: "10:00am - 11:00am",
-              },
-              {
-                id: "d1a7c9f3-8b42-4e6d-9f05-2c7a1e4b8d63",
-                status: true,
-                date: "11/14/2026",
-                timeSlot: "11:00am - 12:00pm",
-              },
-            ],
-          },
-          {
-            date: "11/15/2026",
-            openWindows: [
-              {
-                id: "6e4b1d92-3f7a-4c8e-a519-9d2b6f1c7e80",
-                status: true,
-                date: "11/15/2026",
-                timeSlot: "8:00am - 9:00am",
-              },
-              {
-                id: "b8f2c6a1-9d43-4e7b-8a15-3c6e9f2d4a71",
-                status: true,
-                date: "11/15/2026",
-                timeSlot: "9:00am - 10:00am",
-              },
-              {
-                id: "4a7e2c9d-1b6f-4d8a-b352-6f9c1e4d7a28",
-                status: true,
-                date: "11/15/2026",
-                timeSlot: "10:00am - 11:00am",
-              },
-              {
-                id: "c5d9a2f7-3e81-4b6c-9a40-7e1d3f8b2c65",
-                status: true,
-                date: "11/15/2026",
-                timeSlot: "11:00am - 12:00pm",
-              },
-            ],
-          },
-        ];
-
-        // Set all available dates to list
         const dates = (data as any[]).map(({ date }) => ({
           date,
-          formattedDate: new Date(date).toLocaleDateString(),
+          formattedDate: parseDDMMYYYY(date).toLocaleDateString(),
         }));
         setAllSlots(data);
         setAvailableDates(dates);
@@ -342,190 +245,7 @@ export default function AgentAvailabilityPicker({
     }
   };
 
-  //   const onSubMitHandler = async (e: any) => {
-  //     e.preventDefault();
-  //     if (isUserLoggedIn()) {
-  //       setLoading(true);
-  //       try {
-  //         const response = await axiosInstance.post(
-  //           "/agency-availability/display-availability",
-  //           {
-  //             propertyId,
-  //             medium,
-  //             limitTo: {
-  //               start: format(startDate, "dd/MM/yyyy"),
-  //               end: format(endDate, "dd/MM/yyyy"),
-  //             },
-  //           }
-  //         );
-
-  //         if (response?.data?.success) {
-  //           setTimeWindows(response.data?.data);
-  //           setLoading(false);
-  //         }
-  //       } catch (err: any) {
-  //         //console.error(err);
-  //         setErrorObj({
-  //           ...errorMsg,
-  //           flag: true,
-  //           msg: err?.response?.data?.message.includes(
-  //             "Field limitTo.start must be in the future"
-  //           )
-  //             ? "All dates must be in the Future"
-  //             : err?.response?.data?.message,
-  //         });
-  //       } finally {
-  //         setTimeout(() => {
-  //           setLoading(false);
-  //         }, 5000);
-  //       }
-  //     } else {
-  //       setErrorObj({
-  //         ...errorMsg,
-  //         flag: true,
-  //         msg: "Sign-In First to Schedule a Viewing",
-  //       });
-  //     }
-  //   };
-
   return (
-    // <div className="bg-white h-fit p-6 rounded-lg shadow-sm border mt-8">
-    //   <h2 className="text-xl font-semibold mb-4">Request a Tour</h2>
-
-    //   <div className="space-y-4">
-    //     <form onSubmit={onSubMitHandler}>
-    //       <RadioGroup
-    //         defaultValue="new"
-    //         className="gap-6"
-    //         name="propertyCondition"
-    //       >
-    //         <section className="flex items-center mb-4 gap-4">
-    //           <Label htmlFor="new" className="text-gray-500">
-    //             Do you wish to view this property :
-    //           </Label>
-    //           <div className="flex items-center gap-2">
-    //             <input
-    //               type="radio"
-    //               value={"IN_PERSON"}
-    //               id="in_person"
-    //               defaultChecked={true}
-    //               name="radio"
-    //               onChange={(e: any) => handleInputChange(e.target.value)}
-    //             />
-    //             <label htmlFor="in_person">IN_PERSON&nbsp;?</label>
-    //           </div>
-    //           <div className="flex items-center gap-2">
-    //             <input
-    //               type="radio"
-    //               value={"VIRTUAL"}
-    //               id="virtual"
-    //               name="radio"
-    //               onChange={(e: any) => handleInputChange(e.target.value)}
-    //             />
-    //             <label htmlFor="virtual">VIRTUALLY&nbsp;?</label>
-    //           </div>
-    //         </section>
-    //       </RadioGroup>
-
-    //       <div className="flex flex-row gap-4 space-y-2">
-    //         <div>
-    //           <p className="text-sm pb-2">Start&nbsp;Date</p>
-    //           <input
-    //             type="date"
-    //             value={startDate}
-    //             onChange={(e) => setStartDate(e.target.value)}
-    //             className="border rounded p-2"
-    //           />
-    //         </div>
-    //         <div>
-    //           <p className="text-sm pb-2">End&nbsp;Date</p>
-    //           <input
-    //             type="date"
-    //             min={startDate}
-    //             max={getMaxDate(startDate)}
-    //             onChange={(e) => setEndDate(e.target.value)}
-    //             className="border rounded p-2"
-    //           />
-    //         </div>
-    //       </div>
-
-    //       <Button
-    //         type="submit"
-    //         variant="default"
-    //         className=" p-2 mt-2 w-56 disabled:bg-slate-300"
-    //         disabled={loading}
-    //       >
-    //         {loading ? "Loading..." : "Submit"}
-    //       </Button>
-    //     </form>
-    //     {timeWindows.length > 0 && (
-    //       <h3 className="text-lg font-medium">Available Time Slots</h3>
-    //     )}
-    //     {timeWindows.length > 0 ? (
-    //       timeWindows?.map((day, index) => (
-    //         <Card key={index} className="rounded-2xl">
-    //           <CardHeader className="pb-2">
-    //             <CardTitle className="text-sm font-semibold text-muted-foreground">
-    //               {day.date}
-    //             </CardTitle>
-    //           </CardHeader>
-
-    //           <CardContent className="flex flex-wrap gap-2">
-    //             {day.openWindows.map((time, index) => {
-    //               const isActive =
-    //                 selected?.date === day.date &&
-    //                 selected?.time === time.timeSlot;
-
-    //               return (
-    //                 <Button
-    //                   key={`${time}-${index}`}
-    //                   variant={isActive ? "default" : "outline"}
-    //                   size="sm"
-    //                   onClick={() => {
-    //                     handleSelect(day.date, time.timeSlot);
-    //                     setAvailabilityId(time.id);
-    //                   }}
-    //                   className={clsx(
-    //                     "flex items-center gap-2 rounded-xl",
-    //                     isActive && "shadow-md"
-    //                   )}
-    //                 >
-    //                   <Clock className="h-4 w-4" />
-    //                   {time.timeSlot}
-    //                 </Button>
-    //               );
-    //             })}
-    //           </CardContent>
-    //         </Card>
-    //       ))
-    //     ) : (
-    //       <p>
-    //         {!medium || !startDate || !endDate
-    //           ? ""
-    //           : "No available slots. Please adjust your filters and try again."}
-    //       </p>
-    //     )}
-
-    //     {selected && (
-    //       <Badge variant="secondary" className="text-sm">
-    //         Selected : {selected.date} • {selected.time}
-    //       </Badge>
-    //     )}
-    //     <BookViewingDialog
-    //       isOpen={selected !== null}
-    //       onCloseHandler={() => setSelected(null)}
-    //       selected={selected}
-    //       availabilityWindowId={availabilityId}
-    //       propertyId={propertyId}
-    //       medium={medium}
-    //     />
-    //   </div>
-    //   <ErrorDialog
-    //     open={errorMsg.flag}
-    //     onOpenChange={() => setErrorObj({ ...errorMsg, msg: "", flag: false })}
-    //     description={errorMsg.msg}
-    //   />
-    // </div>
     <div className="flex items-center justify-center pt-10 pb-10">
       {/* Modal to confirm virtual_viewing */}
       {isModalOpen && virtualViewingFee && (
@@ -614,7 +334,7 @@ export default function AgentAvailabilityPicker({
                 onChange={(e) => setSelectedDate(e.target.value)}
                 className="w-full border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option selected disabled>
+                <option defaultValue={""} selected disabled>
                   Select available date
                 </option>
                 {availableDates.map(({ date, formattedDate }) => (

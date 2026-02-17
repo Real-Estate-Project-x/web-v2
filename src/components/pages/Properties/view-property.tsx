@@ -86,6 +86,7 @@ const PropertyDetails = () => {
     msg: "",
     flag: false,
   });
+  const [paymentReference, setPaymentReference] = useState<string>();
 
   // Form for tour request
   // const tourForm = useForm<TourFormData>({
@@ -230,37 +231,41 @@ const PropertyDetails = () => {
   //   return JSON.parse(decryptData(result, encryptionKey));
   // };
 
+  const fetchData = async (slug: string, userId?: string) => {
+    let url = `property/customer-listings/detail/${slug}`;
+    if (userId) {
+      url += `?userId=${userId}`;
+    }
+
+    try {
+      const propertyResult = await axiosInstance.get(url);
+      if (propertyResult.data.success) {
+        const propertyObject = propertyResult.data.data;
+        setProperty(propertyObject || ({} as ViewPropertyInterface));
+        setIsFavourite(propertyObject.isFavourite);
+
+        // get comments
+        const commentsResult = await axiosInstance.get(
+          `agent-property-viewing/user-ratings/${propertyObject?.property?.id}`
+        );
+        if (commentsResult.data.success) {
+          setComments(commentsResult.data.data);
+        }
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error fetching properties:", error);
+    }
+  };
+
   useEffect(() => {
     const slug = searchParams.get("id");
-    const userId = pickUserId();
-    const fetchData = async () => {
-      let url = `property/customer-listings/detail/${slug}`;
-      if (userId) {
-        url += `?userId=${userId}`;
-      }
-
-      try {
-        const propertyResult = await axiosInstance.get(url);
-        if (propertyResult.data.success) {
-          const propertyObject = propertyResult.data.data;
-          setProperty(propertyObject || ({} as ViewPropertyInterface));
-          setIsFavourite(propertyObject.isFavourite);
-
-          // get comments
-          const commentsResult = await axiosInstance.get(
-            `agent-property-viewing/user-ratings/${propertyObject?.property?.id}`
-          );
-          if (commentsResult.data.success) {
-            setComments(commentsResult.data.data);
-          }
-          setIsLoading(false);
-        }
-      } catch (error) {
-        setIsLoading(false);
-        console.error("Error fetching properties:", error);
-      }
-    };
-    if (slug || userId) fetchData();
+    setPaymentReference(searchParams.get("reference") as string);
+    if (slug) {
+      const userId = pickUserId();
+      fetchData(slug, userId);
+    }
   }, []);
 
   // useEffect(() => {
@@ -640,10 +645,9 @@ const PropertyDetails = () => {
                       </div>
                     </div>
 
-                    {/* RIGHT SIDE — Agent Card (unchanged) */}
-
+                    {/* RIGHT SIDE — Agent Card */}
                     <div className="lg:col-span-1">
-                      {propertyData.property.agency && (
+                      {propertyData?.property.agency && (
                         <AgencySnippetCard
                           agency={propertyData.property.agency}
                         />
@@ -655,6 +659,7 @@ const PropertyDetails = () => {
                 {/* {isUserLoggedIn() && ( */}
                 <AgentAvailabilityPicker
                   propertyId={propertyData?.property?.id as string}
+                  paymentReference={paymentReference}
                 />
                 {/* )} */}
                 {/* Video tag section*/}

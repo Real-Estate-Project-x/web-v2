@@ -1,14 +1,13 @@
-'use client';
-import { Home } from "lucide-react";
+"use client";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  //#EBEBEB bg-gradient-to-r from-[#1E3A8A] to-[#0253CC] bg-clip-text text-transparent 
+  //#EBEBEB bg-gradient-to-r from-[#1E3A8A] to-[#0253CC] bg-clip-text text-transparent
   return (
     <footer className="bg-[#EBEBEB] text-black py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center mb-4">
               <Home className="text-[#1E3A8A] hover:text-gray-500 mr-2" />
@@ -68,11 +67,16 @@ const Footer = () => {
             <p className="font-light mb-2">info@aboderealestate.com</p>
             <p className="font-light mb-2">(555) 123-4567</p>
           </div>
-        </div>
+        </div> */}
 
-        <div className="border-t border-gray-800 pt-6 text-center">
+        {/* <div className="border-t border-gray-800 pt-6 text-center">
           <p className="">
             &copy; {currentYear} Abode Real Estate. All rights reserved.
+          </p>
+        </div> */}
+        <div className=" border-gray-800 pt-6 text-center">
+          <p className="">
+            &copy; {currentYear} Blupodd.com. All rights reserved.
           </p>
         </div>
       </div>

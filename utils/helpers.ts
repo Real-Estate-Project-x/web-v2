@@ -61,8 +61,8 @@ export const convertDateCreatedToGetNumberOfDays = (dateCreated: string) => {
 export const setLocalStorageField = <T>(key: string, data: T) =>
   localStorage.setItem(key, JSON.stringify(data));
 
-export const getLocalStorageField = (key: string) =>
-  JSON.parse(localStorage.getItem(key) as string);
+export const getLocalStorageField = <T>(key: string) =>
+  JSON.parse(localStorage.getItem(key) as string) as T;
 
 export const getLocalStorageFieldRaw = (key: string) => {
   if (typeof window === "undefined") return null;
@@ -130,4 +130,9 @@ export const getOrdinal = (day: number) => {
     default:
       return "th";
   }
+};
+
+export const parseDDMMYYYY = (dateString: string) => {
+  const [day, month, year] = dateString.split("/").map(Number);
+  return new Date(year, month - 1, day);
 };

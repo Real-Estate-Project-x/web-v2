@@ -27,7 +27,9 @@ export default function AgencySnippetCard({ agency }: Props) {
             src={logoUrl}
             className="w-20 h-20 mx-auto rounded-full border-4 border-white object-cover shadow-md"
           />
-          <h3 className="mt-4 text-xl font-semibold">{agency.name}</h3>
+          <h3 className="mt-4 text-xl font-semibold">
+            {String(agency.name).toUpperCase()}
+          </h3>
           <p className="text-sm text-blue-100">Trusted Real Estate Experts</p>
         </div>
 
