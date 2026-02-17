@@ -54,6 +54,7 @@ export default function AgentAvailabilityPicker({
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const [virtualViewingFee, setVirtualViewingFee] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (propertyId && paymentReference) {
@@ -63,6 +64,7 @@ export default function AgentAvailabilityPicker({
 
   const submitViewingRequest = async () => {
     try {
+      setIsLoading(true);
       if (medium === ViewingMedium.IN_PERSON) {
         const result = await submitInPersonViewing(selectedTimeSlot);
         if (result?.success) {
@@ -79,7 +81,9 @@ export default function AgentAvailabilityPicker({
         // => [Open modal to display cost of virtual viewing & confirm user go ahead]
         setIsModalOpen(true);
       }
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       const errorMessage = "An error occurred";
       toast(errorMessage, {
         description: JSON.stringify(error),
@@ -221,10 +225,10 @@ export default function AgentAvailabilityPicker({
         start: format(startDate, "MM/dd/yyyy"),
         end: format(endDate, "MM/dd/yyyy"),
       },
-      //////// => Load availability records to db
     };
 
     try {
+      setIsLoading(true);
       const response = await axiosInstance.post(url, payload);
       if (response.data?.success) {
         const {
@@ -237,8 +241,10 @@ export default function AgentAvailabilityPicker({
         }));
         setAllSlots(data);
         setAvailableDates(dates);
+        setIsLoading(false);
       }
     } catch (error) {
+      setIsLoading(false);
     } finally {
       console.log("Finished fetching availability slots...");
     }
@@ -325,7 +331,7 @@ export default function AgentAvailabilityPicker({
           </div>
         </div>
 
-        {medium && isUserLoggedIn() && (
+        {medium && availableDates.length > 0 && isUserLoggedIn() && (
           <>
             <div>
               <label className="block font-semibold text-gray-700 mb-2">
@@ -386,6 +392,12 @@ export default function AgentAvailabilityPicker({
               </>
             )}
           </>
+        )}
+
+        {medium && !isLoading && availableDates.length <= 0 && (
+          <h1 className="text-center">
+            oops...this agent has not yet set availability
+          </h1>
         )}
       </div>
     </div>
