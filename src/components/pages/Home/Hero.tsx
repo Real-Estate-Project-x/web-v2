@@ -135,7 +135,7 @@ const Hero = () => {
 
             {/* Right Column - Search Form */}
             <div className="lg:justify-self-end w-full max-w-lg hidden lg:block">
-              <div className="bg-white/95 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20">
+              <div className="bg-white/95 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/20">
                 <div className="space-y-6">
                   {/* Filter Tabs */}
                   {/* <div className="flex flex-wrap gap-2">
@@ -158,6 +158,9 @@ const Hero = () => {
                   </div> */}
 
                   {/* Search Form */}
+                  <div className="border-b border-gray-200 pb-3">
+                    <h2 className="text-base font-medium text-[#1E3A8A]/90 text-center tracking-[0.3em] uppercase">Search Properties</h2>
+                  </div>
                   <form onSubmit={handleSearch} className="space-y-4">
                     {/* Property Type Input */}
                     <div className="relative">
@@ -189,7 +192,7 @@ const Hero = () => {
                     {/* Search Button */}
                     <Button type="submit"
                       disabled={loading}
-                      className="w-full h-14 bg-[#0253CC] hover:bg-real-700 text-white text-lg font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                      className="w-full h-13 bg-[#1E3A8A] hover:bg-[#0253CC] text-white text-base font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                       {loading ? "Searching..." : "Search Properties"}
                     </Button>
                   </form>
