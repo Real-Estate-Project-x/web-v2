@@ -1,7 +1,10 @@
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { PropertyInterface, ViewPropertyInterface } from "../../utils/interfaces";
+import {
+  PropertyInterface,
+  ViewPropertyInterface,
+} from "../../utils/interfaces";
 import { getLocalStorageField } from "../../utils/helpers";
 
 export function cn(...inputs: ClassValue[]) {
@@ -24,8 +27,11 @@ export const getUserIp = async (): Promise<string> => {
   return response.data.ip;
 };
 
-export const returnHeaders = (ip = "104.28.204.233", longitude = "7.520406", latitude = "6.412896") => {
-  
+export const returnHeaders = (
+  ip = "104.28.204.233",
+  longitude = "7.520406",
+  latitude = "6.412896"
+) => {
   return {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
@@ -36,32 +42,26 @@ export const returnHeaders = (ip = "104.28.204.233", longitude = "7.520406", lat
   };
 };
 
-export function hasAmenities(data : Partial<PropertyInterface>) : boolean{
+export function hasAmenities(data: Partial<PropertyInterface>): boolean {
   return Boolean(
-    data?.hasWifi || 
-    data?.hasCctv || 
-    data?.hasLaundry || 
-    data?.hasGym 
+    data?.hasWifi || data?.hasCctv || data?.hasLaundry || data?.hasGym
   );
 }
 
-export function hasFeatures(data : Partial<PropertyInterface>) : boolean {
+export function hasFeatures(data: Partial<PropertyInterface>): boolean {
   return Boolean(
-    data?.hasCarParking || 
-    data?.hasKidsPlayArea || 
-    data?.isPetFriendly || 
-    data?.isNewBuilding
-  )
+    data?.hasCarParking ||
+      data?.hasKidsPlayArea ||
+      data?.isPetFriendly ||
+      data?.isNewBuilding
+  );
 }
 
-export function isUserLoggedIn() : boolean{
-  if(getLocalStorageField('token')){
-    return true;
-  }
-  return false;
+export function isUserLoggedIn(): boolean {
+  return !!getLocalStorageField("token");
 }
 
-export function reformatDate(date : string) : string{
-  const splitDate = date?.split('/');
-  return `${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`
+export function reformatDate(date: string): string {
+  const splitDate = date?.split("/");
+  return `${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`;
 }

@@ -223,14 +223,6 @@ const PropertyDetails = () => {
     return stars;
   };
 
-  // const getInfoFromLocalStorage = () => {
-  //   const encryptionKey = String(
-  //     process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY
-  //   );
-  //   const result = getLocalStorageField("userInfo");
-  //   return JSON.parse(decryptData(result, encryptionKey));
-  // };
-
   const fetchData = async (slug: string, userId?: string) => {
     let url = `property/customer-listings/detail/${slug}`;
     if (userId) {
@@ -263,38 +255,12 @@ const PropertyDetails = () => {
     const slug = searchParams.get("id");
     setPaymentReference(searchParams.get("reference") as string);
     if (slug) {
-      const userId = pickUserId();
-      fetchData(slug, userId);
+      if (typeof window !== "undefined") {
+        fetchData(slug, pickUserId());
+      }
+      fetchData(slug);
     }
   }, []);
-
-  // useEffect(() => {
-  //   // on refresh this component reloads and triggers this api call to verify user payment
-  //   const viewingId = getLocalStorageFieldRaw("viewingId") as string;
-  //   const paymentReference = getLocalStorageFieldRaw("payRef") as string;
-
-  //   const VerifyVirtualPayment = async () => {
-  //     try {
-  //       const paymentConfirmationResponse = await axiosInstance.post(`/agent-property-viewing/virtual/confirm`,{
-  //         viewingId,
-  //         paymentReference
-  //       });
-  //       console.log({paymentConfirmationResponse});
-  //       if(paymentConfirmationResponse?.data?.success){
-  //         toast.success(paymentConfirmationResponse?.data?.message);
-  //       }
-  //     } catch (error : any) {
-  //       console.log({error});
-  //       toast.error("Payment Did not go through",{description : error?.response?.data?.message});
-  //     }finally{
-  //       localStorage.removeItem("viewingId");
-  //       localStorage.removeItem("payRef");
-  //     }
-  //   }
-  //   if(viewingId && paymentReference){
-  //     VerifyVirtualPayment();
-  //   }
-  // },[]);
 
   const ratingConstant = propertyData?.property?.bluepoddRating
     ? propertyData.property.bluepoddRating

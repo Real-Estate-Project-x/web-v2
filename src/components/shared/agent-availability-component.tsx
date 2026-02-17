@@ -42,7 +42,7 @@ export default function AgentAvailabilityPicker({
   paymentReference,
   propertyId,
 }: Props) {
-  const [medium, setMedium] = useState<ViewingMedium>(ViewingMedium.IN_PERSON);
+  const [medium, setMedium] = useState<ViewingMedium>();
   const [availableDates, setAvailableDates] = useState<
     {
       date: string;
@@ -56,7 +56,6 @@ export default function AgentAvailabilityPicker({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchViewingSlots();
     if (propertyId && paymentReference) {
       finalizeVirtualViewing(paymentReference);
     }
@@ -245,6 +244,14 @@ export default function AgentAvailabilityPicker({
     }
   };
 
+  const selectViewingMedium = async (medium: ViewingMedium) => {
+    setMedium(medium);
+    if (!isUserLoggedIn()) {
+      toast("Login before booking a viewing");
+    }
+    fetchViewingSlots(medium);
+  };
+
   return (
     <div className="flex items-center justify-center pt-10 pb-10">
       {/* Modal to confirm virtual_viewing */}
@@ -275,10 +282,7 @@ export default function AgentAvailabilityPicker({
 
           <div className="grid grid-cols-2 gap-4">
             <label
-              onClick={() => {
-                setMedium(ViewingMedium.IN_PERSON);
-                fetchViewingSlots(ViewingMedium.IN_PERSON);
-              }}
+              onClick={() => selectViewingMedium(ViewingMedium.IN_PERSON)}
               className="border rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
             >
               <input
@@ -300,10 +304,7 @@ export default function AgentAvailabilityPicker({
             </label>
 
             <label
-              onClick={() => {
-                setMedium(ViewingMedium.VIRTUAL);
-                fetchViewingSlots(ViewingMedium.VIRTUAL);
-              }}
+              onClick={() => selectViewingMedium(ViewingMedium.VIRTUAL)}
               className="border rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
             >
               <input
@@ -324,7 +325,7 @@ export default function AgentAvailabilityPicker({
           </div>
         </div>
 
-        {medium && (
+        {medium && isUserLoggedIn() && (
           <>
             <div>
               <label className="block font-semibold text-gray-700 mb-2">

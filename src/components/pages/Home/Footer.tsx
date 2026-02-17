@@ -75,9 +75,7 @@ const Footer = () => {
           </p>
         </div> */}
         <div className=" border-gray-800 pt-6 text-center">
-          <p className="">
-            &copy; {currentYear} Blupodd.com. All rights reserved.
-          </p>
+          <p>&copy; {currentYear} Blupodd.com. All rights reserved.</p>
         </div>
       </div>
     </footer>

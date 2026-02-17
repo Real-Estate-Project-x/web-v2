@@ -61,7 +61,9 @@ export default function LoginForm() {
 
           // on:login, pick this last url and navigate there
           const key = "last_tracked_url";
-          const lastTrackedUrl = getLocalStorageField(key);
+          const lastTrackedUrl = getLocalStorageField<{ currentUrl: string }>(
+            key
+          );
           if (lastTrackedUrl) {
             router.push(lastTrackedUrl.currentUrl);
             deleteLocalStorageField(key);

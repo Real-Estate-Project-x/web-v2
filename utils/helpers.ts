@@ -73,8 +73,12 @@ export const deleteLocalStorageField = (key: string) =>
   localStorage.removeItem(key);
 
 export const pickUserId = () => {
+  const localUserInfo = getLocalStorageField<any>("userInfo");
+  if (!localUserInfo) {
+    return;
+  }
   const userInfo = decryptData(
-    getLocalStorageField("userInfo"),
+    localUserInfo,
     String(process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY)
   );
   return JSON.parse(userInfo).userId;
@@ -132,7 +136,7 @@ export const getOrdinal = (day: number) => {
   }
 };
 
-export const parseDDMMYYYY = (dateString: string) => {
+export const parseDDMMYYYY = (dateString: string): Date => {
   const [day, month, year] = dateString.split("/").map(Number);
   return new Date(year, month - 1, day);
 };
