@@ -77,10 +77,14 @@ const Footer = () => {
           </p>
         </div> */}
         <div>
-          <LogoComponent/>
+          <LogoComponent />
+
+          {/* <LogoComponent color={pathname === "/" ? scrolled ? "#1E3A8A" : "#FFFFFF" :"#1E3A8A"}/> */}
         </div>
         <div className=" border-gray-800 pt-2 text-center">
-          <p className="mt-4">&copy; {currentYear} Blupodd.com. All rights reserved.</p>
+          <p className="mt-4">
+            &copy; {currentYear} Blupodd.com. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
