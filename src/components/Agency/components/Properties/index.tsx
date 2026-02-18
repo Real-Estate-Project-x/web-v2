@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Edit, Eye, Filter, SortAsc, Upload, Zap } from "lucide-react";
+import { Search, Edit, Eye, Upload, Zap } from "lucide-react";
 import PropertyEditForm from "./dialogs/edit-property";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
