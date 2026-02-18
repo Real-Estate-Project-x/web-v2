@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,29 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
-  Search,
-  Edit,
-  Eye,
-  Filter,
-  SortAsc,
-  SortDesc,
-  Upload,
-  Zap,
-} from "lucide-react";
+import { Search, Edit, Eye, Filter, SortAsc, Upload, Zap } from "lucide-react";
 import PropertyEditForm from "./dialogs/edit-property";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { AgentDatabaseInterface, PaginationControlInterface } from "../../../../../utils/interfaces";
+import {
+  AgentDatabaseInterface,
+  PaginationControlInterface,
+} from "../../../../../utils/interfaces";
 import {
   convertDateCreatedToGetNumberOfDays,
+  deleteLocalStorageField,
   formatPrice,
   getLocalStorageFieldRaw,
 } from "../../../../../utils/helpers";
@@ -42,12 +31,11 @@ import PropertyListingDialog from "./dialogs/new-upload";
 import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-select";
 import { BoostPropertyPrompt } from "./agent-property-view";
-import { toast } from "sonner";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  // const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [statusFilter, setStatusFilter] = useState("NEWEST");
   //const [currentPage, setCurrentPage] = useState(1);
   const [isBoosted, setIsBoosted] = useState(false);
@@ -55,98 +43,153 @@ const AgentPropertiesManager = () => {
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
-  const [property, setProperty] = useState<AgentDatabaseInterface>({} as AgentDatabaseInterface);
-  const [properties, setProperties] = useState<AgentDatabaseInterface[]>([] as AgentDatabaseInterface[]);
+  const [property, setProperty] = useState<AgentDatabaseInterface>(
+    {} as AgentDatabaseInterface
+  );
+  const [properties, setProperties] = useState<AgentDatabaseInterface[]>(
+    [] as AgentDatabaseInterface[]
+  );
   const router = useRouter();
   const [reload, setReload] = useState<boolean>(false);
-  const agencyId = getLocalStorageFieldRaw('agentId');
+  const agencyId = getLocalStorageFieldRaw("agentId");
   const [pagination, setPagination] = useState<PaginationControlInterface>(
     {} as PaginationControlInterface
   );
+  const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
+  const [states, setStates] = useState<any[]>([]);
 
-  useEffect(() => {
+  const [stateId, setStateId] = useState("");
+  const [propertyTypeId, setPropertyTypeId] = useState("");
+  const [upFor, setUpFor] = useState("");
+  const [isActive, setIsActive] = useState("");
+  const [sortBy, setSortBy] = useState("VIEWS");
+  const [sortOrder, setSortOrder] = useState("DESC");
 
-    const boostPaymentReference = localStorage.getItem("boost_payment_reference");
-    if(boostPaymentReference){
-      // verify payment status from backend
-      axiosInstance.get(`/payment/boost/verify/${boostPaymentReference}`)
-      .then((response) => {
-        if(response?.data?.success){
-          toast.success("Property Boosted!",{description : "Your property will now appear higher in search results."});
-          localStorage.removeItem("boost_payment_reference");
-          setIsBoosted(true);
-        }
-      }).catch((err) => {
-        console.log({err});
-      });
+  const verifyBoost = async (reference: string) => {
+    const url = `/payment/boost/verify/${reference}`;
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
     }
+  };
 
-  },[]);
+  const fetchStates = async () => {
+    const url = `/country/states/by-country`;
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  const fetchAgentProperties = async (pageNumber = 1, pageSize = 10) =>{
-    axiosInstance.get(`/agency/${agencyId}/properties?sortBy=${statusFilter}&pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    .then((response) => {
-     setProperties(response.data.data);
-     setPagination(response?.data?.paginationControl);
-    }).catch((err) => {
-      console.log({err});
-    });
-  }
+  const fetchPropertyTypes = async () => {
+    const url = "/property-type";
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  const loadData = async (page : number) => {
+  const fetchAgentProperties = async (
+    pageNumber = 1,
+    pageSize = 10,
+    queryParams = {}
+  ) => {
+    const url = `/property/agency-property-list/${agencyId}/`;
+    try {
+      const response = await axiosInstance.get(url, {
+        params: { ...queryParams, pageNumber, pageSize },
+      });
+      if (response.data?.success) {
+        const {
+          data: { data, paginationControl },
+        } = response;
+        setProperties(data);
+        setPagination(paginationControl);
+      }
+    } catch (error) {
+      let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
+    }
+  };
+
+  const loadData = async (page: number) => {
     await fetchAgentProperties(page);
-  }
+  };
 
   useEffect(() => {
-
-    //if(!agencyId) return;
     loadData(1);
 
-  },[isBoosted, agencyId, reload, statusFilter]);
-
-
-  const filteredAndSortedProperties = () : AgentDatabaseInterface[] => {
-    if(properties.length === 0){
-      return [];
+    const key = "boost_payment_reference";
+    const boostPaymentReference = localStorage.getItem(key);
+    if (boostPaymentReference) {
+      // verify payment status from backend
+      verifyBoost(boostPaymentReference)
+        .then((response) => {
+          const message = response.message ?? "Property boosted successfully";
+          toast.success(message, {
+            description:
+              "Your property will now appear higher in search results.",
+          });
+          setIsBoosted(true);
+          deleteLocalStorageField(key);
+        })
+        .catch((err) => {
+          console.log({ err });
+        });
     }
-     return properties.filter(property => {
-      const matchesSearch =
-        property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.propertyType?.tag?.toLowerCase().includes(searchTerm.toLowerCase());
+    // Fetch states record
+    fetchStates()
+      .then((response) => {
+        setStates(response.data);
+      })
+      .catch((error) => {
+        throw error;
+      });
 
-        return matchesSearch;
-    }).sort((a, b) => {
-      let aValue, bValue;
-      switch (statusFilter.toLowerCase()) {
-        case "price":
-          aValue = a.price;
-          bValue = b.price;
-          break;
-        case "date":
-          aValue = new Date(a.dateCreated).getTime();
-          bValue = new Date(b.dateCreated).getTime();
-          break;
-        default:
-          aValue = convertDateCreatedToGetNumberOfDays(a.dateCreated);
-          bValue = convertDateCreatedToGetNumberOfDays(b.dateCreated);
-      }
-      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
-    });
-    
-  }
-  
-  const hasNoRecords = Array.isArray(filteredAndSortedProperties) && filteredAndSortedProperties?.length === 0;
+    // Fetch property_type records
+    fetchPropertyTypes()
+      .then((response) => {
+        setPropertyTypes(response.data);
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }, [isBoosted, agencyId, reload, statusFilter]);
 
-  // Pagination
-  // const totalPages = Math.ceil(
-  //   filteredAndSortedProperties.length / propertiesPerPage
-  // );
-  // const startIndex = (currentPage - 1) * propertiesPerPage;
-  // const currentProperties = filteredAndSortedProperties()?.slice(
-  //   startIndex,
-  //   startIndex + propertiesPerPage
-  // );
+  const handleSearch = async () => {
+    const queryParams = {
+      pageNumber: 1,
+      pageSize: 10,
+      ...(searchTerm && { searchTerm }),
+      ...(stateId && { stateId }),
+      ...(propertyTypeId && { propertyTypeId }),
+      ...(upFor && { upFor }),
+      ...(isActive !== "" && { isActive: isActive === "true" }),
+      ...(typeof isBoosted === "boolean" && { isBoosted }),
+      ...(sortBy && sortOrder && { sortBy, sortOrder }),
+    };
+
+    await fetchAgentProperties(1, 10, queryParams);
+  };
+
+  const hasNoRecords = Array.isArray(properties) && properties.length <= 0;
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -173,7 +216,7 @@ const AgentPropertiesManager = () => {
         {/* Header with Add Property Button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-semibold">My Properties</h2>
+            <h2 className="text-2xl font-semibold">Agency Properties</h2>
             <p className="text-muted-foreground">
               Manage and track your property listings
             </p>
@@ -188,67 +231,141 @@ const AgentPropertiesManager = () => {
 
         {/* Search and Filters */}
         <Card>
-          <CardContent className="px-4 ">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    placeholder="Search properties by title, address, or type..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+          <CardContent className="px-6 py-5">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+            >
+              <div className="space-y-4">
+                {/* 🔍 Row 1: Search + Sorting */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                  {/* Search */}
+                  <div className="relative lg:col-span-5">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      placeholder="Search properties..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+
+                  {/* Sort By */}
+                  <div className="lg:col-span-3">
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Sort By" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PRICE">Price</SelectItem>
+                        <SelectItem value="VIEWS">Views</SelectItem>
+                        <SelectItem value="DAYS_ON_MARKET">
+                          Days On Market
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Sort Order */}
+                  <div className="lg:col-span-2">
+                    <Select value={sortOrder} onValueChange={setSortOrder}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Order" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DESC">Descending</SelectItem>
+                        <SelectItem value="ASC">Ascending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="lg:col-span-2">
+                    <Button type="submit" className="w-full">
+                      Search
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 🏠 Row 2: Filters */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {/* State */}
+                  <Select value={stateId} onValueChange={setStateId}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="State" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {states.map((state) => (
+                        <SelectItem key={state.id} value={state.id}>
+                          {String(state.name).toUpperCase()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Property Type */}
+                  <Select
+                    value={propertyTypeId}
+                    onValueChange={setPropertyTypeId}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Property Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {propertyTypes.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {String(type.name).toUpperCase()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Up For */}
+                  <Select value={upFor} onValueChange={setUpFor}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Up For" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SALE">For Sale</SelectItem>
+                      <SelectItem value="RENT">For Rent</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Active Status */}
+                  <Select value={isActive} onValueChange={setIsActive}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Active Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Active</SelectItem>
+                      <SelectItem value="false">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Boosted */}
+                  <Select
+                    value={isBoosted === null ? "" : String(isBoosted)}
+                    onValueChange={(value) => setIsBoosted(value === "true")}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Boosted" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Boosted</SelectItem>
+                      <SelectItem value="false">Not Boosted</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[150px]">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NEWEST">Newest</SelectItem>
-                    <SelectItem value="ALPHABETICAL_ORDER">A-Z</SelectItem>
-                    <SelectItem value="OLDEST">Oldest</SelectItem>
-                    {/* <SelectItem value="pending">Pending</SelectItem> */}
-                    <SelectItem value="PRICE">Price</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full sm:w-[150px]">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date">Date Added</SelectItem>
-                    <SelectItem value="price">Price</SelectItem>
-                    <SelectItem value="daysOnMarket">Days on Market</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() =>
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                  }
-                >
-                  {sortOrder === "asc" ? (
-                    <SortAsc className="h-4 w-4" />
-                  ) : (
-                    <SortDesc className="h-4 w-4" />
-                  )}
-                </Button> */}
-              </div>
-            </div>
+            </form>
           </CardContent>
         </Card>
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAndSortedProperties && filteredAndSortedProperties()?.map((property, index) => (
+          {properties?.map((property, index) => (
             <Card key={property.id} className="overflow-hidden pt-0 pb-4">
               <div className="relative">
                 <img
@@ -257,12 +374,15 @@ const AgentPropertiesManager = () => {
                   className="w-full h-56 object-cover"
                 />
                 {property.isBoosted && (
-                    <div className="absolute top-2 right-2">
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                        <Zap className="h-3 w-3 mr-1" />
-                        Boosted
+                  <div className="absolute top-2 right-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-yellow-100 text-yellow-800"
+                    >
+                      <Zap className="h-3 w-3 mr-1" />
+                      Boosted
                     </Badge>
-                    </div>
+                  </div>
                 )}
                 <div className="absolute top-2 left-2">
                   {getStatusBadge(property.upFor)}
@@ -314,98 +434,51 @@ const AgentPropertiesManager = () => {
                         <Eye className="h-4 w-4 mr-1" />
                         {/* View */}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => {
-                        setProperty(property);
-                        setIndex(index);
-                        setEditProperty(true);
-                      }}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setProperty(property);
+                          setIndex(index);
+                          setEditProperty(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-1" />
                         {/* Edit */}
                       </Button>
                     </div>
-                      <Button size="sm" className="bg-green-800 text-white disabled:bg-gray-400"
+                    <Button
+                      size="sm"
+                      className="bg-green-800 text-white disabled:bg-gray-400"
                       disabled={property?.isBoosted}
                       onClick={() => {
                         setProperty(property);
                         setIsBoosted(true);
-                      }}>
-                        <Zap className="h-4 w-4 mr-1" />
-                        Boost
-                      </Button>
-                    </div>
+                      }}
+                    >
+                      <Zap className="h-4 w-4 mr-1" />
+                      Boost
+                    </Button>
                   </div>
-                </CardContent>
+                </div>
+              </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* Pagination */}
-        {/* {totalPages > 1 && (
-          <div className="flex justify-center">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (currentPage > 1) setCurrentPage(currentPage - 1);
-                    }}
-                    className={
-                      currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                    }
-                  />
-                </PaginationItem>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(page);
-                        }}
-                        isActive={currentPage === page}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                )}
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (currentPage < totalPages)
-                        setCurrentPage(currentPage + 1);
-                    }}
-                    className={
-                      currentPage === totalPages
-                        ? "pointer-events-none opacity-50"
-                        : ""
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )} */}
-        {pagination?.currentPage  &&
+        {pagination?.currentPage && (
           <DynamicPagination
             currentPage={pagination?.currentPage}
             totalPages={pagination?.totalPages}
             hasNext={pagination?.hasNext}
             hasPrevious={pagination?.hasPrevious}
-            onPageChange={loadData} 
+            onPageChange={loadData}
           />
-        }
+        )}
 
         {/* No Results */}
         {hasNoRecords && (
-          <Card >
+          <Card>
             <CardContent className="p-8 text-center">
               <p className="text-muted-foreground">
                 No properties found matching your criteria.
@@ -413,25 +486,30 @@ const AgentPropertiesManager = () => {
             </CardContent>
           </Card>
         )}
-        </div>
+      </div>
 
-        <PropertyListingDialog open={uploadProperty} onOpenChange={() => {setUploadProperty(false); setReload(!reload);}}/>
-        <PropertyEditForm 
-          property={property} 
-          isOpen={editProperty} 
-          index={index+1}
-          onClose={() => setEditProperty(false)} 
-          onSave={() => setReload(!reload)} 
-        />
-        <BoostPropertyPrompt 
-          isOpen={isBoosted} 
-          onClose={() => setIsBoosted(false)} 
-          id={property?.id}
-          setBoost={() => setIsBoosted(true)}
-        />
+      <PropertyListingDialog
+        open={uploadProperty}
+        onOpenChange={() => {
+          setUploadProperty(false);
+          setReload(!reload);
+        }}
+      />
+      <PropertyEditForm
+        property={property}
+        isOpen={editProperty}
+        index={index + 1}
+        onClose={() => setEditProperty(false)}
+        onSave={() => setReload(!reload)}
+      />
+      <BoostPropertyPrompt
+        isOpen={isBoosted}
+        onClose={() => setIsBoosted(false)}
+        id={property?.id}
+        setBoost={() => setIsBoosted(true)}
+      />
     </>
   );
 };
-
 
 export default AgentPropertiesManager;
