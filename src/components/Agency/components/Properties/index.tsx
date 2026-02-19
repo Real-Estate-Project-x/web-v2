@@ -35,11 +35,8 @@ import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  // const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [statusFilter, setStatusFilter] = useState("NEWEST");
-  //const [currentPage, setCurrentPage] = useState(1);
   const [isBoosted, setIsBoosted] = useState(false);
-  //const propertiesPerPage = 6;
   const [uploadProperty, setUploadProperty] = useState<boolean>(false);
   const [editProperty, setEditProperty] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
