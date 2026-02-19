@@ -21,8 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { deleteCookie } from "@/lib/helpers";
-import { deleteLocalStorageField } from "../../../../utils/helpers";
+import { removeStoredKeys } from "../../../../utils/helpers";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -40,13 +39,6 @@ const DashboardLayout = ({
   const logout = () => {
     removeStoredKeys();
     router.push("/login");
-  };
-
-  const removeStoredKeys = () => {
-    // remove items from short_term storage
-    deleteLocalStorageField("token");
-    deleteLocalStorageField("userInfo");
-    deleteCookie("access_token");
   };
 
   return (

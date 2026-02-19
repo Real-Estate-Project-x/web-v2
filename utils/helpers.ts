@@ -1,3 +1,4 @@
+import { deleteCookie } from "@/lib/helpers";
 import { AES, enc } from "crypto-js";
 
 export const formatPrice = (price: number): string => {
@@ -139,4 +140,11 @@ export const getOrdinal = (day: number) => {
 export const parseDDMMYYYY = (dateString: string): Date => {
   const [day, month, year] = dateString.split("/").map(Number);
   return new Date(year, month - 1, day);
+};
+
+export const removeStoredKeys = () => {
+  // remove items from short_term storage
+  deleteLocalStorageField("token");
+  deleteLocalStorageField("userInfo");
+  deleteCookie("access_token");
 };
