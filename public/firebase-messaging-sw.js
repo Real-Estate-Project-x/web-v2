@@ -13,6 +13,7 @@ firebase.initializeApp({
   storageBucket: "blupodd.firebasestorage.app",
   messagingSenderId: "960932343124",
   appId: "1:960932343124:web:25a904e7823350b17b2cc1",
+  measurementId: "G-B6Q0LQVVY1",
 });
 
 const messaging = firebase.messaging();

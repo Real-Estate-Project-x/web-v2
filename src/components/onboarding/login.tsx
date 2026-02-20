@@ -16,7 +16,6 @@ import {
   getLocalStorageField,
   deleteLocalStorageField,
 } from "../../../utils/helpers";
-import EnableNotifications from "../shared/enable-notification";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -219,8 +218,6 @@ export default function LoginForm() {
           </p>
         </form>
       </div>
-
-      <EnableNotifications />
     </>
   );
 }

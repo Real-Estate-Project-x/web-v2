@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { getToken, onMessage } from "firebase/messaging";
 import { getFirebaseMessaging } from "@/lib/firebase";
-import { pickUserId } from "../../utils/helpers";
+import { getBrowserName, pickUserId } from "../../utils/helpers";
 
 export function useFirebaseNotifications() {
   const [token, setToken] = useState<string | null>(null);
@@ -27,7 +27,6 @@ export function useFirebaseNotifications() {
         // so you handle it manually — e.g. show a toast
         const { title, body } = payload.notification ?? {};
         toast(title, { description: JSON.stringify(body) });
-        // alert(`${title}: ${body}`); // replace with your toast library
       });
     };
 
@@ -65,14 +64,6 @@ export function useFirebaseNotifications() {
       // Wait for the SW to be active before proceeding
       await navigator.serviceWorker.ready;
 
-      console.log("1. Permission:", Notification.permission);
-      console.log("2. SW supported:", "serviceWorker" in navigator);
-      console.log(
-        "3. VAPID key defined:",
-        !!process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
-      );
-      console.log("4. Protocol:", window.location.protocol); // must be https: or http://localhost
-
       const fcmToken = await getToken(messaging, {
         vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
         serviceWorkerRegistration: swRegistration,
@@ -88,18 +79,16 @@ export function useFirebaseNotifications() {
 
       // 3. Send the token to your backend so it can be stored
       //    This is what your backend puts into `deviceTokens`
-      const payload = {
-        userId: pickUserId(),
-        deviceToken: {
-          agentName: "web",
-          deviceId: token,
-        },
-      };
-      console.log({ payload });
       const result = await fetch("/user", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          userId: pickUserId(),
+          deviceToken: {
+            agentName: getBrowserName(),
+            deviceId: fcmToken,
+          },
+        }),
       });
       const full_response = await result.json();
       console.log({ full_response });
