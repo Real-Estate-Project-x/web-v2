@@ -66,7 +66,7 @@ export const FeaturedProperties :FC<Property> = ({data}) => {
       {!data && <LoadingCard/>} 
       
       {(data && data.length > 0) &&
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-[#F0F7FF]">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
               <div className="text-center md:text-left mb-4 md:mb-0">

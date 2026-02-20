@@ -26,7 +26,7 @@ const Testimonials :FC<Props> = ({_data_for_TopAgents}) => {
     );
   }
   return (
-    <section className="py-8 md:py-16 bg-real-50">
+    <section className="py-8 md:py-16 bg-[#F0F7FF]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-navy-900 mb-4">

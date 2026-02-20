@@ -9,7 +9,7 @@ import {
 import Navbar from "../Home/Nav";
 import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Bath, Bed, MapPin, Search, Square } from "lucide-react";
+import { Bath, Bed, Building, Coins, MapPin, Search, Square, Type } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -77,11 +77,11 @@ export const PropertyFilter: FC<FilterProps> = ({
   return (
     <div className="w-full flex flex-wrap gap-3">
       <div className="w-full flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-1/2 relative flex-1">
+        <div className="w-full md:w-1/2 relative flex flex-row gap-2 items-center">
           <Input
             type="text"
             placeholder="Search by location, property type..."
-            className="w-full pl-10"
+            className="w-full pl-10 h-12"
             onChange={(e) => {
               if (e.target.value === "") {
                 // If search term is empty, reset to original data
@@ -100,94 +100,100 @@ export const PropertyFilter: FC<FilterProps> = ({
               setData(filteredData);
             }}
           />
-          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-3 h-5 w-5 mt-0.5 text-gray-400" />
         </div>
-        <Select
-          onValueChange={(value: string) => {
-            const [minPrice, maxPrice] = value.split("-");
-            const filteredData = copyData.filter((property) => {
-              if (!maxPrice) {
-                return property.price >= parseInt(minPrice);
-              }
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <Select
+            onValueChange={(value: string) => {
+              const [minPrice, maxPrice] = value.split("-");
+              const filteredData = copyData.filter((property) => {
+                if (!maxPrice) {
+                  return property.price >= parseInt(minPrice);
+                }
 
-              return (
-                property.price >= parseInt(minPrice) &&
-                property.price <= parseInt(maxPrice)
+                return (
+                  property.price >= parseInt(minPrice) &&
+                  property.price <= parseInt(maxPrice)
+                );
+              });
+
+              setData(filteredData);
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+              <Coins/>
+              <SelectValue placeholder="Price Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="200-500">₦200k - ₦500k</SelectItem>
+              <SelectItem value="500-1000000">₦500k - ₦1M</SelectItem>
+              <SelectItem value="1000000-2000000">₦1M - ₦2M</SelectItem>
+              <SelectItem value="2000000-5000000">₦2M - ₦5M</SelectItem>
+              <SelectItem value="5000000-">₦5M+</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            onValueChange={(value: string) =>
+              isApi ? onChangeHandler(value) : filterByUpFor(value)
+            }
+          >
+            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+              <Building/>
+              <SelectValue placeholder="Property For?" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="RENT">{"RENT"}</SelectItem>
+              <SelectItem value="SALE">{"SALE"}</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            onValueChange={(value: string) => {
+              const filteredData = copyData.filter(
+                (property) =>
+                  property.propertyType.name.toLowerCase() === value.toLowerCase()
               );
-            });
+              setData(filteredData);
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+              <Type/>
+              <SelectValue placeholder="Property Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="flat">Flat</SelectItem>
+              <SelectItem value="duplex">Duplex</SelectItem>
+              <SelectItem value="Bungalow">Bungalow</SelectItem>
+              {/* <SelectItem value="Office spaces">Office Spaces</SelectItem> */}
+            </SelectContent>
+          </Select>
 
-            setData(filteredData);
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
-            <SelectValue placeholder="Price Range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="200-500">₦200k - ₦500k</SelectItem>
-            <SelectItem value="500-1000000">₦500k - ₦1M</SelectItem>
-            <SelectItem value="1000000-2000000">₦1M - ₦2M</SelectItem>
-            <SelectItem value="2000000-5000000">₦2M - ₦5M</SelectItem>
-            <SelectItem value="5000000-">₦5M+</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          onValueChange={(value: string) =>
-            isApi ? onChangeHandler(value) : filterByUpFor(value)
-          }
-        >
-          <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
-            <SelectValue placeholder="Property For?" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="RENT">{"RENT"}</SelectItem>
-            <SelectItem value="SALE">{"SALE"}</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select
+            onValueChange={(value: string) => {
+              const filteredData = copyData.filter((property) => {
+                const numOfBeds = parseInt(value);
+                if (numOfBeds === 5) {
+                  return property.noOfBedrooms >= 5;
+                }
+                return property.noOfBedrooms === numOfBeds;
+              });
 
-        <Select
-          onValueChange={(value: string) => {
-            const filteredData = copyData.filter(
-              (property) =>
-                property.propertyType.name.toLowerCase() === value.toLowerCase()
-            );
-            setData(filteredData);
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
-            <SelectValue placeholder="Property Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="flat">Flat</SelectItem>
-            <SelectItem value="duplex">Duplex</SelectItem>
-            <SelectItem value="Bungalow">Bungalow</SelectItem>
-            {/* <SelectItem value="Office spaces">Office Spaces</SelectItem> */}
-          </SelectContent>
-        </Select>
-
-        <Select
-          onValueChange={(value: string) => {
-            const filteredData = copyData.filter((property) => {
-              const numOfBeds = parseInt(value);
-              if (numOfBeds === 5) {
-                return property.noOfBedrooms >= 5;
-              }
-              return property.noOfBedrooms === numOfBeds;
-            });
-
-            setData(filteredData);
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px]">
-            <SelectValue placeholder="Bedrooms" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">1 Bed</SelectItem>
-            <SelectItem value="2">2 Beds</SelectItem>
-            <SelectItem value="3">3 Beds</SelectItem>
-            <SelectItem value="4">4 Beds</SelectItem>
-            <SelectItem value="5">5+ Beds</SelectItem>
-          </SelectContent>
-        </Select>
+              setData(filteredData);
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+              <Bed/>
+              <SelectValue placeholder="Bedrooms" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">1 Bed</SelectItem>
+              <SelectItem value="2">2 Beds</SelectItem>
+              <SelectItem value="3">3 Beds</SelectItem>
+              <SelectItem value="4">4 Beds</SelectItem>
+              <SelectItem value="5">5+ Beds</SelectItem>
+            </SelectContent>
+          </Select>
+        </section>
       </div>
     </div>
   );
@@ -319,10 +325,12 @@ const Properties = () => {
     <React.Fragment>
       <Navbar />
       <div className="mx-6 sm:mx-10 md:mx-16 mt-24 mb-10">
-        {/* <h2 className="text-4xl font-normal text-navy-900 pb-5 pb-4">Properties</h2> */}
-        <h1 className="text-4xl font-semibold text-navy-900 mt-4 mb-8">
-          Find Your Dream Home
-        </h1>
+        <div className="mb-4">
+          <h1 className="text-3xl md:text-4xl font-semibold text-[#102A43] mb-2">Find Your Dream Home</h1>
+          <p className="text-[#486581] max-w-xl font-normal">
+            Explore sought-after locations trusted by buyers and renters alike.
+          </p>
+        </div>
 
         <PropertyFilter
           setData={setProperties}
