@@ -1,14 +1,12 @@
 "use client";
 
-import React from "react";
+import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
-  //NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
-  // NavigationMenuTrigger,
-  // navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
 import {
   Home,
@@ -21,7 +19,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { removeStoredKeys } from "../../../../utils/helpers";
+import {
+  decryptData,
+  getBrowserName,
+  getLocalStorageField,
+  removeStoredKeys,
+} from "../../../../utils/helpers";
+import EnableNotifications from "@/components/shared/enable-notification";
+import { axiosInstance } from "@/lib/axios-interceptor";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -35,14 +40,63 @@ const DashboardLayout = ({
   setActiveSection,
 }: DashboardLayoutProps) => {
   const router = useRouter();
+  const [areNotificationsEnabled, setAreNotificationsEnabled] = useState(false);
+  const { requestPermissionAndGetToken, permission } =
+    useFirebaseNotifications();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const logout = () => {
     removeStoredKeys();
     router.push("/login");
   };
 
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const url = "/user/profile?fields=success,data(deviceTokens)";
+      const result = await axiosInstance.get(url);
+
+      if (result?.data?.success) {
+        const profile = result.data.data;
+        hasNotificationBeingAccepted(profile);
+      }
+    } catch (ex) {
+      console.error(ex);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const hasNotificationBeingAccepted = (profile: any) => {
+    type TokenType = { deviceId: string; agentName: string };
+
+    const browserName = getBrowserName();
+
+    const check = (profile.deviceTokens as TokenType[]).find(
+      ({ agentName }) => agentName === browserName
+    );
+
+    if (check) {
+      setAreNotificationsEnabled(true);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Start: Accept notification for P_N */}
+      {!areNotificationsEnabled &&
+        !["granted", "denied"].includes(permission) && (
+          <EnableNotifications
+            onClose={() => setAreNotificationsEnabled(true)}
+            onClick={requestPermissionAndGetToken}
+          />
+        )}
+      {/* End: Accept notification for P_N */}
+
       <div className="flex flex-1">
         {/* Sidebar - Hidden on mobile */}
         <aside className="w-64 bg-gray-100 border-r hidden lg:block">
