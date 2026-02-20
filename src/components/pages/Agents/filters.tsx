@@ -44,22 +44,24 @@ const AgentFilters = ({
     <section className="py-6">
       <div className="container mx-auto px-4">
         <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <h2 className="text-base font-medium text-[#1E3A8A]/90 text-center tracking-[0.3em] uppercase">Search Filters</h2>
+          <CardContent className="px-6">
             {/* Search and Main Controls */}
             <div className="flex flex-col lg:flex-row gap-4 mb-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <div className="flex-1 relative border rounded-lg">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   placeholder="Search by name, specialty, or location..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value)
                   }}
-                  className="pl-10 border-0 bg-gray-50/80 focus:bg-white transition-colors"
+                  className="pl-10 border-0 bg-gray-50/80 focus:bg-white transition-colors py-5"
                 />
               </div>
+
               
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-row gap-2">
                 <Select value={filterBy} onValueChange={setFilterBy}>
                   <SelectTrigger className="w-full sm:w-56 md:w-36 border bg-gray-50/80">
                     <SlidersHorizontal className="h-4 w-4 mr-2" />

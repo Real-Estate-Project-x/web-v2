@@ -286,7 +286,7 @@ export default function AgentAvailabilityPicker({
             Select Viewing Type
           </label>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <label
               onClick={() => selectViewingMedium(ViewingMedium.IN_PERSON)}
               className="border rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"

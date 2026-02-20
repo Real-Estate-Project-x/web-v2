@@ -10,6 +10,7 @@ import Footer from "../Home/Footer";
 import { ErrorDialog } from "@/components/shared/error-dialog";
 import { SuccessDialog } from "@/components/shared/success-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
+import { BLUPODD } from "@/lib/constants";
 
 const ContactUsComponent = () => {
   const [state, setState] = useState({
@@ -92,7 +93,20 @@ const ContactUsComponent = () => {
       <div className="container mx-auto px-4 py-16 min-h-[70vh] flex flex-col items-center justify-center">
         <div className="bg-white/90 rounded-lg shadow-lg max-w-2xl w-full p-8 mb-10 mt-16 relative">
           <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-real-600 rounded-full p-4 shadow-lg">
-            <ContactRound className="text-white w-10 h-10" />
+            {/* <ContactRound className="text-white w-10 h-10" /> */}
+            <div
+              className="relative flex items-center justify-center w-11 h-11 
+              rounded-md
+              bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700
+              text-white font-bold text-lg
+              shadow-lg shadow-blue-900/40
+              border border-blue-400/30
+              transition-all duration-300 hover:scale-105">
+              <span className="tracking-wide">U</span>
+
+              {/* Architectural shine */}
+              <div className="absolute inset-0 rounded-md bg-white/5 pointer-events-none"></div>
+            </div>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-center text-navy-900 mb-4 mt-8">
             Contact Us
@@ -191,19 +205,19 @@ const ContactUsComponent = () => {
           </form>
         </div>
 
-        <div className="w-full max-w-2xl bg-white rounded-lg shadow flex flex-col md:flex-row items-center justify-between px-8 py-6 gap-4">
+        <div className="w-full max-w-2xl bg-white rounded-lg shadow flex flex-col justify-start md:flex-row md:items-center md:justify-between px-4 lg:px-8 py-6 gap-4">
           <div className="flex items-center gap-3">
             <Mail className="text-real-600" />
             <div>
               <h3 className="text-sm font-semibold text-navy-900">Email</h3>
-              <span className="text-gray-600">contact@blupodd.com</span>
+              <span className="text-gray-600">{BLUPODD.EMAIL}</span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mr-3">
             <User className="text-real-600" />
             <div>
               <h3 className="text-sm font-semibold text-navy-900">Phone</h3>
-              <span className="text-gray-600">+1 (555) 123-4567</span>
+              <span className="text-gray-600">{BLUPODD.PHONE}</span>
             </div>
           </div>
         </div>

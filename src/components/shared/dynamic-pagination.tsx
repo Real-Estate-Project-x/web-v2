@@ -33,18 +33,21 @@ export function DynamicPagination({
       {Array.from({ length: totalPages }, (_, i) => {
         const page = i + 1;
         return (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            style={{
-              fontWeight: page === currentPage ? "bold" : "normal",
-              backgroundColor: page === currentPage ? "#ddd" : "#fff",
-            }}
-          >
-            {page}
-          </button>
+          <>
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              style={{
+                fontWeight: page === currentPage ? "bold" : "normal",
+                backgroundColor: page === currentPage ? "#ddd" : "#fff",
+              }}
+            >
+              {page}
+            </button>
+            {page >= 5 && `...`}
+          </>
         );
-      })}
+      }).slice(0,5)}
 
       <button disabled={!hasNext} onClick={() => onPageChange(currentPage + 1)}>
         Next

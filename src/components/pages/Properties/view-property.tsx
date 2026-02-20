@@ -394,7 +394,7 @@ const PropertyDetails = () => {
             <div className="grid grid-cols-1 gap-8">
               {/* Main Property Details */}
               <div className="lg:col-span-2 space-y-6">
-                <div className="grid grid-cols-5 gap-4 py-4 border-y">
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4 py-4 border-y">
                   <div className="text-center">
                     <div className="flex items-center justify-center">
                       <Bed className="h-5 w-5 mr-2" />
@@ -447,7 +447,7 @@ const PropertyDetails = () => {
                 <div className="max-w-12xl mx-auto">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* LEFT SIDE — Combined Box */}
-                    <div className="lg:col-span-2 bg-white rounded-2xl p-6 space-y-10">
+                    <div className="lg:col-span-2 bg-white rounded-2xl p-0 lg:p-6 space-y-10">
                       {/* ===== PROPERTY AMENITIES ===== */}
                       <div>
                         <h2 className="text-xl md:text-2xl font-semibold mb-5">

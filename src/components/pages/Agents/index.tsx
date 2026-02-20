@@ -109,18 +109,19 @@ const Agents = () => {
       <Navbar />
 
       <main className="flex-1">
-        {/* Hero Section bg-gradient-to-r from-navy-900 via-navy-800 to-blue-900 */}
-        <section className="relative bg-gradient-to-r from-navy-900 via-navy-800 to-blue-900 py-16 overflow-hidden ">
+        {/* Hero Section bg-gradient-to-r from-navy-900 via-navy-800 to-blue-900 700: "#334E68",
+// 					800: "#243B53"*/}
+        <section className="relative bg-gradient-to-r from-[#0f1c36] via-[#243B53] to-[#102A43] py-16 overflow-hidden ">
           <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center mt-8">
-              <h1 className="text-2xl md:text-4xl font-bold text-white mb-6">
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">
                 Meet Our{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-cyan-300">
                   Expert Agents
                 </span>
               </h1>
-              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto tracking-wide leading-relaxed text-center">
                 Connect with experienced real estate professionals who deliver
                 exceptional results and personalized service.
               </p>
@@ -128,13 +129,13 @@ const Agents = () => {
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
                 <div className="bg-black/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold text-white">
+                  <div className="text-2xl sm:text-3xl font-bold text-white">
                     {data?.length}
                   </div>
                   <div className="text-sm text-white/80">Expert Agents</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold text-white">
+                  <div className="text-2xl sm:text-3xl font-bold text-white">
                     {(
                       data?.reduce(
                         (sum, agent) => sum + agent?.agency?.rating,

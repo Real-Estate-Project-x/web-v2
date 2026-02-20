@@ -130,8 +130,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
             size="icon"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
-            className={scrolled ? "text-gray-800" : "text-slate-200"}
-          >
+            className={(scrolled || pathname !== "/")? "text-gray-800" : "text-slate-200"}>
             {isMenuOpen ? (
               <X className="h-6 w-6" />
             ) : (
@@ -220,13 +219,12 @@ export const LogoComponent = ({ color }: { color?: string }) => {
       {/* <div className="bg-black px-6 py-4 border-b border-blue-900/40"> */}
       <div
         className="relative flex items-center justify-center w-11 h-11 
-            rounded-md
-            bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700
-            text-white font-bold text-lg
-            shadow-lg shadow-blue-900/40
-            border border-blue-400/30
-            transition-all duration-300 hover:scale-105"
-      >
+        rounded-md
+        bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700
+        text-white font-bold text-lg
+        shadow-lg shadow-blue-900/40
+        border border-blue-400/30
+        transition-all duration-300 hover:scale-105">
         <span className="tracking-wide">U</span>
 
         {/* Architectural shine */}
