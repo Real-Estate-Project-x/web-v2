@@ -353,9 +353,8 @@ export default function PropertyListingDialog({
         lg:max-w-6xl
         max-h-[90vh]
         overflow-y-auto
-        bg-white
-      ">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
+        bg-white">
+        <DialogHeader className="px-2 md:px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
             Create Property Listing
@@ -367,26 +366,26 @@ export default function PropertyListingDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-              <TabsList className="mx-6 grid w-auto grid-cols-4 gap-2">
+              <TabsList className="mx-2 md:mx-6 grid w-auto grid-cols-4 gap-2">
                 <TabsTrigger value="basic" className="gap-2">
                   <Info className="h-4 w-4" />
-                  Basic
+                  <p className="hidden sm:inline">Basic</p>
                 </TabsTrigger>
                 <TabsTrigger value="details" className="gap-2">
                   <Home className="h-4 w-4" />
-                  Details
+                  <p className="hidden sm:inline">Details</p>
                 </TabsTrigger>
                 <TabsTrigger value="amenities" className="gap-2">
                   <Building2 className="h-4 w-4" />
-                  Amenities
+                  <p className="hidden sm:inline">Amenities</p>
                 </TabsTrigger>
                 <TabsTrigger value="media" className="gap-2">
                   <Image className="h-4 w-4" />
-                  Media
+                  <p className="hidden sm:inline">Media</p>
                 </TabsTrigger>
               </TabsList>
 
-              <ScrollArea className="h-[calc(90vh-280px)] px-6 py-4">
+              <ScrollArea className="h-[calc(90vh-280px)] px-2 md:px-6 py-4">
                 <TabsContent value="basic" className="space-y-4 mt-0">
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
@@ -1026,7 +1025,7 @@ export default function PropertyListingDialog({
               </ScrollArea>
             </Tabs>
 
-            <div className="flex justify-between items-center px-6 py-4 border-t bg-muted/30">
+            <div className="flex justify-between items-center px-2 md:px-6 py-4 border-t bg-muted/30">
               <Button
                 type="button"
                 variant="outline"

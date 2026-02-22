@@ -13,6 +13,7 @@ import { LogOut } from "lucide-react";
 import { agentDashboardData } from "../Agency";
 import { usePathname, useRouter } from "next/navigation";
 import { removeStoredKeys } from "../../../utils/helpers";
+import { LogoComponent } from "../pages/Home/Nav";
 
 interface AgentSidebarProps {
   activeSection: string;
@@ -35,12 +36,16 @@ export function AgentSidebar({
 
   return (
     <Sidebar
-      className={`${state === "collapsed" ? "w-14" : "w-60"} h-screen`}
-      collapsible="icon"
-    >
-      <SidebarTrigger className="m-2 self-end" />
+      className={`${state === "collapsed" ? "w-14" : "w-80"} h-screen hidden xl:flex`}
+      collapsible="icon">
+      <section className="flex justify-between items-center ">
+        <LogoComponent/>
+        <SidebarTrigger className="m-2 self-end" />
+      </section>
+      
 
       <SidebarContent className="bg-white shadow-none flex flex-col h-full">
+        
         {/* SCROLLABLE MENU AREA */}
         <div className="flex-1 overflow-y-auto px-2">
           <SidebarMenu className="flex flex-col gap-1">

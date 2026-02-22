@@ -140,10 +140,10 @@ const AgentDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <div className="container mx-auto px-4 py-8">
         {/* Agent Profile Header */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -189,7 +189,7 @@ const AgentDashboard = () => {
                         <Mail className="h-4 w-4 mr-2" />
                         Email
                       </Button>
-                    </div> */}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
@@ -210,7 +210,7 @@ const AgentDashboard = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

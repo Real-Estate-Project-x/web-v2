@@ -312,7 +312,7 @@ const AgentSchedule = () => {
               </Card>
             ) : (
               schedules?.map((schedule : AgencyScheduleInterface, index : number) => (
-                <Card key={`schedule-${index}`} className="hover:shadow-lg transition-shadow">
+                <Card key={`schedule-${index}`} className="hover:shadow-lg transition-shadow mb-3">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div className="flex-1">
@@ -339,7 +339,7 @@ const AgentSchedule = () => {
                           {schedule?.openWindows?.map((slot) => (
                             <div
                               key={slot.id}
-                              className="flex items-center gap-1 bg-muted px-3 py-1.5 rounded-full">
+                              className="flex items-center gap-1 bg-muted px-3 py-1.5 rounded-full mb-3">
 
                               <Clock className="h-3 w-3 text-muted-foreground" />
                               <span className="text-sm">{slot?.timeSlot}</span>

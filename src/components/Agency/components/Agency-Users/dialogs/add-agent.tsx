@@ -88,7 +88,6 @@ export function AddAgent({ trigger, setRefresh }: UserFormDialogProps) {
         phoneNumber :  data.phoneNumber 
     });
 
-    console.log({response});
     if(response?.data?.code === 201){
         setRefresh(true);
         setTimeout(() => {
@@ -106,7 +105,7 @@ export function AddAgent({ trigger, setRefresh }: UserFormDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="gap-2">
+          <Button className="gap-2 mt-4">
             <UserPlus className="h-4 w-4" />
             Add User
           </Button>

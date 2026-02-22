@@ -26,13 +26,13 @@ const AgentLayout = ({ children }: { children: React.ReactNode }) => {
   
     return <SidebarProvider>
         <div className="w-full flex min-h-screen bg-background">
-            <AgentSidebar activeSection={activeSection} setActiveSection={setActiveSection}/>
-            <div className="flex-1">
-                <div>
-                    <AgentProfileHeader agent={agent}/>
-                    {children}
-                </div>
+          <AgentSidebar activeSection={activeSection} setActiveSection={setActiveSection}/>
+          <div className="flex-1">
+            <div>
+              <AgentProfileHeader agent={agent}/>
+              {children}
             </div>
+          </div>
         </div>
     </SidebarProvider>;   
 }
@@ -49,12 +49,12 @@ const AgentProfileHeader : FC<AgentData> = ({agent}) => {
     }
     const agentData = agent;
     return(
-        <div className="mb-8">
+        <div className="w-full overflow-x-hidden mb-8 p-4">
         {/* Agent Profile Header */}
           <Card>
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <Avatar className="h-24 w-24 bg-gray-200 rounded-full flex items-center justify-center">
+                <Avatar className="h-24 w-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
                   <AvatarImage src={agentData?.profileImage?.image?.url} alt={agentData?.agenciesCreated?.[0].name} />
                   <AvatarFallback>
                     <User/>
@@ -63,11 +63,11 @@ const AgentProfileHeader : FC<AgentData> = ({agent}) => {
                 
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                      <h1 className="text-3xl font-bold uppercase">{agentData?.agenciesCreated?.[0].name}</h1>
-                      <p className="text-lg text-muted-foreground capitalize">{agentData?.agenciesCreated?.[0]?.description}</p>
+                    <div className="mx-auto md:mx-0">
+                      <h1 className="text-3xl font-bold uppercase text-center md:text-start">{agentData?.agenciesCreated?.[0].name}</h1>
+                      <p className="text-lg text-muted-foreground capitalize text-center md:text-start">{agentData?.agenciesCreated?.[0]?.description}</p>
                       <div className="flex items-center gap-4 mt-2">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 mx-auto md:mx-0">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                           <span className="font-medium">{agentData?.agenciesCreated?.[0]?.rating}</span>
                         </div>
@@ -76,7 +76,7 @@ const AgentProfileHeader : FC<AgentData> = ({agent}) => {
                     
                   </div>
                   
-                  <section className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+                  <section className="flex flex-col items-start md:flex-row md:items-center gap-4 mt-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
                       {agentData?.agenciesCreated?.[0]?.email}
@@ -86,7 +86,7 @@ const AgentProfileHeader : FC<AgentData> = ({agent}) => {
                       {agentData?.agenciesCreated?.[0]?.agencyPhoneNumber}
                     </div>
                   </section>
-                <section className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+                <section className="flex flex-col items-start md:flex-row md:items-center gap-4 mt-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                         <MessageCircle className="h-4 w-4" />
                         {agentData?.agenciesCreated?.[0]?.whatsappNumber}

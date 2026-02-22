@@ -126,11 +126,11 @@ const AgencyUsersView = ({
 
   return (
     <>
-      <div className="container mx-auto space-y-6">
+      <div className="container mx-auto space-y-6 p-5">
         {/* Summary Widgets */}
         <div className="my-4">
-          <h2 className="text-2xl font-semibold">Users</h2>
-          <p className="text-muted-foreground">View and track User activity</p>
+          <h2 className="text-3xl md:text-2xl font-semibold">Users</h2>
+          <p className="text-muted-foreground text-lg">View and track User activity</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
@@ -202,7 +202,7 @@ const AgencyUsersView = ({
             <CardTitle>
               Sub-Agents ({agentsUsers?.totalSubAgents ?? 0})
             </CardTitle>
-            <CardDescription className="flex justify-between items-center">
+            <CardDescription className="flex flex-col items-start">
               Manage and view performance of all sub-agents in your agency.
               Click on any row to view detailed information.
               <AddAgent setRefresh={setRefreshState} />

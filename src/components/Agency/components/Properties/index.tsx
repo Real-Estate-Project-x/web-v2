@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Edit, Eye, Upload, Zap } from "lucide-react";
+import { Search, Edit, Eye, Upload, Zap, SortAsc, SortDesc, BarChart3, MapPin, Building, Building2, CircleCheck } from "lucide-react";
 import PropertyEditForm from "./dialogs/edit-property";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
@@ -228,7 +228,7 @@ const AgentPropertiesManager = () => {
 
         {/* Search and Filters */}
         <Card>
-          <CardContent className="px-6 py-5">
+          <CardContent className="px-6 pb-4 pt-2 lg:py-5">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -237,47 +237,52 @@ const AgentPropertiesManager = () => {
             >
               <div className="space-y-4">
                 {/* 🔍 Row 1: Search + Sorting */}
+                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] uppercase inline lg:hidden">Search Filters</p>
+                <br/>
+                <br/>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                   {/* Search */}
                   <div className="relative lg:col-span-5">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
                     <Input
                       placeholder="Search properties..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 py-6"
                     />
                   </div>
+                  <section className="grid grid-cols-2 gap-1">
+                    {/* Sort By */}
+                    <div className="lg:col-span-3">
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-full">
+                          <BarChart3/>
+                          <SelectValue placeholder="Sort By" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PRICE">Price</SelectItem>
+                          <SelectItem value="VIEWS">Views</SelectItem>
+                          <SelectItem value="DAYS_ON_MARKET">
+                            Days On Market
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  {/* Sort By */}
-                  <div className="lg:col-span-3">
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Sort By" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="PRICE">Price</SelectItem>
-                        <SelectItem value="VIEWS">Views</SelectItem>
-                        <SelectItem value="DAYS_ON_MARKET">
-                          Days On Market
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Sort Order */}
-                  <div className="lg:col-span-2">
-                    <Select value={sortOrder} onValueChange={setSortOrder}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Order" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="DESC">Descending</SelectItem>
-                        <SelectItem value="ASC">Ascending</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
+                    {/* Sort Order */}
+                    <div className="col-span-1 lg:col-span-2">
+                      <Select value={sortOrder} onValueChange={setSortOrder}>
+                        <SelectTrigger className="w-full">
+                          <SortDesc/>
+                          <SelectValue placeholder="Order" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DESC">Desc</SelectItem>
+                          <SelectItem value="ASC">Asc</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </section>
                   {/* Submit Button */}
                   <div className="lg:col-span-2">
                     <Button type="submit" className="w-full">
@@ -287,10 +292,15 @@ const AgentPropertiesManager = () => {
                 </div>
 
                 {/* 🏠 Row 2: Filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {/* <section className="w-full"> */}
+                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] py-4 uppercase inline lg:hidden">Extra Filters</p>
+                <br/>
+                <br/>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {/* State */}
                   <Select value={stateId} onValueChange={setStateId}>
                     <SelectTrigger className="w-full">
+                      <MapPin/>
                       <SelectValue placeholder="State" />
                     </SelectTrigger>
                     <SelectContent>
@@ -308,6 +318,7 @@ const AgentPropertiesManager = () => {
                     onValueChange={setPropertyTypeId}
                   >
                     <SelectTrigger className="w-full">
+                      <Building2/>
                       <SelectValue placeholder="Property Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -322,6 +333,7 @@ const AgentPropertiesManager = () => {
                   {/* Up For */}
                   <Select value={upFor} onValueChange={setUpFor}>
                     <SelectTrigger className="w-full">
+                      <Upload/>
                       <SelectValue placeholder="Up For" />
                     </SelectTrigger>
                     <SelectContent>
@@ -333,6 +345,7 @@ const AgentPropertiesManager = () => {
                   {/* Active Status */}
                   <Select value={isActive} onValueChange={setIsActive}>
                     <SelectTrigger className="w-full">
+                      <CircleCheck/>
                       <SelectValue placeholder="Active Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -347,6 +360,7 @@ const AgentPropertiesManager = () => {
                     onValueChange={(value) => setIsBoosted(value === "true")}
                   >
                     <SelectTrigger className="w-full">
+                      <Zap/>
                       <SelectValue placeholder="Boosted" />
                     </SelectTrigger>
                     <SelectContent>
@@ -355,6 +369,7 @@ const AgentPropertiesManager = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                {/* </section> */}
               </div>
             </form>
           </CardContent>
