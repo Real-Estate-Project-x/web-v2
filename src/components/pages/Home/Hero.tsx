@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { axiosInstance } from "@/lib/axios-interceptor";
+import { PropertyUpFor } from "@/lib/constants";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&q=80",
@@ -22,29 +23,62 @@ const heroImages = [
 const Hero = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [searchText, setSearchText] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<PropertyUpFor>();
+  const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
+  const [selectedPropertyType, setSelectedPropertyType] = useState<string>();
   const searchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-  const [highlights, setHighlights] = useState<{total : number, totalForRent : number, totalForSale : number, totalAgents : number}>({
+  const [highlights, setHighlights] = useState<{
+    total: number;
+    totalForRent: number;
+    totalForSale: number;
+    totalAgents: number;
+  }>({
     total: 0,
     totalForRent: 0,
     totalForSale: 0,
-    totalAgents : 0,
+    totalAgents: 0,
   });
 
-  useEffect(() => {
-    axiosInstance.get("/property/customer-listings/metrics/highlights")
-    .then((response) => {
-      setHighlights({
-        total: response.data.data.total,
-        totalForRent: response.data.data.totalForRent,
-        totalForSale: response.data.data.totalForSale,
-        totalAgents : response.data.data.totalAgents,
-      });
-    }).catch((error) => { 
+  const fetchPropertyTypes = async () => {
+    const url = "/property-type";
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        const result = response.data;
+        setPropertyTypes(result.data);
+
+        return result;
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const fetchHighlights = async () => {
+    const url = "/property/customer-listings/metrics/highlights";
+    try {
+      const response = await axiosInstance.get(url);
+      if (response?.data) {
+        const {
+          data: { data },
+        } = response;
+        setHighlights({
+          total: data.total,
+          totalForRent: data.totalForRent,
+          totalForSale: data.totalForSale,
+          totalAgents: data.totalAgents,
+        });
+      }
+    } catch (error) {
       console.error("Error fetching highlights:", error);
-    });
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    Promise.all([fetchHighlights(), fetchPropertyTypes()]);
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
@@ -55,16 +89,19 @@ const Hero = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const query = { propertyTypeId: selectedPropertyType, category };
     router.push(
-      `/properties/search?query=${encodeURIComponent(
-        searchText
-      )}&filter=${encodeURIComponent(category)}`
+      `/properties/search/?query=${encodeURIComponent(JSON.stringify(query))}`
     );
   };
 
   const quickSearchOptions = [
     { icon: Home, label: "Homes for Sale", count: highlights.totalForSale },
-    { icon: Building2, label: "Properties for Rent", count: highlights.totalForRent },
+    {
+      icon: Building2,
+      label: "Properties for Rent",
+      count: highlights.totalForRent,
+    },
     { icon: TrendingUp, label: "Total Properties", count: highlights.total },
   ];
 
@@ -119,16 +156,24 @@ const Hero = () => {
               {/* Quick Stats */}
               <div className="flex flex-wrap gap-8 text-white/90">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#8EC2FF]">{highlights?.total}+</div>
-                  <div className="text-xs py-1 uppercase tracking-wider">Properties</div>
+                  <div className="text-3xl font-bold text-[#8EC2FF]">
+                    {highlights?.total}+
+                  </div>
+                  <div className="text-xs py-1 uppercase tracking-wider">
+                    Properties
+                  </div>
                 </div>
                 {/* <div className="text-center">
                   <div className="text-3xl font-bold text-[#8EC2FF]">0%</div>
                   <div className="text-xs py-1 uppercase tracking-wider">Satisfaction</div>
                 </div> */}
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#8EC2FF]">{highlights.totalAgents}+</div>
-                  <div className="text-xs py-1 uppercase tracking-wider">Agents</div>
+                  <div className="text-3xl font-bold text-[#8EC2FF]">
+                    {highlights.totalAgents}+
+                  </div>
+                  <div className="text-xs py-1 uppercase tracking-wider">
+                    Agents
+                  </div>
                 </div>
               </div>
             </div>
@@ -159,40 +204,56 @@ const Hero = () => {
 
                   {/* Search Form */}
                   <div className="border-b border-gray-200 pb-3">
-                    <h2 className="text-base font-medium text-[#1E3A8A]/90 text-center tracking-[0.3em] uppercase">Search Properties</h2>
+                    <h2 className="text-base font-medium text-[#1E3A8A]/90 text-center tracking-[0.3em] uppercase">
+                      Search Properties
+                    </h2>
                   </div>
                   <form onSubmit={handleSearch} className="space-y-4">
-                    {/* Property Type Input */}
                     <div className="relative">
-                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                      <Input
-                        ref={searchRef}
-                        type="text"
-                        placeholder="Property type (I.E Flat, Duplex, Warehouse)..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        className="pl-12 h-14 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base"
-                      />
+                      <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Select
+                        onValueChange={(value) =>
+                          setSelectedPropertyType(value)
+                        }
+                      >
+                        <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
+                          <SelectValue placeholder="Property type (I.E Flat, Duplex, Warehouse)..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {propertyTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              {String(type.name).toUpperCase()}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="relative">
                       <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <Select
-                      onValueChange={(value) => setCategory(value)}>
+                        onValueChange={(value) =>
+                          setCategory(value as PropertyUpFor)
+                        }
+                      >
                         <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                        <SelectItem value="RENT">Rent</SelectItem>
-                        <SelectItem value="SALE">Sale</SelectItem>
-            
+                          {Object.values(PropertyUpFor).map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     {/* Search Button */}
-                    <Button type="submit"
+                    <Button
+                      type="submit"
                       disabled={loading}
-                      className="w-full h-13 bg-[#1E3A8A] hover:bg-[#0253CC] text-white text-base font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                      className="w-full h-13 bg-[#1E3A8A] hover:bg-[#0253CC] text-white text-base font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
                       {loading ? "Searching..." : "Search Properties"}
                     </Button>
                   </form>
@@ -226,7 +287,6 @@ const Hero = () => {
             </div>
           </div>
         </div>
-        
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
@@ -252,42 +312,55 @@ const Hero = () => {
       <div className="block lg:hidden justify-self-end w-full max-w-lg">
         <div className="bg-white/95 backdrop-blur-lg px-4 py-8 rounded-3xl border border-white/20">
           <div className="py-4">
-            <h2 className="text-xl font-medium text-[#1E3A8A]/90 text-sm text-center tracking-[0.3em] uppercase">Search Properties</h2>
+            <h2 className="text-xl font-medium text-[#1E3A8A]/90 text-sm text-center tracking-[0.3em] uppercase">
+              Search Properties
+            </h2>
           </div>
           <div className="space-y-6">
             {/* Search Form */}
             <form onSubmit={handleSearch} className="space-y-4">
               {/* Property Type Input */}
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  ref={searchRef}
-                  type="text"
-                  placeholder="Property type (I.E Flat, Duplex, Warehouse)..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  className="pl-12 h-14 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base"
-                />
+                <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Select
+                  onValueChange={(value) => setSelectedPropertyType(value)}
+                >
+                  <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
+                    <SelectValue placeholder="Property type (I.E Flat, Duplex, Warehouse)..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertyTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {String(type.name).toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="relative">
                 <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Select
-                onValueChange={(value) => setCategory(value)}>
+                  onValueChange={(value) => setCategory(value as PropertyUpFor)}
+                >
                   <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                  <SelectItem value="RENT">Rent</SelectItem>
-                  <SelectItem value="SALE">Sale</SelectItem>
-      
+                    {Object.values(PropertyUpFor).map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Search Button */}
-              <Button type="submit"
+              <Button
+                type="submit"
                 disabled={loading}
-                className="w-full h-14 bg-[#1E3A8A] hover:bg-[#0253CC] text-white text-lg font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                className="w-full h-14 bg-[#1E3A8A] hover:bg-[#0253CC] text-white text-lg font-normal rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
                 {loading ? "Searching..." : "Search Properties"}
               </Button>
             </form>
