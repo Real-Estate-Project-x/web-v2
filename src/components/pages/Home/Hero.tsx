@@ -24,8 +24,6 @@ const Hero = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [searchText, setSearchText] = useState<string>("");
   const [category, setCategory] = useState<PropertyUpFor>();
-  const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
-  const [selectedPropertyType, setSelectedPropertyType] = useState<string>();
   const searchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,21 +38,6 @@ const Hero = () => {
     totalForSale: 0,
     totalAgents: 0,
   });
-
-  const fetchPropertyTypes = async () => {
-    const url = "/property-type";
-    try {
-      const response = await axiosInstance.get(url);
-      if (response.data?.success) {
-        const result = response.data;
-        setPropertyTypes(result.data);
-
-        return result;
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
 
   const fetchHighlights = async () => {
     const url = "/property/customer-listings/metrics/highlights";
@@ -78,7 +61,7 @@ const Hero = () => {
   };
 
   useEffect(() => {
-    Promise.all([fetchHighlights(), fetchPropertyTypes()]);
+    fetchHighlights();
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
@@ -89,7 +72,10 @@ const Hero = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const query = { propertyTypeId: selectedPropertyType, category };
+    const query = {
+      category,
+      searchText,
+    };
     router.push(
       `/properties/search/?query=${encodeURIComponent(JSON.stringify(query))}`
     );
@@ -210,24 +196,14 @@ const Hero = () => {
                   </div>
                   <form onSubmit={handleSearch} className="space-y-4">
                     <div className="relative">
-                      <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                      <Select
-                        onValueChange={(value) =>
-                          setSelectedPropertyType(value)
-                        }
-                      >
-                        <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
-                          <SelectValue placeholder="Property type (I.E Flat, Duplex, Warehouse)..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {propertyTypes.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
-                              {String(type.name).toUpperCase()}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Input
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder="I.E: 3 bedroom flat"
+                        className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-md"
+                      />
                     </div>
+
                     <div className="relative">
                       <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <Select
@@ -321,22 +297,14 @@ const Hero = () => {
             <form onSubmit={handleSearch} className="space-y-4">
               {/* Property Type Input */}
               <div className="relative">
-                <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Select
-                  onValueChange={(value) => setSelectedPropertyType(value)}
-                >
-                  <SelectTrigger className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-xs">
-                    <SelectValue placeholder="Property type (I.E Flat, Duplex, Warehouse)..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {propertyTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {String(type.name).toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder="I.E: 3 bedroom flat"
+                  className="w-full pl-12 py-6.5 bg-white border-gray-200 text-navy-800 rounded-xl focus-visible:ring-blue-100 text-base placeholder:text-md"
+                />
               </div>
+
               <div className="relative">
                 <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Select

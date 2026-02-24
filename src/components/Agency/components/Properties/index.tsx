@@ -14,7 +14,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Edit, Eye, Upload, Zap, SortAsc, SortDesc, BarChart3, MapPin, Building, Building2, CircleCheck } from "lucide-react";
+import {
+  Search,
+  Edit,
+  Eye,
+  Upload,
+  Zap,
+  SortAsc,
+  SortDesc,
+  BarChart3,
+  MapPin,
+  Building,
+  Building2,
+  CircleCheck,
+} from "lucide-react";
 import PropertyEditForm from "./dialogs/edit-property";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
@@ -237,9 +250,11 @@ const AgentPropertiesManager = () => {
             >
               <div className="space-y-4">
                 {/* 🔍 Row 1: Search + Sorting */}
-                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] uppercase inline lg:hidden">Search Filters</p>
-                <br/>
-                <br/>
+                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] uppercase inline lg:hidden">
+                  Search Filters
+                </p>
+                <br />
+                <br />
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                   {/* Search */}
                   <div className="relative lg:col-span-5">
@@ -256,7 +271,7 @@ const AgentPropertiesManager = () => {
                     <div className="lg:col-span-3">
                       <Select value={sortBy} onValueChange={setSortBy}>
                         <SelectTrigger className="w-full">
-                          <BarChart3/>
+                          <BarChart3 />
                           <SelectValue placeholder="Sort By" />
                         </SelectTrigger>
                         <SelectContent>
@@ -273,7 +288,7 @@ const AgentPropertiesManager = () => {
                     <div className="col-span-1 lg:col-span-2">
                       <Select value={sortOrder} onValueChange={setSortOrder}>
                         <SelectTrigger className="w-full">
-                          <SortDesc/>
+                          <SortDesc />
                           <SelectValue placeholder="Order" />
                         </SelectTrigger>
                         <SelectContent>
@@ -293,14 +308,16 @@ const AgentPropertiesManager = () => {
 
                 {/* 🏠 Row 2: Filters */}
                 {/* <section className="w-full"> */}
-                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] py-4 uppercase inline lg:hidden">Extra Filters</p>
-                <br/>
-                <br/>
+                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] py-4 uppercase inline lg:hidden">
+                  Extra Filters
+                </p>
+                <br />
+                <br />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {/* State */}
                   <Select value={stateId} onValueChange={setStateId}>
                     <SelectTrigger className="w-full">
-                      <MapPin/>
+                      <MapPin />
                       <SelectValue placeholder="State" />
                     </SelectTrigger>
                     <SelectContent>
@@ -318,7 +335,7 @@ const AgentPropertiesManager = () => {
                     onValueChange={setPropertyTypeId}
                   >
                     <SelectTrigger className="w-full">
-                      <Building2/>
+                      <Building2 />
                       <SelectValue placeholder="Property Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -333,7 +350,7 @@ const AgentPropertiesManager = () => {
                   {/* Up For */}
                   <Select value={upFor} onValueChange={setUpFor}>
                     <SelectTrigger className="w-full">
-                      <Upload/>
+                      <Upload />
                       <SelectValue placeholder="Up For" />
                     </SelectTrigger>
                     <SelectContent>
@@ -345,7 +362,7 @@ const AgentPropertiesManager = () => {
                   {/* Active Status */}
                   <Select value={isActive} onValueChange={setIsActive}>
                     <SelectTrigger className="w-full">
-                      <CircleCheck/>
+                      <CircleCheck />
                       <SelectValue placeholder="Active Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -360,7 +377,7 @@ const AgentPropertiesManager = () => {
                     onValueChange={(value) => setIsBoosted(value === "true")}
                   >
                     <SelectTrigger className="w-full">
-                      <Zap/>
+                      <Zap />
                       <SelectValue placeholder="Boosted" />
                     </SelectTrigger>
                     <SelectContent>
