@@ -412,7 +412,7 @@ export interface SearchPropertyInterfaceType {
       isRegistered: boolean;
       inPersonViewingFee: number | null;
     };
-    photoUrls: string[];
+    // photoUrls: string[];
     postedByUser: {
       id: string;
       status: boolean;

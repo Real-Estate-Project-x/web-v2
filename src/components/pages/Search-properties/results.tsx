@@ -1,12 +1,14 @@
 "use client";
+
+import Link from "next/link";
+import { FC, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Square, MapPin, Heart, Share, Phone } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { FC, useEffect, useState } from "react";
-import { SearchPropertyInterfaceType } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
+import { SearchPropertyInterfaceType } from "../../../../utils/interfaces";
 
 type Props = {
   data: SearchPropertyInterfaceType[];
@@ -14,6 +16,14 @@ type Props = {
 
 const SearchResultsList: FC<Props> = ({ data }) => {
   const router = useRouter();
+
+  const constructImageUrl = (property: SearchPropertyInterfaceType) => {
+    const firstImage = property.property.propertyImages.shift();
+    return (
+      (firstImage as any)?.image?.url ??
+      "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg"
+    );
+  };
 
   useEffect(() => {
     console.log({ data });
@@ -30,12 +40,12 @@ const SearchResultsList: FC<Props> = ({ data }) => {
             {/* Property Image */}
             <div className="md:w-1/3 relative h-64 md:h-auto">
               <img
-                src={property?.property?.photoUrls?.[0]}
+                src={constructImageUrl(property)}
                 alt={property?.property?.title}
                 className="w-full h-80 object-cover"
               />
               <div className="absolute top-4 left-4 flex gap-2">
-                <Badge className="bg-real-600">
+                <Badge className="bg-real-600 capitalize">
                   {property?.property?.propertyType?.name}
                 </Badge>
                 {property?.property?.isNewBuilding && (
@@ -114,12 +124,20 @@ const SearchResultsList: FC<Props> = ({ data }) => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Schedule Tour
-                  </Button>
+                  <Link
+                    href={`/properties/view?id=${property?.property.slug}#schedule-tour`}
+                  >
+                    <Button
+                      className="cursor-pointer"
+                      variant="outline"
+                      size="sm"
+                    >
+                      Schedule Tour
+                    </Button>
+                  </Link>
                   <Button
                     size="sm"
-                    className="bg-[#2563EB] hover:bg-[#1D4ED8]"
+                    className="cursor-pointer bg-[#2563EB] hover:bg-[#1D4ED8]"
                     onClick={() =>
                       router.push(
                         `/properties/view?id=${property?.property.slug}`

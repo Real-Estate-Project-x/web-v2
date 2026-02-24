@@ -191,7 +191,6 @@ const SearchResults = () => {
     const url = `/agency/dropdown/agency-list/?fields=success,paginationControl,data(id,name,description)`;
     try {
       const response = await axiosInstance.get(url);
-      console.log({ response });
       if (response.data.success) {
         setAgencies(response.data.data);
       }

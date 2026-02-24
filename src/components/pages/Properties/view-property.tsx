@@ -251,6 +251,17 @@ const PropertyDetails = () => {
     }
   };
 
+  const scrollToPageLocation = () => {
+    const hash = window.location.hash;
+    const interval = setInterval(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+        clearInterval(interval);
+      }
+    }, 100);
+  };
+
   useEffect(() => {
     const slug = searchParams.get("id");
     setPaymentReference(searchParams.get("reference") as string);
@@ -260,6 +271,7 @@ const PropertyDetails = () => {
       }
       fetchData(slug);
     }
+    scrollToPageLocation();
   }, []);
 
   const ratingConstant = propertyData?.property?.bluepoddRating
@@ -612,7 +624,7 @@ const PropertyDetails = () => {
                     </div>
 
                     {/* RIGHT SIDE — Agent Card */}
-                    <div className="lg:col-span-1">
+                    <div id="schedule-tour" className="lg:col-span-1">
                       {propertyData?.property.agency && (
                         <AgencySnippetCard
                           agency={propertyData.property.agency}
