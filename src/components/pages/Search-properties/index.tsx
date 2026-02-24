@@ -343,7 +343,6 @@ const SearchResults = () => {
         )}
 
         {/* Search Results */}
-
         <div className="bg-white rounded-lg shadow-lg p-6 h-auto mb-8">
           <div
             className="w-fit bg-white p-1 mb-4 text-black rounded-full shadow-sm cursor-pointer"
