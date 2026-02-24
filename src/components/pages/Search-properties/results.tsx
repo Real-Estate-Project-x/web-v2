@@ -36,9 +36,9 @@ const SearchResultsList: FC<Props> = ({ data }) => {
           key={property?.property?.id}
           className="overflow-hidden hover:shadow-lg transition-shadow"
         >
-          <div className="md:flex">
+          <div className="flex flex-col md:flex-row">
             {/* Property Image */}
-            <div className="md:w-1/3 relative h-64 md:h-auto">
+            <div className="w-full md:w-1/3 relative h-auto md:h-auto">
               <img
                 src={constructImageUrl(property)}
                 alt={property?.property?.title}
@@ -63,24 +63,24 @@ const SearchResultsList: FC<Props> = ({ data }) => {
             </div>
 
             {/* Property Details */}
-            <CardContent className="md:w-2/3 p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-[#102A43] mb-2 capitalize">
+            <CardContent className="md:w-2/3 p-4 md:p-6">
+              <div className="flex flex-col-reverse md:justify-between items-start mb-4">
+                <div className="space-y-4">
+                  <h3 className="text-xl lg:text-2xl font-bold text-[#102A43] mb-2 capitalize">
                     {property?.property?.title}
                   </h3>
                   <div className="flex items-center text-gray-600 mb-2">
                     <MapPin className="h-4 w-4 mr-1" />
-                    <span className="text-sm capitalize">
+                    <span className="text-base capitalize">
                       {property?.property?.address}
                     </span>
                   </div>
-                  <p className="text-gray-700 text-sm mb-3 capitalize">
-                    {property?.property?.description}
+                  <p className="text-gray-700 text-base mb-3 capitalize">
+                    {property?.property?.description?.length <= 30 ? property?.property?.description : property?.property?.description?.concat('...') }
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-real-600">
+                  <div className="text-xl lg:text-2xl font-bold text-real-600">
                     {formatPrice(property?.property?.price)}
                   </div>
                   {/* <div className="text-sm text-gray-600">Built in {property.property.}</div> */}
@@ -88,21 +88,21 @@ const SearchResultsList: FC<Props> = ({ data }) => {
               </div>
 
               {/* Property Stats */}
-              <div className="flex justify-between items-center mb-4 p-3 bg-gray-50 rounded-lg">
+              <div className="flex flex-col space-y-4 md:space-y-2 md:justify-between md:items-center mb-4 p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center">
-                  <Bed className="h-4 w-4 mr-1 text-gray-600" />
+                  <Bed className="h-5 w-5 mr-1 text-gray-600" />
                   <span className="text-sm font-medium">
                     {property?.property?.noOfBedrooms} beds
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Bath className="h-4 w-4 mr-1 text-gray-600" />
+                  <Bath className="h-5 w-5 mr-1 text-gray-600" />
                   <span className="text-sm font-medium">
                     {property?.property?.noOfToilets} baths & Toilets
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Square className="h-4 w-4 mr-1 text-gray-600" />
+                  <Square className="h-5 w-5 mr-1 text-gray-600" />
                   <span className="text-sm font-medium">
                     {property?.property?.sizeInSquareFeet} sqft
                   </span>
@@ -113,8 +113,9 @@ const SearchResultsList: FC<Props> = ({ data }) => {
               </div>
 
               {/* Agent Info & Actions */}
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col space-y-2  md:justify-between md:items-center">
                 <div className="text-sm text-gray-600">
+                  <p className="text">(Agency Info)</p>
                   <div className="font-medium capitalize my-2">
                     {property?.property?.agency?.name}
                   </div>

@@ -350,12 +350,12 @@ const SearchResults = () => {
           >
             <ChevronLeft />
           </div>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col md:justify-between md:items-center mb-6">
             <div>
               <h2 className="text-2xl font-bold text-navy-900">
                 Search Results
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 py-2 md:py-0">
                 Found <b>({pagination.totalCount})</b> properties matching your
                 criteria
               </p>
