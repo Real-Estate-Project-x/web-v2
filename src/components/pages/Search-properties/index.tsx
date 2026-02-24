@@ -357,7 +357,7 @@ const SearchResults = () => {
                 Search Results
               </h2>
               <p className="text-gray-600">
-                Found ({pagination.totalCount}) properties matching your
+                Found <b>({pagination.totalCount})</b> properties matching your
                 criteria
               </p>
             </div>
