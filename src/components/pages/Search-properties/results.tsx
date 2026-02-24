@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Square, MapPin, Heart, Share, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { SearchPropertyInterfaceType } from "../../../../utils/interfaces";
 import { formatPrice } from "../../../../utils/helpers";
 
@@ -14,6 +14,10 @@ type Props = {
 
 const SearchResultsList: FC<Props> = ({ data }) => {
   const router = useRouter();
+
+  useEffect(() => {
+    console.log({ data });
+  }, []);
 
   return (
     <div className="space-y-6">

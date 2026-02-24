@@ -19,6 +19,7 @@ import { SearchResultsLoaderCard } from "@/components/shared/loader-cards";
 import { PropertyUpFor } from "@/lib/constants";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 // import { Badge } from "@/components/ui/badge";
 
 const SearchResults = () => {
@@ -187,9 +188,10 @@ const SearchResults = () => {
   };
 
   async function fetchAgencies() {
-    const url = `agency/customer-listings/agents-list`;
+    const url = `/agency/dropdown/agency-list/?fields=success,paginationControl,data(id,name,description)`;
     try {
       const response = await axiosInstance.get(url);
+      console.log({ response });
       if (response.data.success) {
         setAgencies(response.data.data);
       }
@@ -203,7 +205,11 @@ const SearchResults = () => {
     }
   }
 
-  const globalSearch = async () => {
+  const loadData = async (pageNumber = 1) => {
+    await globalSearch(pageNumber);
+  };
+
+  const globalSearch = async (pageNumber = 1, pageSize = 10) => {
     const payload = {
       ...(searchTerm && { searchTerm }),
       ...(stateId && { stateId }),
@@ -211,9 +217,7 @@ const SearchResults = () => {
       ...(propertyTypeId && { propertyTypeId }),
     };
 
-    console.log({ payload });
-
-    await fetchSearchResults(1, 10, payload);
+    await fetchSearchResults(pageNumber, pageSize, payload);
   };
 
   const fetchSearchResults = async (
@@ -354,7 +358,8 @@ const SearchResults = () => {
                 Search Results
               </h2>
               <p className="text-gray-600">
-                Found {searchResults.length} properties matching your criteria
+                Found ({pagination.totalCount}) properties matching your
+                criteria
               </p>
             </div>
             <div className="flex gap-2">
@@ -370,16 +375,27 @@ const SearchResults = () => {
 
           {searchResults.length <= 0 && !loading ? (
             <div className="text-center text-gray-500">
-              No properties found matching your criteria.
+              No properties found. Try adjusting your search criteria
             </div>
           ) : (
-            <SearchResultsList
-              data={
-                searchResults
-                  ? searchResults
-                  : ([] as SearchPropertyInterfaceType[])
-              }
-            />
+            <>
+              <SearchResultsList
+                data={
+                  searchResults
+                    ? searchResults
+                    : ([] as SearchPropertyInterfaceType[])
+                }
+              />
+              {pagination?.currentPage && (
+                <DynamicPagination
+                  currentPage={pagination?.currentPage}
+                  totalPages={pagination?.totalPages}
+                  hasNext={pagination?.hasNext}
+                  hasPrevious={pagination?.hasPrevious}
+                  onPageChange={loadData}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
