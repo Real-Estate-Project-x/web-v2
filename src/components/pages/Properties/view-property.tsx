@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Bed,
   Heart,
@@ -18,7 +19,10 @@ import {
   Building2,
   Cctv,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Carousel,
   CarouselContent,
@@ -29,14 +33,11 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm, FormProvider } from "react-hook-form";
-import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import ContactAgentModal from "./Dialogs/Contact-agent";
 import ScheduleViewingModal from "./Dialogs/schedule-viewing";
-import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +52,6 @@ import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import AgentAvailabilityPicker from "@/components/shared/agent-availability-component";
 import ReportModal from "./Dialogs/report-property";
-import dynamic from "next/dynamic";
 import AgencySnippetCard from "@/components/shared/agency-snippet-card";
 // just importing the propertyMap component led to window not defined issues because it was running on the server b4 the window was up
 // using use client specified client component not server but importing dynamically and disabling ssr makes the component wait until window is up b4 running
@@ -107,18 +107,11 @@ const PropertyDetails = () => {
     },
   });
 
-  // const onSubmitTourRequest = (data: TourFormData) => {
-  //   console.log("Tour request submitted:", data);
-  //   toast.success("Tour request submitted successfully!");
-  //   tourForm.reset();
-  // };
-
   const trackViewedProperty = async (propertyId: string) => {
     const url = `/property/viewed-properties/${propertyId}`;
     try {
       const result = await axiosInstance.post(url, {});
       if (result.data.success) {
-        console.log({ response: result.data });
         return result.data;
       }
     } catch (error) {}
