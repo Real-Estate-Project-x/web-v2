@@ -22,29 +22,29 @@ export const DashboardSettings = () => {
     firstName: "",
   });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
 
-        const url = "user/profile";
-        const result = await axiosInstance.get(url);
+      const url = "/user/profile";
+      const result = await axiosInstance.get(url);
 
-        if (result?.data?.success) {
-          const profile = result.data.data;
-          setForm({
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            email: profile.email,
-          });
-        }
-      } catch (ex) {
-        console.error(ex);
-      } finally {
-        setLoading(false);
+      if (result?.data?.success) {
+        const profile = result.data.data;
+        setForm({
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+        });
       }
-    };
+    } catch (ex) {
+      console.error(ex);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProfile();
   }, []);
 

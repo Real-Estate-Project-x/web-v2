@@ -1,36 +1,77 @@
-'use client';
+"use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Bell, User, Shield, Palette, Globe, CreditCard, Settings as SettingsIcon } from "lucide-react";
-
+import { Settings as SettingsIcon } from "lucide-react";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import { pickUserId } from "../../../../../utils/helpers";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const Settings = () => {
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: false,
-    marketing: true,
-    security: true,
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    email: "",
+    lastName: "",
+    firstName: "",
   });
 
-  const [preferences, setPreferences] = useState({
-    darkMode: false,
-    language: "English",
-    currency: "USD",
-    timezone: "UTC",
-  });
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
-  const handleNotificationChange = (key: string, value: boolean) => {
-    setNotifications(prev => ({ ...prev, [key]: value }));
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const url =
+        "/user/profile?fields=success,message,data(id,email,firstName,lastName)";
+      const result = await axiosInstance.get(url);
+
+      if (result?.data?.success) {
+        const profile = result.data.data;
+        setForm({
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+        });
+      }
+    } catch (ex) {
+      console.error(ex);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePreferenceChange = (key: string, value: boolean) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    const userId = pickUserId();
+
+    const url = "/user?fields=success,message";
+    const payload = {
+      userId,
+      email: form.email,
+      firstName: form.firstName,
+      lastName: form.lastName,
+    };
+
+    try {
+      const result = await axiosInstance.patch(url, payload);
+      if (result?.data?.success) {
+        toast(result?.data.message ?? "Profile updated successfully!");
+        return;
+      }
+    } catch (ex: any) {
+      setLoading(false);
+      toast(
+        ex.response?.data?.message || "An error occurred. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,230 +83,107 @@ const Settings = () => {
               <SettingsIcon className="h-8 w-8" />
               Settings
             </h1>
-            <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
+            <p className="text-gray-600 mt-2">
+              Manage your account settings and preferences
+            </p>
           </div>
 
           <div className="grid gap-6">
-            {/* Profile Settings */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Profile Information
-                </CardTitle>
-                <CardDescription>
-                  Update your personal information and profile details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src="/placeholder.svg" alt="Profile" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1">
-                    <h3 className="font-medium">John Doe</h3>
-                    <p className="text-sm text-gray-600">john.doe@example.com</p>
-                    <Badge variant="secondary">Premium Agent</Badge>
+              <form
+                autoComplete="off"
+                onSubmit={onSubmit}
+                className="space-y-4"
+              >
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="first-name"
+                        className="text-sm font-medium"
+                      >
+                        First name
+                      </label>
+                      <input
+                        required
+                        id="first-name"
+                        className="w-full p-2 border rounded"
+                        defaultValue={form?.firstName ?? ""}
+                        onChange={(e) =>
+                          setForm({ ...form, firstName: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="last-name"
+                        className="text-sm font-medium"
+                      >
+                        Last name
+                      </label>
+                      <input
+                        required
+                        id="last-name"
+                        className="w-full p-2 border rounded"
+                        defaultValue={form?.lastName ?? ""}
+                        onChange={(e) =>
+                          setForm({ ...form, lastName: e.target.value })
+                        }
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline">Change Photo</Button>
-                  <Button variant="outline">Edit Profile</Button>
-                </div>
-              </CardContent>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium">
+                      Email
+                    </label>
+                    <input
+                      required
+                      id="email"
+                      type="email"
+                      className="w-full p-2 border rounded"
+                      defaultValue={form?.email ?? ""}
+                      onChange={(e) =>
+                        setForm({ ...form, email: e.target.value })
+                      }
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-primary text-white font-semibold rounded-lg mt-2 hover:bg-primary/90 shadow-realestate transition py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-1">
+                        <svg
+                          className="animate-spin h-5 w-5 mr-1"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="#fff"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="#fff"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                          />
+                        </svg>{" "}
+                        Saving Changes...
+                      </span>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </CardFooter>
+              </form>
             </Card>
-
-            {/* Notification Settings */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5" />
-                  Notifications
-                </CardTitle>
-                <CardDescription>
-                  Configure how you receive notifications
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Email Notifications</h4>
-                    <p className="text-sm text-gray-600">Receive notifications via email</p>
-                  </div>
-                  <Switch
-                    checked={notifications.email}
-                    onCheckedChange={(value) => handleNotificationChange("email", value)}
-                  />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Push Notifications</h4>
-                    <p className="text-sm text-gray-600">Receive push notifications on your device</p>
-                  </div>
-                  <Switch
-                    checked={notifications.push}
-                    onCheckedChange={(value) => handleNotificationChange("push", value)}
-                  />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Marketing Communications</h4>
-                    <p className="text-sm text-gray-600">Receive updates about new features and offers</p>
-                  </div>
-                  <Switch
-                    checked={notifications.marketing}
-                    onCheckedChange={(value) => handleNotificationChange("marketing", value)}
-                  />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Security Alerts</h4>
-                    <p className="text-sm text-gray-600">Receive important security notifications</p>
-                  </div>
-                  <Switch
-                    checked={notifications.security}
-                    onCheckedChange={(value) => handleNotificationChange("security", value)}
-                  />
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Appearance Settings */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Appearance
-                </CardTitle>
-                <CardDescription>
-                  Customize the look and feel of your dashboard
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Dark Mode</h4>
-                    <p className="text-sm text-gray-600">Switch to dark theme</p>
-                  </div>
-                  <Switch
-                    checked={preferences.darkMode}
-                    onCheckedChange={(value) => handlePreferenceChange("darkMode", value)}
-                  />
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Regional Settings */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="h-5 w-5" />
-                  Regional Settings
-                </CardTitle>
-                <CardDescription>
-                  Configure your location and regional preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Language</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2">
-                      <option>English</option>
-                      <option>Spanish</option>
-                      <option>French</option>
-                      <option>German</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Currency</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2">
-                      <option>USD ($)</option>
-                      <option>EUR (€)</option>
-                      <option>GBP (£)</option>
-                      <option>JPY (¥)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Timezone</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2">
-                      <option>UTC</option>
-                      <option>EST</option>
-                      <option>PST</option>
-                      <option>GMT</option>
-                    </select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Security Settings */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Security
-                </CardTitle>
-                <CardDescription>
-                  Manage your account security and privacy settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Two-Factor Authentication</h4>
-                  <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
-                  <Button variant="outline">Enable 2FA</Button>
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <h4 className="font-medium">Password</h4>
-                  <p className="text-sm text-gray-600">Last changed 3 months ago</p>
-                  <Button variant="outline">Change Password</Button>
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <h4 className="font-medium">Active Sessions</h4>
-                  <p className="text-sm text-gray-600">Manage devices that are signed in to your account</p>
-                  <Button variant="outline">View Sessions</Button>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Billing Settings */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Billing & Subscription
-                </CardTitle>
-                <CardDescription>
-                  Manage your subscription and billing information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Current Plan</h4>
-                    <p className="text-sm text-gray-600">Premium Agent - $29/month</p>
-                  </div>
-                  <Badge>Active</Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline">View Billing History</Button>
-                  <Button variant="outline">Update Payment Method</Button>
-                  <Button variant="outline">Cancel Subscription</Button>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Save Changes */}
-            <div className="flex justify-end">
-              <Button className="w-full sm:w-auto">Save Changes</Button>
-            </div>
           </div>
         </div>
       </main>
