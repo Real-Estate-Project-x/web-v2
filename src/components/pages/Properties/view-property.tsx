@@ -113,6 +113,17 @@ const PropertyDetails = () => {
   //   tourForm.reset();
   // };
 
+  const trackViewedProperty = async (propertyId: string) => {
+    const url = `/property/viewed-properties/${propertyId}`;
+    try {
+      const result = await axiosInstance.post(url, {});
+      if (result.data.success) {
+        console.log({ response: result.data });
+        return result.data;
+      }
+    } catch (error) {}
+  };
+
   const onSubmitComment = (data: { comment: string; rating: number }) => {
     // if a user is not logged in and has not viewed the apartment, user cannot make a comment
     // if(!isUserLoggedIn() && !propertyData?.isViewed){
@@ -244,6 +255,7 @@ const PropertyDetails = () => {
           setComments(commentsResult.data.data);
         }
         setIsLoading(false);
+        return propertyObject?.property;
       }
     } catch (error) {
       setIsLoading(false);
@@ -253,6 +265,8 @@ const PropertyDetails = () => {
 
   const scrollToPageLocation = () => {
     const hash = window.location.hash;
+    if (!hash) return;
+
     const interval = setInterval(() => {
       const el = document.querySelector(hash);
       if (el) {
@@ -267,7 +281,11 @@ const PropertyDetails = () => {
     setPaymentReference(searchParams.get("reference") as string);
     if (slug) {
       if (typeof window !== "undefined") {
-        fetchData(slug, pickUserId());
+        fetchData(slug, pickUserId()).then((property) => {
+          if (property?.id) {
+            trackViewedProperty(property.id);
+          }
+        });
       }
       fetchData(slug);
     }
