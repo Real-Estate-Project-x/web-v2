@@ -1,4 +1,5 @@
 "use client";
+
 import { FC, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import { PropertyUpFor } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export interface PropertySearchPayload {
   propertyTypeId: string;
