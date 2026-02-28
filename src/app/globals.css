@@ -171,6 +171,10 @@ button:disabled {
   border-bottom: 2px solid #000;
 }
 
+.border-bottom{ border-bottom: 0.5px solid #dedbdb; }
+
+.border-top{ border-top: 0.5px solid #dedbdb; }
+
 .text-area-no-resize {
   resize: none !important;
 }

@@ -166,3 +166,30 @@ export const getBrowserName = () => {
     return "Unknown";
   }
 };
+
+export const cleanObject = (obj: Record<string, any>): Record<string, any> => {
+  const cleaned: Record<string, any> = {};
+
+  Object.entries(obj).forEach(([key, value]) => {
+    // Remove empty string, undefined, or null
+    if (value === "" || value === undefined || value === null) {
+      return;
+    }
+
+    // Handle nested objects
+    if (typeof value === "object" && !Array.isArray(value)) {
+      const nested = cleanObject(value);
+
+      // Only keep object if it has valid keys
+      if (Object.keys(nested).length > 0) {
+        cleaned[key] = nested;
+      }
+
+      return;
+    }
+
+    cleaned[key] = value;
+  });
+
+  return cleaned;
+};
