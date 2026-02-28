@@ -1,73 +1,50 @@
 "use client";
 
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
-import PropertySearchForm from "./search-form";
+import PropertySearchForm, { PropertySearchPayload } from "./search-form";
 import SearchResultsList from "./results";
-import { useRouter, useSearchParams } from "next/navigation";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
-  AgentDatabaseInterface,
   PaginationControlInterface,
   SearchPropertyInterfaceType,
 } from "../../../../utils/interfaces";
-import { SearchResultsLoaderCard } from "@/components/shared/loader-cards";
 import { PropertyUpFor } from "@/lib/constants";
-import { AxiosError } from "axios";
-import { toast } from "sonner";
+import { cleanObject } from "../../../../utils/helpers";
+import { SearchResultsLoaderCard } from "@/components/shared/loader-cards";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
-// import { Badge } from "@/components/ui/badge";
 
 const SearchResults = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  //   const [searchResults, setSearchResults] = useState<
-  //     SearchPropertyInterfaceType[]
-  //   >([] as SearchPropertyInterfaceType[]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const filter = searchParams.get("filter") as string;
   const query = searchParams.get("query") as string;
   const [togglePrice, setTogglePrice] = useState<boolean>(false);
   const [toggleDate, setToggleDate] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string>(filter);
-  const [propertyType, setPropertyType] = useState<string>("");
-  const [listingType, setListingType] = useState<string>(query);
-  const [bedrooms, setBedrooms] = useState<number>(1);
-  const [bathrooms, setBathrooms] = useState<number>(1);
-  const [minPrice, setMinPrice] = useState<number>(100000);
-  const [maxPrice, setMaxPrice] = useState<number>(50000000);
-  const [sizeRange, setSizeRange] = useState<number[]>([500, 5000]);
-  const [kidsArea, setkidsArea] = useState<boolean>(false);
-  const [hasWifi, setHasWifi] = useState<boolean>(false);
-  const [carParking, setCarParking] = useState<boolean>(false);
-  const [hasGym, setHasGym] = useState<boolean>(false);
-  const [hasLaundry, setHasLaundry] = useState<boolean>(false);
-  const [hasCCTV, setHasCCTV] = useState<boolean>(false);
-  const [isNewBuilding, setIsNewBuilding] = useState<boolean>(false);
-  const [isPetFriendly, setIsPetFriendly] = useState<boolean>(false);
-  const [propertyTypes, setPropertyTypes] = useState<any>([]);
-  const [states, setStates] = useState<any>([]);
-  const [stateId, setStateId] = useState<string>();
-  const [agencies, setAgencies] = useState<string>();
+  const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
+  const [states, setStates] = useState<any[]>([]);
+  const [agencies, setAgencies] = useState<any[]>([]);
   const [upFor, setUpFor] = useState<PropertyUpFor>();
-  const [propertyTypeId, setPropertyTypeId] = useState<string>();
   const [searchTerm, setSearchTerm] = useState<string>();
-  //   const [searchResults, setSearchResults] = useState<AgentDatabaseInterface[]>(
-  //     [] as AgentDatabaseInterface[]
-  //   );
   const [searchResults, setSearchResults] = useState<
     SearchPropertyInterfaceType[]
   >([] as SearchPropertyInterfaceType[]);
   const [pagination, setPagination] = useState<PaginationControlInterface>(
     {} as PaginationControlInterface
   );
+  const [advancedSearchParams, setAdvancedSearchParams] = useState<
+    PropertySearchPayload | undefined
+  >();
 
   //how to sort by price
   const sortByPrice = () => {
@@ -99,62 +76,18 @@ const SearchResults = () => {
     setSearchResults(sortedData);
   };
 
-  const getSearchResults = async (
-    filter: string,
-    query: string,
-    hasMoreFilters = false
-  ) => {
-    //const hasMoreFilters = moreFilters && Object.keys(moreFilters).length > 0;
+  const handleChildData = async (data: any) => {
+    const payload = cleanObject(data) as PropertySearchPayload;
+    setAdvancedSearchParams(payload);
 
-    const payload = hasMoreFilters
-      ? {
-          propertyTypeId: "",
-          upFor: filter,
-          searchTerm: query,
-          pricing: {
-            start: parseInt(minPrice.toString()),
-            end: parseInt(maxPrice.toString()),
-          },
-          numberOfBeds: bedrooms,
-          numberOfToilets: bathrooms,
-          isNewBuilding,
-          isPetFriendly,
-          hasWifi,
-          hasLaundry,
-          hasCarParking: carParking,
-          hasKidsPlayArea: kidsArea,
-          hasCctv: hasCCTV,
-          hasGym,
-          // squareFootage: {
-          //     start: sizeRange[0],
-          //     end: sizeRange[1]
-          // }
-        }
-      : {
-          propertyTypeId: "",
-          upFor: filter,
-          searchTerm: query,
-        };
-
-    await axiosInstance
-      .post(`/property/customer-listings/global-search`, payload)
-      .then((response) => {
-        if (response.data.success) {
-          setSearchResults(
-            response.data.data || ([] as SearchPropertyInterfaceType[])
-          );
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error("Error fetching search results:", error);
-      });
+    // Query api
+    await globalSearch(1, 10);
   };
-  const handleAdvancedSearch = async (e: React.FormEvent) => {
+
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    await getSearchResults(filter, searchQuery);
+    // Query api
+    await globalSearch(1, 10);
   };
 
   const fetchPropertyTypes = async () => {
@@ -178,7 +111,7 @@ const SearchResults = () => {
       const response = await axiosInstance.get(url);
       if (response.data?.success) {
         const result = response.data;
-        setStates(result);
+        setStates(result.data);
 
         return result;
       }
@@ -209,14 +142,24 @@ const SearchResults = () => {
   };
 
   const globalSearch = async (pageNumber = 1, pageSize = 10) => {
+    let mergedPayload: Partial<PropertySearchPayload> = {};
+    if (advancedSearchParams) {
+      mergedPayload = Object.fromEntries(
+        Object.entries(advancedSearchParams).filter(
+          ([_, value]) => value !== undefined && value !== null && value !== ""
+        )
+      ) as Partial<PropertySearchPayload>;
+    }
+    console.log({ advancedSearchParams });
+
     const payload = {
       ...(searchTerm && { searchTerm }),
-      ...(stateId && { stateId }),
-      ...(upFor && { upFor }),
-      ...(propertyTypeId && { propertyTypeId }),
+      ...mergedPayload,
     };
 
+    setLoading(true);
     await fetchSearchResults(pageNumber, pageSize, payload);
+    setLoading(false);
   };
 
   const fetchSearchResults = async (
@@ -246,11 +189,9 @@ const SearchResults = () => {
   };
 
   useEffect(() => {
-    let query = String(searchParams.get("query"));
-    const filter = String(searchParams.get("filter"));
-
+    const query = searchParams.get("query");
     if (query) {
-      const { searchText, category } = JSON.parse(query);
+      const { searchText, category } = JSON.parse(String(query));
       setUpFor(category);
       setSearchTerm(searchText);
       globalSearch();
@@ -278,14 +219,14 @@ const SearchResults = () => {
       <div className="container mx-auto px-4 -mt-16 relative z-10">
         {/* Quick Search Bar */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <form onSubmit={handleAdvancedSearch}>
+          <form onSubmit={handleSearch}>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
                 <Input
                   type="text"
                   placeholder="Search by location, property type, or keywords..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10"
                 />
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -294,14 +235,21 @@ const SearchResults = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-blue-800 hover:bg-[#1D4ED8] text-white disabled:opacity-50 mt-0 md:mt-0 ml-0 md:ml-4"
+                className="cursor-pointer bg-blue-800 hover:bg-[#1D4ED8] text-white disabled:opacity-50 mt-0 md:mt-0 ml-0 md:ml-4"
               >
                 {loading ? "Searching..." : "Search Properties"}
               </Button>
               <Button
+                type="button"
+                variant="default"
+                className="cursor-pointer gap-2"
+              >
+                Save Search
+              </Button>
+              <Button
                 variant="outline"
                 type="button"
-                className="gap-2"
+                className="gap-2 cursor-pointer"
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -312,32 +260,16 @@ const SearchResults = () => {
         </div>
 
         {/* Advanced Search Form */}
-        {showAdvancedFilters && (
+        {showAdvancedFilters && states && propertyTypes && agencies && (
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
             <PropertySearchForm
-              setInputValue={setInputValue}
-              setPropertyType={setPropertyType}
-              setListingType={setListingType}
-              setBedrooms={setBedrooms}
-              setBathrooms={setBathrooms}
-              setMinPrice={setMinPrice}
-              setMaxPrice={setMaxPrice}
-              sizeRange={sizeRange}
-              setSizeRange={setSizeRange}
-              setKidsArea={setkidsArea}
-              setHasWifi={setHasWifi}
-              setCarParking={setCarParking}
-              setHasGym={setHasGym}
-              setHasLaundry={setHasLaundry}
-              setHasCCTV={setHasCCTV}
-              setIsNewBuilding={setIsNewBuilding}
-              setIsPetFriendly={setIsPetFriendly}
-              loader={loading}
-              inputValue={inputValue}
-              listingType={listingType}
+              propertyTypes={propertyTypes}
+              states={states}
+              agencies={agencies}
+              preSelectedCategory={upFor}
+              onSendData={handleChildData}
               setLoader={setLoading}
-              // propertyType={propertyType}
-              onSubmit={getSearchResults}
+              loader={loading}
             />
           </div>
         )}
@@ -350,14 +282,14 @@ const SearchResults = () => {
           >
             <ChevronLeft />
           </div>
-          <div className="flex flex-col md:justify-between md:items-center mb-6">
+          <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-2xl font-bold text-navy-900">
                 Search Results
               </h2>
-              <p className="text-gray-600 py-2 md:py-0">
-                Found <b>({pagination.totalCount})</b> properties matching your
-                criteria
+              <p className="text-gray-600">
+                Found <b>({pagination.totalCount ?? 0})</b> properties matching
+                your criteria
               </p>
             </div>
             <div className="flex gap-2">
