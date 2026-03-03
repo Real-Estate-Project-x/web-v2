@@ -9,7 +9,16 @@ import {
 import Navbar from "../Home/Nav";
 import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Bath, Bed, Building, Coins, MapPin, Search, Square, Type } from "lucide-react";
+import {
+  Bath,
+  Bed,
+  Building,
+  Coins,
+  MapPin,
+  Search,
+  Square,
+  Type,
+} from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -17,7 +26,7 @@ import {
   PaginationControlInterface,
   PropertyInterface,
 } from "../../../../utils/interfaces";
-import { formatPrice } from "../../../../utils/helpers";
+import { defaultImageUrls, formatPrice } from "../../../../utils/helpers";
 import LoadingCard from "@/components/shared/loader-cards";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { Card, CardContent } from "@/components/ui/card";
@@ -121,7 +130,7 @@ export const PropertyFilter: FC<FilterProps> = ({
             }}
           >
             <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
-              <Coins/>
+              <Coins />
               <SelectValue placeholder="Price Range" />
             </SelectTrigger>
             <SelectContent>
@@ -138,7 +147,7 @@ export const PropertyFilter: FC<FilterProps> = ({
             }
           >
             <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
-              <Building/>
+              <Building />
               <SelectValue placeholder="Property For?" />
             </SelectTrigger>
             <SelectContent>
@@ -151,13 +160,14 @@ export const PropertyFilter: FC<FilterProps> = ({
             onValueChange={(value: string) => {
               const filteredData = copyData.filter(
                 (property) =>
-                  property.propertyType.name.toLowerCase() === value.toLowerCase()
+                  property.propertyType.name.toLowerCase() ===
+                  value.toLowerCase()
               );
               setData(filteredData);
             }}
           >
             <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
-              <Type/>
+              <Type />
               <SelectValue placeholder="Property Type" />
             </SelectTrigger>
             <SelectContent>
@@ -182,7 +192,7 @@ export const PropertyFilter: FC<FilterProps> = ({
             }}
           >
             <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
-              <Bed/>
+              <Bed />
               <SelectValue placeholder="Bedrooms" />
             </SelectTrigger>
             <SelectContent>
@@ -310,8 +320,13 @@ const Properties = () => {
         const {
           data: { data, paginationControl },
         } = response;
+
+        // [Remove_later] Line is a patch for faulty image_urls from image_kit
+        (data as any[]).map((item) => defaultImageUrls(item));
+
         setCopyData(data);
         setProperties(data);
+
         setPagination(paginationControl);
       }
       setIsLoading(false);
@@ -326,7 +341,9 @@ const Properties = () => {
       <Navbar />
       <div className="mx-6 sm:mx-10 md:mx-16 mt-24 mb-10">
         <div className="mb-4">
-          <h1 className="text-3xl md:text-4xl font-semibold text-[#102A43] mb-2">Find Your Dream Home</h1>
+          <h1 className="text-3xl md:text-4xl font-semibold text-[#102A43] mb-2">
+            Find Your Dream Home
+          </h1>
           <p className="text-[#486581] max-w-xl font-normal">
             Explore sought-after locations trusted by buyers and renters alike.
           </p>

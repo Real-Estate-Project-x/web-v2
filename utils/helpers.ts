@@ -193,3 +193,27 @@ export const cleanObject = (obj: Record<string, any>): Record<string, any> => {
 
   return cleaned;
 };
+
+// To be removed later
+export const defaultImageUrls = (property: any) => {
+  const imageUrls = [
+    "https://blupodd.sirv.com/uploads/95fcba07-4a79-4dcd-b056-345343e8a7d5.jpeg",
+    "https://blupodd.sirv.com/uploads/8b3a8c4c-4540-400e-baf8-1adb9e71bf50.jpeg",
+    "https://blupodd.sirv.com/uploads/78eef01d-5b4b-4c56-ba35-cc775be751ba.jpeg",
+    "https://blupodd.sirv.com/uploads/862f6ba6-63ca-4a82-9503-196078c8353f.jpeg",
+    "https://blupodd.sirv.com/uploads/45b56385-afa7-4f72-b4d1-5240fd5fb46b.jpeg",
+    "https://blupodd.sirv.com/uploads/baec6c7c-0647-4ee4-8521-acc2185eb3aa.jpeg",
+    "https://blupodd.sirv.com/uploads/4a1f0a9b-9477-4b17-9e0e-b7f7dc48786e.jpeg",
+  ];
+
+  const getRandomImageUrl = () => {
+    const randomIndex = Math.floor(Math.random() * imageUrls.length);
+    return imageUrls[randomIndex];
+  };
+
+  for (const { image } of property.propertyImages) {
+    if (String(image.url).includes("imagekit")) {
+      image.url = getRandomImageUrl();
+    }
+  }
+};

@@ -46,7 +46,11 @@ import {
   PropertyInterface,
   ViewPropertyInterface,
 } from "../../../../utils/interfaces";
-import { formatPrice, pickUserId } from "../../../../utils/helpers";
+import {
+  defaultImageUrls,
+  formatPrice,
+  pickUserId,
+} from "../../../../utils/helpers";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
 import { ErrorDialog } from "@/components/shared/error-dialog";
 import { axiosInstance } from "@/lib/axios-interceptor";
@@ -238,6 +242,8 @@ const PropertyDetails = () => {
       if (propertyResult.data.success) {
         const propertyObject = propertyResult.data.data;
         setProperty(propertyObject || ({} as ViewPropertyInterface));
+        // [Remove_later] Line is a patch for faulty image_urls from image_kit
+        defaultImageUrls(propertyObject.property);
         setIsFavourite(propertyObject.isFavourite);
 
         // get comments
