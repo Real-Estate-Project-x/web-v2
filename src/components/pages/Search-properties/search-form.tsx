@@ -47,7 +47,7 @@ export interface PropertySearchPayload {
 interface Props {
   loader: boolean;
   preSelectedCategory?: PropertyUpFor;
-  propertyTypes: { id: string; name: string }[];
+  propertyTypes: { id: string; name: string; tag: string }[];
   states: { id: string; name: string }[];
   agencies: { id: string; name: string }[];
   setLoader: (v: boolean) => void;
@@ -65,9 +65,11 @@ const PropertySearchForm: FC<Props> = ({
 }) => {
   const [saveLoading, setSaveLoading] = useState(false);
 
-  useEffect(() => {
-    console.log({ states, propertyTypes, agencies });
-  }, []);
+  const getPropertyType = (propertyTypeId: string) => {
+    if (!propertyTypes.length) return;
+
+    return propertyTypes.find(({ id }) => id === propertyTypeId);
+  };
 
   const [filter, setFilter] = useState<PropertySearchPayload>({
     propertyTypeId: "",
@@ -104,15 +106,6 @@ const PropertySearchForm: FC<Props> = ({
     setLoader(true);
     console.log({ filter });
     onSendData(filter);
-  };
-
-  const handleSaveSearch = async () => {
-    try {
-      setSaveLoading(true);
-      // await onSaveSearch(filter);
-    } finally {
-      setSaveLoading(false);
-    }
   };
 
   const resetFilters = () => {
@@ -205,43 +198,45 @@ const PropertySearchForm: FC<Props> = ({
             </Select>
           </div>
 
-          <>
-            {/* Bedrooms (Input) */}
-            <div className="space-y-2">
-              <Label>Bedrooms</Label>
-              <Input
-                type="number"
-                min={1}
-                value={filter.numberOfBeds ?? ""}
-                onChange={(e) =>
-                  setFilter((prev) => ({
-                    ...prev,
-                    numberOfBeds: e.target.value
-                      ? Number(e.target.value)
-                      : undefined,
-                  }))
-                }
-              />
-            </div>
+          {getPropertyType(filter.propertyTypeId)?.tag === "RESIDENTIAL" && (
+            <>
+              {/* Bedrooms (Input) */}
+              <div className="space-y-2">
+                <Label>Bedrooms</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={filter.numberOfBeds ?? ""}
+                  onChange={(e) =>
+                    setFilter((prev) => ({
+                      ...prev,
+                      numberOfBeds: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
+                    }))
+                  }
+                />
+              </div>
 
-            {/* Toilets (Input) */}
-            <div className="space-y-2">
-              <Label>Toilets</Label>
-              <Input
-                type="number"
-                min={1}
-                value={filter.numberOfToilets ?? ""}
-                onChange={(e) =>
-                  setFilter((prev) => ({
-                    ...prev,
-                    numberOfToilets: e.target.value
-                      ? Number(e.target.value)
-                      : undefined,
-                  }))
-                }
-              />
-            </div>
-          </>
+              {/* Toilets (Input) */}
+              <div className="space-y-2">
+                <Label>Toilets</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={filter.numberOfToilets ?? ""}
+                  onChange={(e) =>
+                    setFilter((prev) => ({
+                      ...prev,
+                      numberOfToilets: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
+                    }))
+                  }
+                />
+              </div>
+            </>
+          )}
 
           {/* Up For (Select) */}
           <div className="space-y-2">

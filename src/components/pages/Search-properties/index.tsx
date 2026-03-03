@@ -105,6 +105,43 @@ const SearchResults = () => {
     }
   };
 
+  const saveSearch = async () => {
+    let mergedPayload: Partial<PropertySearchPayload> = {};
+    if (advancedSearchParams) {
+      mergedPayload = Object.fromEntries(
+        Object.entries(advancedSearchParams).filter(
+          ([_, value]) => value !== undefined && value !== null && value !== ""
+        )
+      ) as Partial<PropertySearchPayload>;
+    }
+
+    const payload = {
+      ...mergedPayload,
+      ...(searchTerm && { searchTerm }),
+    };
+
+    setLoading(true);
+    const response = await postSavedSearch(payload);
+    setLoading(false);
+
+    if (response?.success) {
+      toast.success(response.message ?? "Saved search successfully");
+    }
+  };
+
+  const postSavedSearch = async <T,>(payload: T): Promise<any> => {
+    try {
+      const url = "/saved-search/?fields=success,code,message";
+
+      const response = await axiosInstance.post(url, payload);
+      if (!response.data) return;
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const fetchStates = async () => {
     const url = "/country/states/by-country";
     try {
@@ -150,11 +187,10 @@ const SearchResults = () => {
         )
       ) as Partial<PropertySearchPayload>;
     }
-    console.log({ advancedSearchParams });
 
     const payload = {
-      ...(searchTerm && { searchTerm }),
       ...mergedPayload,
+      ...(searchTerm && { searchTerm }),
     };
 
     setLoading(true);
@@ -243,6 +279,7 @@ const SearchResults = () => {
                 type="button"
                 variant="default"
                 className="cursor-pointer gap-2"
+                onClick={saveSearch}
               >
                 Save Search
               </Button>
