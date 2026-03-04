@@ -25,10 +25,6 @@ const SearchResultsList: FC<Props> = ({ data }) => {
     );
   };
 
-  useEffect(() => {
-    console.log({ data });
-  }, []);
-
   return (
     <div className="space-y-6">
       {data?.map((property: SearchPropertyInterfaceType) => (
@@ -76,7 +72,9 @@ const SearchResultsList: FC<Props> = ({ data }) => {
                     </span>
                   </div>
                   <p className="text-gray-700 text-base mb-3 capitalize">
-                    {property?.property?.description?.length <= 30 ? property?.property?.description : property?.property?.description?.concat('...') }
+                    {property?.property?.description?.length <= 30
+                      ? property?.property?.description
+                      : property?.property?.description?.concat("...")}
                   </p>
                 </div>
                 <div className="text-right">

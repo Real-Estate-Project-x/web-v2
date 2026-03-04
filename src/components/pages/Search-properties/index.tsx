@@ -157,7 +157,7 @@ const SearchResults = () => {
     }
   };
 
-  async function fetchAgencies() {
+  const fetchAgencies = async () => {
     const url = `/agency/dropdown/agency-list/?fields=success,paginationControl,data(id,name,description)`;
     try {
       const response = await axiosInstance.get(url);
@@ -172,7 +172,7 @@ const SearchResults = () => {
       toast(message, { description: JSON.stringify(error) });
       throw error;
     }
-  }
+  };
 
   const loadData = async (pageNumber = 1) => {
     await globalSearch(pageNumber);
