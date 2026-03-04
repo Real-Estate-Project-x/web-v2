@@ -205,62 +205,9 @@ export const PropertyFilter: FC<FilterProps> = ({
         </div>
 
         {/* Quick Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 w-full">
-          {/* Price */}
-          <Select
-            onValueChange={(value: string) => {
-              const [min, max] = value.split("-");
-              setFilters({
-                ...filters,
-                minPrice: parseInt(min),
-                maxPrice: max ? parseInt(max) : null,
-              });
-            }}
-          >
-            <SelectTrigger className="full-height w-full">
-              <Coins />
-              <SelectValue placeholder="Price Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="200000-500000">₦200k - ₦500k</SelectItem>
-              <SelectItem value="500000-1000000">₦500k - ₦1M</SelectItem>
-              <SelectItem value="1000000-2000000">₦1M - ₦2M</SelectItem>
-              <SelectItem value="2000000-5000000">₦2M - ₦5M</SelectItem>
-              <SelectItem value="5000000-">₦5M+</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Up For */}
-          <Select
-            onValueChange={(value) => setFilters({ ...filters, upFor: value })}
-          >
-            <SelectTrigger className="full-height w-full">
-              <Building />
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="RENT">RENT</SelectItem>
-              <SelectItem value="SALE">SALE</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Property Type */}
-          <Select
-            onValueChange={(value) =>
-              setFilters({ ...filters, propertyType: value })
-            }
-          >
-            <SelectTrigger className="full-height w-full">
-              <Type />
-              <SelectValue placeholder="Property Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="flat">Flat</SelectItem>
-              <SelectItem value="duplex">Duplex</SelectItem>
-              <SelectItem value="bungalow">Bungalow</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 w-full">
+          
+        </div> */}
       </div>
 
       {/* Toggle Advanced */}
@@ -292,6 +239,63 @@ export const PropertyFilter: FC<FilterProps> = ({
       {showAdvanced && (
         <section className="border rounded-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-4 border-bottom">
+            {/* Price */}
+            <Select
+              onValueChange={(value: string) => {
+                const [min, max] = value.split("-");
+                setFilters({
+                  ...filters,
+                  minPrice: parseInt(min),
+                  maxPrice: max ? parseInt(max) : null,
+                });
+              }}
+            >
+              <SelectTrigger className="full-height w-full">
+                <Coins />
+                <SelectValue placeholder="Price Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="200000-500000">₦200k - ₦500k</SelectItem>
+                <SelectItem value="500000-1000000">₦500k - ₦1M</SelectItem>
+                <SelectItem value="1000000-2000000">₦1M - ₦2M</SelectItem>
+                <SelectItem value="2000000-5000000">₦2M - ₦5M</SelectItem>
+                <SelectItem value="5000000-">₦5M+</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Up For */}
+            <Select
+              onValueChange={(value) =>
+                setFilters({ ...filters, upFor: value })
+              }
+            >
+              <SelectTrigger className="full-height w-full">
+                <Building />
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="RENT">RENT</SelectItem>
+                <SelectItem value="SALE">SALE</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Property Type */}
+            <Select
+              onValueChange={(value) =>
+                setFilters({ ...filters, propertyType: value })
+              }
+            >
+              <SelectTrigger className="full-height w-full">
+                <Type />
+                <SelectValue placeholder="Property Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="flat">Flat</SelectItem>
+                <SelectItem value="duplex">Duplex</SelectItem>
+                <SelectItem value="bungalow">Bungalow</SelectItem>
+              </SelectContent>
+            </Select>
+
             {/* Agency */}
             <Select
               onValueChange={(value) =>
@@ -379,9 +383,17 @@ export const PropertyFilter: FC<FilterProps> = ({
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4 p-4">
+          <div className="w-full flex justify-end gap-4 p-4">
             <Button className="cursor-pointer" onClick={applyFilters}>
               Apply Filter
+            </Button>
+
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              onClick={applyFilters}
+            >
+              Reset
             </Button>
           </div>
         </section>
