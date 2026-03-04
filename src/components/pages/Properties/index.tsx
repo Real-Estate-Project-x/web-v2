@@ -6,31 +6,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import Navbar from "../Home/Nav";
 import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Bath,
   Bed,
+  Toilet,
   Building,
   Coins,
   MapPin,
   Search,
+  SlidersHorizontal,
   Square,
+  UsersRound,
   Type,
+  SaveAll,
 } from "lucide-react";
 import Footer from "../Home/Footer";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   PaginationControlInterface,
   PropertyInterface,
 } from "../../../../utils/interfaces";
+import PropertySearchForm, {
+  PropertySearchPayload,
+} from "../Search-properties/search-form";
 import { defaultImageUrls, formatPrice } from "../../../../utils/helpers";
 import LoadingCard from "@/components/shared/loader-cards";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { Card, CardContent } from "@/components/ui/card";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 type Props = {
   array: PropertyInterface[];
@@ -53,6 +64,99 @@ export const PropertyFilter: FC<FilterProps> = ({
   setCopyData,
   isApi = true,
 }) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const [filters, setFilters] = useState<any>({
+    searchTerm: "",
+    minPrice: null,
+    maxPrice: null,
+    upFor: null,
+    propertyType: null,
+    bedrooms: null,
+    agencyId: null,
+    hasArchitecturalPlans: false,
+    hasCarParking: false,
+    isNewBuilding: false,
+    isPetFriendly: false,
+    hasWifi: false,
+    hasLaundry: false,
+    hasKidsPlayArea: false,
+    hasCctv: false,
+    hasGym: false,
+  });
+
+  const applyFilters = () => {
+    let filtered = [...copyData];
+
+    if (filters.searchTerm) {
+      const term = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.address.toLowerCase().includes(term) ||
+          p.title.toLowerCase().includes(term) ||
+          p.upFor.toLowerCase().includes(term)
+      );
+    }
+
+    if (filters.minPrice !== null) {
+      filtered = filtered.filter((p) => p.price >= filters.minPrice);
+    }
+
+    if (filters.maxPrice !== null) {
+      filtered = filtered.filter((p) => p.price <= filters.maxPrice);
+    }
+
+    if (filters.upFor) {
+      filtered = filtered.filter((p) => p.upFor === filters.upFor);
+    }
+
+    if (filters.propertyType) {
+      filtered = filtered.filter(
+        (p) =>
+          p.propertyType.name.toLowerCase() ===
+          filters.propertyType.toLowerCase()
+      );
+    }
+
+    if (filters.bedrooms) {
+      filtered = filtered.filter((p) =>
+        filters.bedrooms === 5
+          ? p.noOfBedrooms >= 5
+          : p.noOfBedrooms === filters.bedrooms
+      );
+    }
+
+    if (filters.agencyId) {
+      filtered = filtered.filter((p) => p.agency?.id === filters.agencyId);
+    }
+
+    // Boolean filters
+    const booleanKeys = [
+      "hasArchitecturalPlans",
+      "hasCarParking",
+      "isNewBuilding",
+      "isPetFriendly",
+      "hasWifi",
+      "hasLaundry",
+      "hasKidsPlayArea",
+      "hasCctv",
+      "hasGym",
+    ];
+
+    // booleanKeys.forEach((key) => {
+    //   if (filters[key]) {
+    //     filtered = filtered.filter((p) => p[key] === true);
+    //   }
+    // });
+
+    setData(filtered);
+  };
+
+  const saveSearch = () => {
+    console.log("Saved search:", filters);
+    // Hook this to backend later
+  };
+
   //const [dataState, setDataState] = useState<PropertyInterface[]>(data);
 
   const onChangeHandler = (value: string) => {
@@ -84,127 +188,204 @@ export const PropertyFilter: FC<FilterProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-wrap gap-3">
-      <div className="w-full flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-1/2 relative flex flex-row gap-2 items-center">
+    <div className="w-full flex flex-col gap-4">
+      {/* Top Search Row */}
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
+        {/* Search Input */}
+        <div className="w-full lg:w-3/3 relative">
           <Input
             type="text"
             placeholder="Search by location, property type..."
-            className="w-full pl-10 h-12"
-            onChange={(e) => {
-              if (e.target.value === "") {
-                // If search term is empty, reset to original data
-                setData(copyData);
-                return;
-              }
-              const searchTerm = e.target.value.toLowerCase();
-              //filter properties based on search term
-              //using the data in state
-              const filteredData = copyData.filter(
-                (property) =>
-                  property.address.toLowerCase().includes(searchTerm) ||
-                  property.title.toLowerCase().includes(searchTerm) ||
-                  property.upFor.toLowerCase().includes(searchTerm)
-              );
-              setData(filteredData);
-            }}
+            className="pl-10 h-12"
+            onChange={(e) =>
+              setFilters({ ...filters, searchTerm: e.target.value })
+            }
           />
-          <Search className="absolute left-3 top-3 h-5 w-5 mt-0.5 text-gray-400" />
+          <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
         </div>
-        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+
+        {/* Quick Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 w-full">
+          {/* Price */}
           <Select
             onValueChange={(value: string) => {
-              const [minPrice, maxPrice] = value.split("-");
-              const filteredData = copyData.filter((property) => {
-                if (!maxPrice) {
-                  return property.price >= parseInt(minPrice);
-                }
-
-                return (
-                  property.price >= parseInt(minPrice) &&
-                  property.price <= parseInt(maxPrice)
-                );
+              const [min, max] = value.split("-");
+              setFilters({
+                ...filters,
+                minPrice: parseInt(min),
+                maxPrice: max ? parseInt(max) : null,
               });
-
-              setData(filteredData);
             }}
           >
-            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+            <SelectTrigger className="full-height w-full">
               <Coins />
               <SelectValue placeholder="Price Range" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="200-500">₦200k - ₦500k</SelectItem>
-              <SelectItem value="500-1000000">₦500k - ₦1M</SelectItem>
+              <SelectItem value="200000-500000">₦200k - ₦500k</SelectItem>
+              <SelectItem value="500000-1000000">₦500k - ₦1M</SelectItem>
               <SelectItem value="1000000-2000000">₦1M - ₦2M</SelectItem>
               <SelectItem value="2000000-5000000">₦2M - ₦5M</SelectItem>
               <SelectItem value="5000000-">₦5M+</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Up For */}
           <Select
-            onValueChange={(value: string) =>
-              isApi ? onChangeHandler(value) : filterByUpFor(value)
-            }
+            onValueChange={(value) => setFilters({ ...filters, upFor: value })}
           >
-            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+            <SelectTrigger className="full-height w-full">
               <Building />
-              <SelectValue placeholder="Property For?" />
+              <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="RENT">{"RENT"}</SelectItem>
-              <SelectItem value="SALE">{"SALE"}</SelectItem>
+              <SelectItem value="RENT">RENT</SelectItem>
+              <SelectItem value="SALE">SALE</SelectItem>
             </SelectContent>
           </Select>
 
+          {/* Property Type */}
           <Select
-            onValueChange={(value: string) => {
-              const filteredData = copyData.filter(
-                (property) =>
-                  property.propertyType.name.toLowerCase() ===
-                  value.toLowerCase()
-              );
-              setData(filteredData);
-            }}
+            onValueChange={(value) =>
+              setFilters({ ...filters, propertyType: value })
+            }
           >
-            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
+            <SelectTrigger className="full-height w-full">
               <Type />
               <SelectValue placeholder="Property Type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="flat">Flat</SelectItem>
               <SelectItem value="duplex">Duplex</SelectItem>
-              <SelectItem value="Bungalow">Bungalow</SelectItem>
-              {/* <SelectItem value="Office spaces">Office Spaces</SelectItem> */}
+              <SelectItem value="bungalow">Bungalow</SelectItem>
             </SelectContent>
           </Select>
-
-          <Select
-            onValueChange={(value: string) => {
-              const filteredData = copyData.filter((property) => {
-                const numOfBeds = parseInt(value);
-                if (numOfBeds === 5) {
-                  return property.noOfBedrooms >= 5;
-                }
-                return property.noOfBedrooms === numOfBeds;
-              });
-
-              setData(filteredData);
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-[250px] md:w-[200px] lg:w-[140px] py-6">
-              <Bed />
-              <SelectValue placeholder="Bedrooms" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1 Bed</SelectItem>
-              <SelectItem value="2">2 Beds</SelectItem>
-              <SelectItem value="3">3 Beds</SelectItem>
-              <SelectItem value="4">4 Beds</SelectItem>
-              <SelectItem value="5">5+ Beds</SelectItem>
-            </SelectContent>
-          </Select>
-        </section>
+        </div>
       </div>
+
+      {/* Toggle Advanced */}
+      <div className="flex flex-col sm:flex-row gap-3 w-full">
+        <Button
+          className="cursor-pointer"
+          variant="outline"
+          onClick={() => setShowAdvanced(!showAdvanced)}
+        >
+          {" "}
+          <SlidersHorizontal />
+          {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+        </Button>
+
+        <Button className="cursor-pointer" onClick={applyFilters}>
+          <Search /> Search
+        </Button>
+
+        <Button
+          className="cursor-pointer"
+          variant="secondary"
+          onClick={saveSearch}
+        >
+          <SaveAll /> Save Search
+        </Button>
+      </div>
+
+      {/* Advanced Filters */}
+      {showAdvanced && (
+        <section className="border rounded-xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-4 border-bottom">
+            {/* Agency */}
+            <Select
+              onValueChange={(value) =>
+                setFilters({ ...filters, agencyId: value })
+              }
+            >
+              <SelectTrigger className="full-height w-full">
+                <UsersRound />
+                <SelectValue placeholder="Select Agency" />
+              </SelectTrigger>
+              <SelectContent>
+                {[
+                  { id: "1", name: "Agency 1" },
+                  { id: "2", name: "Agency 2" },
+                ].map((agency) => (
+                  <SelectItem key={agency.id} value={agency.id}>
+                    {agency.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Bedrooms */}
+            <Select
+              onValueChange={(value) =>
+                setFilters({ ...filters, bedrooms: parseInt(value) })
+              }
+            >
+              <SelectTrigger className="full-height w-full">
+                <Bed />
+                <SelectValue placeholder="Bedrooms" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1</SelectItem>
+                <SelectItem value="2">2</SelectItem>
+                <SelectItem value="3">3</SelectItem>
+                <SelectItem value="4">4</SelectItem>
+                <SelectItem value="5">5+</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Toilets */}
+            <Select
+              onValueChange={(value) =>
+                setFilters({ ...filters, bedrooms: parseInt(value) })
+              }
+            >
+              <SelectTrigger className="full-height w-full">
+                <Toilet />
+                <SelectValue placeholder="Toilets" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1</SelectItem>
+                <SelectItem value="2">2</SelectItem>
+                <SelectItem value="3">3</SelectItem>
+                <SelectItem value="4">4</SelectItem>
+                <SelectItem value="5">5+</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border-bottom">
+            {/* Boolean Checkboxes */}
+            {[
+              "hasArchitecturalPlans",
+              "hasCarParking",
+              "isNewBuilding",
+              "isPetFriendly",
+              "hasWifi",
+              "hasLaundry",
+              "hasKidsPlayArea",
+              "hasCctv",
+              "hasGym",
+            ].map((field) => (
+              <div key={field} className="flex items-center gap-2">
+                <Checkbox
+                  onCheckedChange={(checked) =>
+                    setFilters({ ...filters, [field]: checked })
+                  }
+                />
+                <label className="text-sm capitalize">
+                  {field.replace(/([A-Z])/g, " $1")}
+                </label>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4 p-4">
+            <Button className="cursor-pointer" onClick={applyFilters}>
+              Apply Filter
+            </Button>
+          </div>
+        </section>
+      )}
     </div>
   );
 };
