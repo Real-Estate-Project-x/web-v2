@@ -145,6 +145,12 @@ export const PropertyFilter: FC<FilterProps> = ({
     onSendData(cleanObject(filter));
   };
 
+  const getPropertyType = (propertyTypeId: string) => {
+    if (!propertyTypes.length) return;
+
+    return propertyTypes.find(({ id }) => id === propertyTypeId);
+  };
+
   const saveSearch = () => {
     const { pricing, squareFootage, ...rest } = filter;
 
@@ -299,6 +305,52 @@ export const PropertyFilter: FC<FilterProps> = ({
                 </SelectContent>
               </Select>
 
+              {getPropertyType(filter.propertyTypeId)?.tag ===
+                "RESIDENTIAL" && (
+                <>
+                  {/* Bedrooms */}
+                  <Select
+                    onValueChange={(value) =>
+                      setFilter({ ...filter, numberOfBeds: +value })
+                    }
+                  >
+                    <SelectTrigger className="full-height w-full">
+                      <Bed />
+                      <SelectValue placeholder="Bedrooms" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="6">6</SelectItem>
+                      <SelectItem value="7">7</SelectItem>
+                      <SelectItem value="8">8+</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Toilets */}
+                  <Select
+                    onValueChange={(value) =>
+                      setFilter({ ...filter, numberOfToilets: +value })
+                    }
+                  >
+                    <SelectTrigger className="full-height w-full">
+                      <Toilet />
+                      <SelectValue placeholder="Toilets" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                      <SelectItem value="5">5+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
+
               {/* State */}
               <Select
                 onValueChange={(value) =>
@@ -334,47 +386,6 @@ export const PropertyFilter: FC<FilterProps> = ({
                       {agency.name}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-
-              {/* Bedrooms */}
-              <Select
-                onValueChange={(value) =>
-                  setFilter({ ...filter, numberOfBeds: +value })
-                }
-              >
-                <SelectTrigger className="full-height w-full">
-                  <Bed />
-                  <SelectValue placeholder="Bedrooms" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                  <SelectItem value="5">5</SelectItem>
-                  <SelectItem value="6">6</SelectItem>
-                  <SelectItem value="7">7</SelectItem>
-                  <SelectItem value="8">8+</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Toilets */}
-              <Select
-                onValueChange={(value) =>
-                  setFilter({ ...filter, numberOfToilets: +value })
-                }
-              >
-                <SelectTrigger className="full-height w-full">
-                  <Toilet />
-                  <SelectValue placeholder="Toilets" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                  <SelectItem value="5">5+</SelectItem>
                 </SelectContent>
               </Select>
             </div>
