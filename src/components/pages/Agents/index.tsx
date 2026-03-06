@@ -35,7 +35,7 @@ const Agents = () => {
   async function fetchAgents(pageNumber = 1, pageSize = 10) {
     setIsLoading(true);
 
-    const url = `agency/customer-listings/agents-list?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    const url = `/agency/customer-listings/agents-list/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
     try {
       const response = await axiosInstance.get(url);
       if (response.data.success) {

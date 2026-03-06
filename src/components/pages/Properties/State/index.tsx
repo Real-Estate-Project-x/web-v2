@@ -1,6 +1,21 @@
 "use client";
 
 import {
+  Bed,
+  Building,
+  Coins,
+  SaveAll,
+  Search,
+  SlidersHorizontal,
+  Toilet,
+  Type,
+  UsersRound,
+} from "lucide-react";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { PropertyUpFor } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,21 +39,6 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { cleanObject } from "../../../../../utils/helpers";
 import { PropertySearchPayload } from "../../Search-properties/search-form";
-import {
-  Bed,
-  Building,
-  Coins,
-  SaveAll,
-  Search,
-  SlidersHorizontal,
-  Toilet,
-  Type,
-  UsersRound,
-} from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { PropertyUpFor } from "@/lib/constants";
-import { AxiosError } from "axios";
-import { toast } from "sonner";
 
 interface FilterProps {
   loader: boolean;

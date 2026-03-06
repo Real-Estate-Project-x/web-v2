@@ -319,6 +319,7 @@ export interface AgentInterface {
   ];
   timeSinceJoined: string;
   totalReviewCount: number;
+  propertyCount: number;
   viewingsCount: number;
   isCurrentlyAvailable: boolean;
 }

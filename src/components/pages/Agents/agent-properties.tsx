@@ -1,18 +1,14 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { PropertyUpFor } from "@/lib/constants";
+import React, { FC, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import {
   Star,
   MapPin,
@@ -26,11 +22,17 @@ import {
   Search,
   SlidersHorizontal,
   Calendar,
+  Coins,
+  Type,
+  UsersRound,
+  Toilet,
+  SaveAll,
 } from "lucide-react";
 import Navbar from "../Home/Nav";
 import Footer from "../Home/Footer";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -43,8 +45,375 @@ import {
   PaginationControlInterface,
   PropertyInterface,
 } from "../../../../utils/interfaces";
-import { formatPrice } from "../../../../utils/helpers";
+import { cleanObject, formatPrice } from "../../../../utils/helpers";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import { PropertySearchPayload } from "../Search-properties/search-form";
+
+interface FilterProps {
+  loader: boolean;
+  propertyTypes: { id: string; name: string; tag: string }[];
+  states: { id: string; name: string }[];
+  setLoader: (v: boolean) => void;
+  onSendData: (data: Partial<AgencyPropertyViewSearchPayloadV2>) => void;
+  onSaveData: (data: Partial<AgencyPropertyViewSearchPayloadV2>) => void;
+}
+
+interface AgencyPropertyViewSearchPayloadV2
+  extends Omit<PropertySearchPayload, "agencyId"> {
+  searchTerm: string;
+
+  removeBoostedProperties: boolean;
+}
+
+export const AgencyPropertyViewPropertyFilter: FC<FilterProps> = ({
+  states,
+  propertyTypes,
+  setLoader,
+  onSendData,
+  onSaveData,
+}) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const [filter, setFilter] = useState<AgencyPropertyViewSearchPayloadV2>({
+    propertyTypeId: "",
+    stateId: "",
+    searchTerm: "",
+    upFor: undefined,
+    pricing: {
+      start: undefined as number | undefined,
+      end: undefined as number | undefined,
+    },
+    numberOfBeds: undefined as number | undefined,
+    numberOfToilets: undefined as number | undefined,
+    isNewBuilding: false,
+    isPetFriendly: false,
+    hasWifi: false,
+    hasLaundry: false,
+    hasCarParking: false,
+    hasKidsPlayArea: false,
+    hasCctv: false,
+    hasGym: false,
+    hasArchitecturalPlans: false,
+    removeBoostedProperties: false,
+    squareFootage: {
+      start: undefined as number | undefined,
+      end: undefined as number | undefined,
+    },
+  });
+
+  const resetFilters = () => {
+    setFilter({
+      propertyTypeId: "",
+      stateId: "",
+      searchTerm: "",
+      upFor: undefined,
+      pricing: {
+        start: undefined as number | undefined,
+        end: undefined as number | undefined,
+      },
+      numberOfBeds: undefined as number | undefined,
+      numberOfToilets: undefined as number | undefined,
+      isNewBuilding: false,
+      isPetFriendly: false,
+      hasWifi: false,
+      hasLaundry: false,
+      hasCarParking: false,
+      hasKidsPlayArea: false,
+      hasCctv: false,
+      hasGym: false,
+      hasArchitecturalPlans: false,
+      removeBoostedProperties: false,
+      squareFootage: {
+        start: undefined as number | undefined,
+        end: undefined as number | undefined,
+      },
+    });
+    setLoader(false);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoader(true);
+    onSendData(cleanObject(filter));
+  };
+
+  const applyFilters = () => {
+    setLoader(true);
+    onSendData(cleanObject(filter));
+  };
+
+  const getPropertyType = (propertyTypeId: string) => {
+    if (!propertyTypes.length) return;
+
+    return propertyTypes.find(({ id }) => id === propertyTypeId);
+  };
+
+  const saveSearch = () => {
+    const { pricing, squareFootage, ...rest } = filter;
+
+    const payload = {
+      ...rest,
+      ...(squareFootage && {
+        roomSpaceSizeEndRange: squareFootage.end,
+        roomSpaceSizeStartRange: squareFootage.start,
+      }),
+      ...(pricing && {
+        endPriceRange: pricing.end,
+        startPriceRange: pricing.start,
+      }),
+    };
+
+    setLoader(true);
+    onSaveData(cleanObject(payload));
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="w-full flex flex-col gap-4">
+        {/* Top Search Row */}
+        <div className="flex flex-col lg:flex-row gap-4 w-full">
+          {/* Search Input */}
+          <div className="w-full lg:w-3/3 relative">
+            <Input
+              type="text"
+              placeholder="Search by location, property type..."
+              className="pl-10 h-12"
+              onChange={(e) =>
+                setFilter({ ...filter, searchTerm: e.target.value })
+              }
+            />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          </div>
+        </div>
+
+        {/* Toggle Advanced */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full">
+          <Button
+            className="cursor-pointer"
+            variant="outline"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
+            {" "}
+            <SlidersHorizontal />
+            {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+          </Button>
+
+          <Button className="cursor-pointer" type="submit">
+            <Search /> Search
+          </Button>
+
+          <Button
+            type="button"
+            className="cursor-pointer"
+            variant="secondary"
+            onClick={saveSearch}
+          >
+            <SaveAll /> Save Search
+          </Button>
+        </div>
+
+        {/* Advanced Filters */}
+        {showAdvanced && (
+          <section className="border rounded-xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-4 gap-4 p-4 border-bottom">
+              {/* Price */}
+              <Select
+                onValueChange={(value: string) => {
+                  const [min, max] = value.split("-");
+                  setFilter({
+                    ...filter,
+                    pricing: { start: +min, end: +max },
+                  });
+                }}
+              >
+                <SelectTrigger className="full-height w-full">
+                  <Coins />
+                  <SelectValue placeholder="Price Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="200000-500000">₦200k - ₦500k</SelectItem>
+                  <SelectItem value="500000-1000000">₦500k - ₦1M</SelectItem>
+                  <SelectItem value="1000000-2000000">₦1M - ₦2M</SelectItem>
+                  <SelectItem value="2000000-5000000">₦2M - ₦5M</SelectItem>
+                  <SelectItem value="5000000-">₦5M+</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Square_footage */}
+              <Select
+                onValueChange={(value: string) => {
+                  const [min, max] = value.split("-");
+                  setFilter({
+                    ...filter,
+                    squareFootage: { start: +min, end: +max },
+                  });
+                }}
+              >
+                <SelectTrigger className="full-height w-full">
+                  <Coins />
+                  <SelectValue placeholder="Square Footage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="200-500">200sqFT - 500sqFT</SelectItem>
+                  <SelectItem value="500-800">500sqFT - 800sqFT</SelectItem>
+                  <SelectItem value="800-1000">800sqFT - 1,000sqFT</SelectItem>
+                  <SelectItem value="1000-2000">
+                    1,000sqFT - 2,000sqFT
+                  </SelectItem>
+                  <SelectItem value="2000-20000">2,000sqT+</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Up For */}
+              <Select
+                onValueChange={(value) =>
+                  setFilter({ ...filter, upFor: value as PropertyUpFor })
+                }
+              >
+                <SelectTrigger className="full-height w-full">
+                  <Building />
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(PropertyUpFor).map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Property Type */}
+              <Select
+                onValueChange={(value) =>
+                  setFilter({ ...filter, propertyTypeId: value })
+                }
+              >
+                <SelectTrigger className="full-height w-full">
+                  <Type />
+                  <SelectValue placeholder="Property Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {propertyTypes?.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {getPropertyType(filter.propertyTypeId)?.tag ===
+                "RESIDENTIAL" && (
+                <>
+                  {/* Bedrooms */}
+                  <Select
+                    onValueChange={(value) =>
+                      setFilter({ ...filter, numberOfBeds: +value })
+                    }
+                  >
+                    <SelectTrigger className="full-height w-full">
+                      <Bed />
+                      <SelectValue placeholder="Bedrooms" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="6">6</SelectItem>
+                      <SelectItem value="7">7</SelectItem>
+                      <SelectItem value="8">8+</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Toilets */}
+                  <Select
+                    onValueChange={(value) =>
+                      setFilter({ ...filter, numberOfToilets: +value })
+                    }
+                  >
+                    <SelectTrigger className="full-height w-full">
+                      <Toilet />
+                      <SelectValue placeholder="Toilets" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                      <SelectItem value="5">5+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
+
+              {/* State */}
+              <Select
+                onValueChange={(value) =>
+                  setFilter({ ...filter, stateId: value })
+                }
+              >
+                <SelectTrigger className="full-height w-full">
+                  <UsersRound />
+                  <SelectValue placeholder="Select State" />
+                </SelectTrigger>
+                <SelectContent>
+                  {states?.map((state) => (
+                    <SelectItem key={state.id} value={state.id}>
+                      {state.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border-bottom">
+              {/* Boolean Checkboxes */}
+              {[
+                "hasArchitecturalPlans",
+                "hasCarParking",
+                "isNewBuilding",
+                "isPetFriendly",
+                "hasWifi",
+                "hasLaundry",
+                "hasKidsPlayArea",
+                "hasCctv",
+                "hasGym",
+                "removeBoostedProperties",
+              ].map((field) => (
+                <div key={field} className="flex items-center gap-2">
+                  <Checkbox
+                    onCheckedChange={(checked) =>
+                      setFilter({ ...filter, [field]: checked })
+                    }
+                  />
+                  <label className="text-sm capitalize">
+                    {field.replace(/([A-Z])/g, " $1")}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <div className="w-full flex justify-end gap-4 p-4">
+              <Button className="cursor-pointer" onClick={applyFilters}>
+                Apply Filter
+              </Button>
+
+              <Button
+                className="cursor-pointer"
+                variant="outline"
+                onClick={resetFilters}
+              >
+                Reset
+              </Button>
+            </div>
+          </section>
+        )}
+      </div>
+    </form>
+  );
+};
 
 const AgentProperties = () => {
   const searchParams = useSearchParams();
@@ -58,15 +427,48 @@ const AgentProperties = () => {
   const [propertyType, setPropertyType] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [bedroomFilter, setBedroomFilter] = useState("all");
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [pagination, setPagination] = useState<PaginationControlInterface>(
     {} as PaginationControlInterface
   );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
+  const [states, setStates] = useState<any[]>([]);
 
   const allProperties = agency && agency?.properties ? agency?.properties : []; //agent ? generatePropertiesForAgent(agent.id) : [];
 
   const loadData = async (page: number) => {
     await fetchProperties(page);
+  };
+
+  const fetchStates = async () => {
+    const url = "/country/states/by-country";
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        const result = response.data;
+        setStates(result.data);
+
+        return result;
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const fetchPropertyTypes = async () => {
+    const url = "/property-type";
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        const result = response.data;
+        setPropertyTypes(result.data);
+
+        return result;
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 
   const fetchProperties = async (pageNumber = 1, pageSize = 3) => {
@@ -119,21 +521,70 @@ const AgentProperties = () => {
     }
   );
 
-  // Reset to page 1 when filters change
-  const handleFilterChange = (
-    setter: React.Dispatch<React.SetStateAction<string>>,
-    value: string
-  ) => {
-    setter(value);
-    setCurrentPage(1);
+  const handleChildData = async (filter: any) => {
+    // Query api
+    await globalSearch(1, 10, { ...filter, agencyId: id });
   };
 
-  const clearFilters = () => {
-    setSearchQuery("");
-    setPropertyType("all");
-    setPriceRange("all");
-    setBedroomFilter("all");
-    setCurrentPage(1);
+  const globalSearch = async (pageNumber = 1, pageSize = 10, payload = {}) => {
+    setIsLoading(true);
+    await fetchSearchResults(pageNumber, pageSize, payload);
+    setIsLoading(false);
+  };
+
+  const fetchSearchResults = async (
+    pageNumber = 1,
+    pageSize = 10,
+    payload = {}
+  ) => {
+    if (!id) return;
+
+    const url = `/property/customer-listings/by-agency/search/${id}`;
+
+    try {
+      const response = await axiosInstance.post(url, {
+        payload,
+        pagination: { pageNumber, pageSize },
+      });
+      if (response.data?.success) {
+        const {
+          data: { data, paginationControl },
+        } = response;
+        setProperties(data);
+        setPagination(paginationControl);
+      }
+    } catch (error) {
+      let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
+    }
+  };
+
+  const handleSaveSearch = async (filter: any) => {
+    // Query api
+    setIsLoading(true);
+    const response = await postSavedSearch({ ...filter, agencyId: id });
+    setIsLoading(false);
+
+    if (response?.success) {
+      toast.success(response.message ?? "Saved search successfully");
+    }
+  };
+
+  const postSavedSearch = async <T,>(payload: T): Promise<any> => {
+    try {
+      const url = "/saved-search/?fields=success,code,message";
+
+      const response = await axiosInstance.post(url, payload);
+      if (!response.data) return;
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const fetchAgencyRecord = async (agencyId: string) => {
@@ -145,10 +596,11 @@ const AgentProperties = () => {
   };
 
   useEffect(() => {
+    const requests = [loadData(1), fetchPropertyTypes(), fetchStates()];
     if (id) {
-      fetchAgencyRecord(id);
+      requests.push(fetchAgencyRecord(id));
     }
-    loadData(1);
+    Promise.all(requests);
   }, []);
 
   if (!agency) {
@@ -275,97 +727,14 @@ const AgentProperties = () => {
             </div>
 
             {/* Search and Filter Section */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6 mb-8 border border-border/50 shadow-sm">
-              <div className="flex flex-col gap-4">
-                {/* Search Bar */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by property name or location..."
-                    value={searchQuery}
-                    onChange={(e) =>
-                      handleFilterChange(setSearchQuery, e.target.value)
-                    }
-                    className="pl-10 bg-white border-border/50"
-                  />
-                </div>
-
-                {/* Filters Row */}
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    <span className="font-medium">Filters:</span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 flex-1">
-                    <Select
-                      value={propertyType}
-                      onValueChange={(value) =>
-                        handleFilterChange(setPropertyType, value)
-                      }
-                    >
-                      <SelectTrigger className="w-full sm:w-[140px] bg-white border-border/50">
-                        <SelectValue placeholder="Type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Types</SelectItem>
-                        <SelectItem value="For Sale">For Sale</SelectItem>
-                        <SelectItem value="For Rent">For Rent</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select
-                      value={priceRange}
-                      onValueChange={(value) =>
-                        handleFilterChange(setPriceRange, value)
-                      }
-                    >
-                      <SelectTrigger className="w-full sm:w-[160px] bg-white border-border/50">
-                        <SelectValue placeholder="Price Range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Prices</SelectItem>
-                        <SelectItem value="under500k">Under ₦500K</SelectItem>
-                        <SelectItem value="500k-1m">₦500K - ₦1M</SelectItem>
-                        <SelectItem value="1m-2m">₦1M - ₦2M</SelectItem>
-                        <SelectItem value="over2m">Over ₦2M</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select
-                      value={bedroomFilter}
-                      onValueChange={(value) =>
-                        handleFilterChange(setBedroomFilter, value)
-                      }
-                    >
-                      <SelectTrigger className="w-full sm:w-[140px] bg-white border-border/50">
-                        <SelectValue placeholder="Bedrooms" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Beds</SelectItem>
-                        <SelectItem value="1-2">1-2 Beds</SelectItem>
-                        <SelectItem value="3-4">3-4 Beds</SelectItem>
-                        <SelectItem value="5+">5+ Beds</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {(searchQuery ||
-                    propertyType !== "all" ||
-                    priceRange !== "all" ||
-                    bedroomFilter !== "all") && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearFilters}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      Clear All
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+            <AgencyPropertyViewPropertyFilter
+              loader={isLoading}
+              states={states}
+              propertyTypes={propertyTypes}
+              setLoader={setIsLoading}
+              onSendData={handleChildData}
+              onSaveData={handleSaveSearch}
+            />
 
             {properties.length <= 0 ? (
               <div className="text-center py-16">
@@ -381,15 +750,6 @@ const AgentProperties = () => {
                       ? "This agent has no active listings."
                       : "Try adjusting your search or filters."}
                   </p>
-                  {allProperties.length > 0 && (
-                    <Button
-                      variant="outline"
-                      className="mt-4"
-                      onClick={clearFilters}
-                    >
-                      Clear Filters
-                    </Button>
-                  )}
                 </div>
               </div>
             ) : (
