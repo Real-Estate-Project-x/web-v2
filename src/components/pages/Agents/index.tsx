@@ -192,7 +192,6 @@ const Agents = () => {
                     </div>
                   </div>
                 )}
-                {/* {numbers.length > 1 && <Pagination _data={numbers} currentPage={currentPage} setCurrentPage={setCurrentPage}/>} */}
               </div>
               {pagination?.currentPage && (
                 <DynamicPagination

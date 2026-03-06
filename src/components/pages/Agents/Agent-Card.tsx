@@ -180,7 +180,7 @@ const AgentCard = ({ agent: data }: AgentCardProps) => {
               </div>
 
               <Link href={`/agents/properties?id=${agent?.id}`}>
-                <button className="shrink-0 group/btn flex items-center gap-1.5 bg-sky-400/10 hover:bg-sky-400 border border-sky-400/20 hover:border-sky-400 text-sky-400 hover:text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200">
+                <button className="cursor-pointer shrink-0 group/btn flex items-center gap-1.5 bg-sky-400/10 hover:bg-sky-400 border border-sky-400/20 hover:border-sky-400 text-sky-400 hover:text-black text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200">
                   View
                   <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
                 </button>
