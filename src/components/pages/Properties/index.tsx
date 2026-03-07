@@ -541,7 +541,7 @@ const Properties = () => {
         const {
           data: { data, paginationControl },
         } = response;
-        setProperties((data as any[]).map(({ property }) => property));
+        setProperties(data);
         setPagination(paginationControl);
       }
     } catch (error) {

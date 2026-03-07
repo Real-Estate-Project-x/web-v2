@@ -63,8 +63,6 @@ const PropertySearchForm: FC<Props> = ({
   agencies,
   preSelectedCategory,
 }) => {
-  const [saveLoading, setSaveLoading] = useState(false);
-
   const getPropertyType = (propertyTypeId: string) => {
     if (!propertyTypes.length) return;
 
@@ -155,6 +153,7 @@ const PropertySearchForm: FC<Props> = ({
             { label: "Pet Friendly", key: "isPetFriendly" },
             { label: "Wifi", key: "hasWifi" },
             { label: "Laundry", key: "hasLaundry" },
+            { label: "Has Architectural Plans", key: "hasArchitecturalPlans" },
           ].map((item) => (
             <div key={item.key} className="flex items-center space-x-2">
               <Checkbox

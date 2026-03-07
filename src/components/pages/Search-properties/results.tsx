@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,8 +17,8 @@ type Props = {
 const SearchResultsList: FC<Props> = ({ data }) => {
   const router = useRouter();
 
-  const constructImageUrl = (property: SearchPropertyInterfaceType) => {
-    const firstImage = property.property.propertyImages.shift();
+  const constructImageUrl = (property: any) => {
+    const firstImage = property.propertyImages.shift();
     return (
       (firstImage as any)?.image?.url ??
       "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg"
@@ -27,9 +27,9 @@ const SearchResultsList: FC<Props> = ({ data }) => {
 
   return (
     <div className="space-y-6">
-      {data?.map((property: SearchPropertyInterfaceType) => (
+      {data?.map((property: any) => (
         <Card
-          key={property?.property?.id}
+          key={property?.id}
           className="overflow-hidden hover:shadow-lg transition-shadow"
         >
           <div className="flex flex-col md:flex-row">
@@ -37,14 +37,14 @@ const SearchResultsList: FC<Props> = ({ data }) => {
             <div className="w-full md:w-1/3 relative h-auto md:h-auto">
               <img
                 src={constructImageUrl(property)}
-                alt={property?.property?.title}
+                alt={property?.title}
                 className="w-full h-80 object-cover"
               />
               <div className="absolute top-4 left-4 flex gap-2">
                 <Badge className="bg-real-600 capitalize">
-                  {property?.property?.propertyType?.name}
+                  {property?.propertyType?.name}
                 </Badge>
-                {property?.property?.isNewBuilding && (
+                {property?.isNewBuilding && (
                   <Badge className="bg-green-500">New</Badge>
                 )}
               </div>
@@ -63,23 +63,23 @@ const SearchResultsList: FC<Props> = ({ data }) => {
               <div className="flex flex-col-reverse md:justify-between items-start mb-4">
                 <div className="space-y-4">
                   <h3 className="text-xl lg:text-2xl font-bold text-[#102A43] mb-2 capitalize">
-                    {property?.property?.title}
+                    {property?.title}
                   </h3>
                   <div className="flex items-center text-gray-600 mb-2">
                     <MapPin className="h-4 w-4 mr-1" />
                     <span className="text-base capitalize">
-                      {property?.property?.address}
+                      {property?.address}
                     </span>
                   </div>
                   <p className="text-gray-700 text-base mb-3 capitalize">
-                    {property?.property?.description?.length <= 30
-                      ? property?.property?.description
-                      : property?.property?.description?.concat("...")}
+                    {property?.description?.length <= 30
+                      ? property?.description
+                      : property?.description?.concat("...")}
                   </p>
                 </div>
                 <div className="text-right">
                   <div className="text-xl lg:text-2xl font-bold text-real-600">
-                    {formatPrice(property?.property?.price)}
+                    {formatPrice(property?.price)}
                   </div>
                   {/* <div className="text-sm text-gray-600">Built in {property.property.}</div> */}
                 </div>
@@ -90,19 +90,19 @@ const SearchResultsList: FC<Props> = ({ data }) => {
                 <div className="flex items-center">
                   <Bed className="h-5 w-5 mr-1 text-gray-600" />
                   <span className="text-sm font-medium">
-                    {property?.property?.noOfBedrooms} beds
+                    {property?.noOfBedrooms} beds
                   </span>
                 </div>
                 <div className="flex items-center">
                   <Bath className="h-5 w-5 mr-1 text-gray-600" />
                   <span className="text-sm font-medium">
-                    {property?.property?.noOfToilets} baths & Toilets
+                    {property?.noOfToilets} baths & Toilets
                   </span>
                 </div>
                 <div className="flex items-center">
                   <Square className="h-5 w-5 mr-1 text-gray-600" />
                   <span className="text-sm font-medium">
-                    {property?.property?.sizeInSquareFeet} sqft
+                    {property?.sizeInSquareFeet} sqft
                   </span>
                 </div>
                 {/* <div className="text-sm text-gray-600">
@@ -115,16 +115,16 @@ const SearchResultsList: FC<Props> = ({ data }) => {
                 <div className="text-sm text-gray-600">
                   <p className="text">(Agency Info)</p>
                   <div className="font-medium capitalize my-2">
-                    {property?.property?.agency?.name}
+                    {property?.agency?.name}
                   </div>
                   <div className="flex items-center">
                     <Phone className="h-3 w-3 mr-1" />
-                    {property?.property?.agency?.agencyPhoneNumber}
+                    {property?.agency?.agencyPhoneNumber}
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <Link
-                    href={`/properties/view?id=${property?.property.slug}#schedule-tour`}
+                    href={`/properties/view?id=${property.slug}#schedule-tour`}
                   >
                     <Button
                       className="cursor-pointer"
@@ -138,9 +138,7 @@ const SearchResultsList: FC<Props> = ({ data }) => {
                     size="sm"
                     className="cursor-pointer bg-[#2563EB] hover:bg-[#1D4ED8]"
                     onClick={() =>
-                      router.push(
-                        `/properties/view?id=${property?.property.slug}`
-                      )
+                      router.push(`/properties/view?id=${property.slug}`)
                     }
                   >
                     View Details
