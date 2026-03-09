@@ -19,7 +19,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavDataInterface } from "../../../../utils/interfaces";
 import { isUserLoggedIn } from "@/lib/utils";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { handleLoggingOff } from "@/lib/helpers";
 
@@ -114,40 +119,43 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
               }`}
             />
           </Link>
-        
-          {!isUserLoggedIn()
-            ?
+
+          {!isUserLoggedIn() ? (
             <Link
               href="/login"
               className={
-                pathname.includes("/agent-dashboard") ? "hidden" : "inline-block"
-              } >
+                pathname.includes("/agent-dashboard")
+                  ? "hidden"
+                  : "inline-block"
+              }
+            >
               <Button
                 variant="default"
                 size="sm"
-                className="ml-4 font-normal cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]">
+                className="ml-4 font-normal cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]"
+              >
                 Sign&nbsp;In
               </Button>
             </Link>
-            :
+          ) : (
             <>
               {/* <div className="flex items-center justify-between mb-4"> */}
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger asChild className="cursor-pointer">
                   {/* <Button variant="outline" size="sm"> */}
-                    <Avatar>
+                  <Avatar>
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>
-                      <User className="w-5 h-5"/>
+                      <User className="w-5 h-5" />
                     </AvatarFallback>
                   </Avatar>
                   {/* </Button> */}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() =>
-                      handleLoggingOff()
-                    }>
+                    className="cursor-pointer"
+                    onClick={() => handleLoggingOff()}
+                  >
                     <Lock className="h-4 w-4 mr-2" />
                     Logout
                   </DropdownMenuItem>
@@ -155,7 +163,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
               </DropdownMenu>
               {/* </div> */}
             </>
-          }
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -165,7 +173,10 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
             size="icon"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
-            className={(scrolled || pathname !== "/")? "text-gray-800" : "text-slate-200"}>
+            className={
+              scrolled || pathname !== "/" ? "text-gray-800" : "text-slate-200"
+            }
+          >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
             ) : (
@@ -202,33 +213,33 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
             {/* <Link href={"/properties/search"}>
               <Search size={18} className="text-black"/>
            </Link> */}
-            {!isUserLoggedIn()
-              ?
+            {!isUserLoggedIn() ? (
               <Link
                 href="/login"
-                className="flex flex-row gap-2 items-center pt-2 text-black">
+                className="flex flex-row gap-2 items-center pt-2 text-black"
+              >
                 <LockOpen size={18} className="inline-block" />
                 Sign&nbsp;In
               </Link>
-              :
+            ) : (
               <>
                 {/* <div className="flex items-center justify-between mb-4"> */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger className="cursor-pointer" asChild>
                     {/* <Button variant="outline" size="sm"> */}
-                     <Avatar>
+                    <Avatar>
                       <AvatarImage src="https://github.com/shadcn.png" />
                       <AvatarFallback>
-                        <User className="w-5 h-5"/>
+                        <User className="w-5 h-5" />
                       </AvatarFallback>
                     </Avatar>
                     {/* </Button> */}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                      onClick={() =>
-                        handleLoggingOff()
-                      }>
+                      className="cursor-pointer"
+                      onClick={() => handleLoggingOff()}
+                    >
                       <Lock className="h-4 w-4 mr-2" />
                       Logout
                     </DropdownMenuItem>
@@ -236,7 +247,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
                 </DropdownMenu>
                 {/* </div> */}
               </>
-            }
+            )}
           </div>
         </div>
       )}
@@ -284,7 +295,8 @@ export const LogoComponent = ({ color }: { color?: string }) => {
         text-white font-bold text-lg
         shadow-lg shadow-blue-900/40
         border border-blue-400/30
-        transition-all duration-300 hover:scale-105">
+        transition-all duration-300 hover:scale-105"
+      >
         <span className="tracking-wide">U</span>
 
         {/* Architectural shine */}
