@@ -11,10 +11,17 @@ import {
   Users2,
   Contact,
   LockOpen,
+  Lock,
+  User,
+  UserCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavDataInterface } from "../../../../utils/interfaces";
+import { isUserLoggedIn } from "@/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { handleLoggingOff } from "@/lib/helpers";
 
 type NavData = {
   data?: NavDataInterface[];
@@ -107,20 +114,48 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
               }`}
             />
           </Link>
-          <Link
-            href="/login"
-            className={
-              pathname.includes("/agent-dashboard") ? "hidden" : "inline-block"
-            }
-          >
-            <Button
-              variant="default"
-              size="sm"
-              className="ml-4 font-normal cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]"
-            >
-              Sign&nbsp;In
-            </Button>
-          </Link>
+        
+          {!isUserLoggedIn()
+            ?
+            <Link
+              href="/login"
+              className={
+                pathname.includes("/agent-dashboard") ? "hidden" : "inline-block"
+              } >
+              <Button
+                variant="default"
+                size="sm"
+                className="ml-4 font-normal cursor-pointer bg-gradient-to-r from-[#1E3A8A] to-[#0253CC]">
+                Sign&nbsp;In
+              </Button>
+            </Link>
+            :
+            <>
+              {/* <div className="flex items-center justify-between mb-4"> */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  {/* <Button variant="outline" size="sm"> */}
+                    <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>
+                      <User className="w-5 h-5"/>
+                    </AvatarFallback>
+                  </Avatar>
+                  {/* </Button> */}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleLoggingOff()
+                    }>
+                    <Lock className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* </div> */}
+            </>
+          }
         </div>
 
         {/* Mobile Menu Button */}
@@ -167,16 +202,41 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
             {/* <Link href={"/properties/search"}>
               <Search size={18} className="text-black"/>
            </Link> */}
-
-            <Link
-              href="/login"
-              className="flex flex-row gap-2 items-center pt-2 text-black"
-            >
-              {/* <Button className="w-full mt-2 hover:bg-blue-800 bg-[#1E3A8A] text-white"> */}
-              <LockOpen size={18} className="inline-block" />
-              Sign&nbsp;In
-              {/* </Button> */}
-            </Link>
+            {!isUserLoggedIn()
+              ?
+              <Link
+                href="/login"
+                className="flex flex-row gap-2 items-center pt-2 text-black">
+                <LockOpen size={18} className="inline-block" />
+                Sign&nbsp;In
+              </Link>
+              :
+              <>
+                {/* <div className="flex items-center justify-between mb-4"> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    {/* <Button variant="outline" size="sm"> */}
+                     <Avatar>
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>
+                        <User className="w-5 h-5"/>
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* </Button> */}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleLoggingOff()
+                      }>
+                      <Lock className="h-4 w-4 mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* </div> */}
+              </>
+            }
           </div>
         </div>
       )}
