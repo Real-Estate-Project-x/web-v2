@@ -212,29 +212,29 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
               </Link>
               :
               <>
-                {/* <div className="flex items-center justify-between mb-4"> */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    {/* <Button variant="outline" size="sm"> */}
-                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>
-                        <User className="w-5 h-5"/>
-                      </AvatarFallback>
-                    </Avatar>
-                    {/* </Button> */}
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleLoggingOff()
-                      }>
-                      <Lock className="h-4 w-4 mr-2" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {/* </div> */}
+              {/* <div className="flex items-center justify-between mb-4"> */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  {/* <Button variant="outline" size="sm"> */}
+                    <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>
+                      <User className="w-5 h-5"/>
+                    </AvatarFallback>
+                  </Avatar>
+                  {/* </Button> */}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleLoggingOff()
+                    }>
+                    <Lock className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* </div> */}
               </>
             }
           </div>
