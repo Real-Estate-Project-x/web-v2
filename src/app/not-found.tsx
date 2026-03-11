@@ -1,6 +1,6 @@
-
 import { LogoComponent } from "../components/pages/Home/Nav";
 import Footer from "../components/pages/Home/Footer";
+import Link from "next/link";
 
 // Inline keyframe styles since Tailwind base doesn't include custom animations
 const styles = `
@@ -71,12 +71,27 @@ function HouseIllustration() {
       <ellipse cx="100" cy="177" rx="58" ry="7" fill="rgba(13,31,60,0.09)" />
 
       {/* House body */}
-      <rect x="36" y="90" width="128" height="85" rx="5" fill="#EAF2FB" stroke="#1A4B8C" strokeWidth="2.5" />
+      <rect
+        x="36"
+        y="90"
+        width="128"
+        height="85"
+        rx="5"
+        fill="#EAF2FB"
+        stroke="#1A4B8C"
+        strokeWidth="2.5"
+      />
 
       {/* Roof fill */}
       <path d="M20 96 L100 26 L180 96Z" fill="#1A4B8C" />
       {/* Roof outline */}
-      <path d="M20 96 L100 26 L180 96" stroke="#0D1F3C" strokeWidth="3" strokeLinejoin="round" fill="none" />
+      <path
+        d="M20 96 L100 26 L180 96"
+        stroke="#0D1F3C"
+        strokeWidth="3"
+        strokeLinejoin="round"
+        fill="none"
+      />
 
       {/* Chimney */}
       <rect x="130" y="40" width="14" height="28" rx="2" fill="#0D1F3C" />
@@ -93,40 +108,103 @@ function HouseIllustration() {
 
       {/* Question mark on door */}
       <text
-        x="100" y="158"
+        x="100"
+        y="158"
         textAnchor="middle"
         fontFamily="DM Serif Display, serif"
         fontSize="20"
         fill="white"
         opacity="0.65"
-      >?</text>
+      >
+        ?
+      </text>
 
       {/* Left window */}
-      <rect x="44" y="104" width="36" height="30" rx="3" fill="#3B82C4" className="window-blink" />
-      <line x1="62" y1="104" x2="62" y2="134" stroke="white" strokeWidth="1.5" />
-      <line x1="44" y1="119" x2="80" y2="119" stroke="white" strokeWidth="1.5" />
+      <rect
+        x="44"
+        y="104"
+        width="36"
+        height="30"
+        rx="3"
+        fill="#3B82C4"
+        className="window-blink"
+      />
+      <line
+        x1="62"
+        y1="104"
+        x2="62"
+        y2="134"
+        stroke="white"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="44"
+        y1="119"
+        x2="80"
+        y2="119"
+        stroke="white"
+        strokeWidth="1.5"
+      />
 
       {/* Right window */}
-      <rect x="120" y="104" width="36" height="30" rx="3" fill="#3B82C4" className="window-blink2" />
-      <line x1="138" y1="104" x2="138" y2="134" stroke="white" strokeWidth="1.5" />
-      <line x1="120" y1="119" x2="156" y2="119" stroke="white" strokeWidth="1.5" />
+      <rect
+        x="120"
+        y="104"
+        width="36"
+        height="30"
+        rx="3"
+        fill="#3B82C4"
+        className="window-blink2"
+      />
+      <line
+        x1="138"
+        y1="104"
+        x2="138"
+        y2="134"
+        stroke="white"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="120"
+        y1="119"
+        x2="156"
+        y2="119"
+        stroke="white"
+        strokeWidth="1.5"
+      />
 
       {/* Floating search pin */}
       <g className="pin-bob" transform="translate(148, 32)">
         <circle cx="15" cy="15" r="13" fill="#E8A94D" />
         <circle cx="15" cy="14" r="5.5" fill="white" />
-        <line x1="19" y1="18" x2="24" y2="23" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M15 28 L15 33" stroke="#E8A94D" strokeWidth="2" strokeLinecap="round" opacity="0.45" />
+        <line
+          x1="19"
+          y1="18"
+          x2="24"
+          y2="23"
+          stroke="white"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15 28 L15 33"
+          stroke="#E8A94D"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.45"
+        />
       </g>
     </svg>
   );
 }
 
-
 // ── Background blobs ──────────────────────────────────────────────────────────
 function Blobs() {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+    <div
+      className="fixed inset-0 overflow-hidden pointer-events-none z-0"
+      aria-hidden="true"
+    >
       {/* Grid overlay */}
       <div
         className="absolute inset-0 opacity-[0.035]"
@@ -146,15 +224,17 @@ function Blobs() {
 
 // ── Main 404 Component ────────────────────────────────────────────────────────
 export default function NotFound() {
-
-
   return (
     <>
       <style>{styles}</style>
 
       <div
         className="font-body relative min-h-screen flex flex-col items-center justify-center text-center px-6 py-20 overflow-hidden"
-        style={{ background: "linear-gradient(155deg, #dceeff 0%, #F7F4EF 52%, #f0e8d8 100%)" }}>
+        style={{
+          background:
+            "linear-gradient(155deg, #dceeff 0%, #F7F4EF 52%, #f0e8d8 100%)",
+        }}
+      >
         <Blobs />
 
         {/* Logo */}
@@ -162,7 +242,6 @@ export default function NotFound() {
 
         {/* Content card — sits above blobs */}
         <div className="relative z-10 flex flex-col items-center">
-
           {/* House */}
           <div className="mb-6 anim-fade-down">
             <HouseIllustration />
@@ -182,27 +261,35 @@ export default function NotFound() {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-            }}>
+            }}
+          >
             404
           </div>
 
           {/* Headline */}
-          <h1 className="anim-fade-up-3 font-display text-[#0D1F3C] mb-3"
-            style={{ fontSize: "clamp(1.4rem, 3.5vw, 2rem)" }}>
+          <h1
+            className="anim-fade-up-3 font-display text-[#0D1F3C] mb-3"
+            style={{ fontSize: "clamp(1.4rem, 3.5vw, 2rem)" }}
+          >
             This page does not exist
           </h1>
 
           {/* Subtext */}
-          <p className="anim-fade-up-4 text-[#6B7E96] font-light leading-relaxed max-w-sm mb-9"
-            style={{ fontSize: "clamp(0.9rem, 2vw, 1rem)" }}>
-            Looks like you've wandered into an empty lot. The page you're looking for may have moved or been taken off the market.
+          <p
+            className="anim-fade-up-4 text-[#6B7E96] font-light leading-relaxed max-w-sm mb-9"
+            style={{ fontSize: "clamp(0.9rem, 2vw, 1rem)" }}
+          >
+            Looks like you've wandered into an empty lot. The page you're
+            looking for may have moved or been taken off the market.
           </p>
 
           {/* Go Back button */}
-          <a href="/"
+          <Link
+            href="/"
             className="go-back-btn anim-fade-up-5 flex items-center gap-2.5 bg-[#1A4B8C] hover:bg-[#0D1F3C] text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg shadow-[#1A4B8C]/25 cursor-pointer border-0 outline-none focus-visible:ring-2 focus-visible:ring-[#3B82C4] focus-visible:ring-offset-2"
             style={{ fontSize: "0.95rem", letterSpacing: "0.01em" }}
-            aria-label="Go back to previous page">
+            aria-label="Go back to previous page"
+          >
             <svg
               viewBox="0 0 16 16"
               className="w-4 h-4 btn-arrow"
@@ -211,21 +298,22 @@ export default function NotFound() {
               strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              aria-hidden="true">
+              aria-hidden="true"
+            >
               <path d="M10 3L5 8l5 5" />
             </svg>
             Back&nbsp;To&nbsp;Home
-          </a>
+          </Link>
 
           {/* Secondary link */}
           <p className="anim-fade-up-6 mt-5 text-[#6B7E96] text-sm">
             Or{" "}
-            <a
-              href="/"
+            <Link
+              href="/properties"
               className="text-[#3B82C4] font-medium hover:underline transition-colors"
             >
               search available properties
-            </a>{" "}
+            </Link>{" "}
             on Blupodd
           </p>
         </div>
@@ -233,7 +321,8 @@ export default function NotFound() {
         {/* Footer */}
         {/* <Footer/> */}
         <p className="absolute bottom-4 text-[#6B7E96] text-sm anim-fade-up-6 z-10">
-          © {new Date().getFullYear()} Blupodd.com · Seamless Integration. Home Hunting, Reimagined.
+          © {new Date().getFullYear()} Blupodd.com · Seamless Integration. Home
+          Hunting, Reimagined.
           <p>All Rights Resolved</p>
         </p>
       </div>
