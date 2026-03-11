@@ -182,25 +182,24 @@ export const StateViewPropertyFilter: FC<FilterProps> = ({
           <Button
             className="cursor-pointer"
             variant="outline"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
+            onClick={() => setShowAdvanced(!showAdvanced)}>
             {" "}
             <SlidersHorizontal />
             {showAdvanced ? "Hide Advanced" : "Show Advanced"}
           </Button>
+          <div className="flex items-center gap-2 flex-row">
+            <Button className="cursor-pointer" type="submit">
+              <Search /> Search
+            </Button>
 
-          <Button className="cursor-pointer" type="submit">
-            <Search /> Search
-          </Button>
-
-          <Button
-            type="button"
-            className="cursor-pointer"
-            variant="secondary"
-            onClick={saveSearch}
-          >
-            <SaveAll /> Save Search
-          </Button>
+            <Button
+              type="button"
+              className="cursor-pointer"
+              variant="secondary"
+              onClick={saveSearch}>
+              <SaveAll /> Save Search
+            </Button>
+          </div>
         </div>
 
         {/* Advanced Filters */}
@@ -412,7 +411,7 @@ export const StatePropertyList: FC = () => {
   const searchParams = useSearchParams();
   const stateName = searchParams.get("name") || "State";
   const [stateId, setStateId] = useState<string>("");
-  const [type, setType] = useState<string>("");
+  //const [type, setType] = useState<string>("");
   const [copyData, setCopyData] = useState<PropertyInterface[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
     const savedPage = getCookie("page");

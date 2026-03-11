@@ -83,7 +83,7 @@ const Footer = () => {
         </div>
         <div className=" border-gray-800 pt-2 text-center">
           <p className="mt-4">
-            &copy; {currentYear} Blupodd.com. All rights reserved.
+            &copy; {currentYear} Blupodd.com.Seamless Integration. Home Hunting, Reimagined. All rights reserved.
           </p>
         </div>
       </div>

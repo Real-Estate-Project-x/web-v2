@@ -1,4 +1,6 @@
+import { axiosInstance } from "@/lib/axios-interceptor";
 import { deleteCookie } from "@/lib/helpers";
+import { AxiosError } from "axios";
 import { AES, enc } from "crypto-js";
 
 export const formatPrice = (price: number): string => {
@@ -62,9 +64,16 @@ export const convertDateCreatedToGetNumberOfDays = (dateCreated: string) => {
 export const setLocalStorageField = <T>(key: string, data: T) =>
   localStorage.setItem(key, JSON.stringify(data));
 
-export const getLocalStorageField = <T>(key: string) => {
+//export const getLocalStorageField = <T>(key: string) => JSON.parse(localStorage.getItem(key) as string) as T;
+export const getLocalStorageField = <T>(key: string): T | null => {
   if (typeof window === "undefined") return null;
-  return JSON.parse(localStorage.getItem(key) as string) as T;
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+  try {
+    return JSON.parse(item) as T;
+  } catch {
+    return null;
+  }
 };
 
 export const getLocalStorageFieldRaw = (key: string) => {
@@ -217,5 +226,37 @@ export const defaultImageUrls = (property: any) => {
     if (String(image.url).includes("imagekit")) {
       image.url = getRandomImageUrl();
     }
+  }
+};
+
+export const fetchAgencies = async (setAgencies: Function, toast: any) => {
+  const url = `/agency/dropdown/agency-list/?fields=success,paginationControl,data(id,name,description)`;
+  try {
+    const response = await axiosInstance.get(url);
+    if (response.data.success) {
+      setAgencies(response.data.data);
+    }
+  } catch (error) {
+    let message = "An error occurred";
+    if (error instanceof AxiosError) {
+      message = error.message;
+    }
+    toast(message, { description: JSON.stringify(error) });
+    throw error;
+  }
+};
+
+export const fetchPropertyTypes = async (setPropertyTypes: Function) => {
+  const url = "/property-type";
+  try {
+    const response = await axiosInstance.get(url);
+    if (response.data?.success) {
+      const result = response.data;
+      setPropertyTypes(result.data);
+
+      return result;
+    }
+  } catch (error) {
+    throw error;
   }
 };
