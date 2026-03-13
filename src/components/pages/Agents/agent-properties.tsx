@@ -544,7 +544,7 @@ const AgentProperties = () => {
   };
 
   const fetchProperties = async (pageNumber = 1, pageSize = 10) => {
-    const url = `/property/customer-listings/by-agency/${id}?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    const url = `/property/customer-listings/by-agency/${id}/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
     try {
       const response = await axiosInstance.get(url);
       if (response.data.success) {
