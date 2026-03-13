@@ -64,7 +64,6 @@ export const convertDateCreatedToGetNumberOfDays = (dateCreated: string) => {
 export const setLocalStorageField = <T>(key: string, data: T) =>
   localStorage.setItem(key, JSON.stringify(data));
 
-//export const getLocalStorageField = <T>(key: string) => JSON.parse(localStorage.getItem(key) as string) as T;
 export const getLocalStorageField = <T>(key: string): T | null => {
   if (typeof window === "undefined") return null;
   const item = localStorage.getItem(key);
