@@ -229,7 +229,7 @@ export default function NotFound() {
       <style>{styles}</style>
 
       <div
-        className="font-body relative min-h-screen flex flex-col items-center justify-center text-center px-5 py-20 pt-5 overflow-hidden"
+        className="font-body relative min-h-screen flex flex-col items-center justify-center text-center px-6 py-20 overflow-hidden"
         style={{
           background:
             "linear-gradient(155deg, #dceeff 0%, #F7F4EF 52%, #f0e8d8 100%)",
