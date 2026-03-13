@@ -2,13 +2,13 @@
 
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { PropertyUpFor } from "@/lib/constants";
 import React, { FC, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Star,
   MapPin,
@@ -47,8 +47,8 @@ import {
   PropertyInterface,
 } from "../../../../utils/interfaces";
 import { cleanObject, formatPrice } from "../../../../utils/helpers";
-import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { PropertySearchPayload } from "../Search-properties/search-form";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 
 interface FilterProps {
   loader: boolean;
