@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AddressAutocompletion,
   AgencyInterface,
   PaginationControlInterface,
   PropertyInterface,
@@ -53,27 +54,31 @@ interface FilterProps {
   loader: boolean;
   propertyTypes: { id: string; name: string; tag: string }[];
   states: { id: string; name: string }[];
+  addressesList: AddressAutocompletion[];
   setLoader: (v: boolean) => void;
   onSendData: (data: Partial<AgencyPropertyViewSearchPayloadV2>) => void;
   onSaveData: (data: Partial<AgencyPropertyViewSearchPayloadV2>) => void;
+  onAddressAutocomplete: (address: string) => void;
 }
 
 interface AgencyPropertyViewSearchPayloadV2
   extends Omit<PropertySearchPayload, "agencyId"> {
   searchTerm: string;
-
   removeBoostedProperties: boolean;
 }
 
 export const AgencyPropertyViewPropertyFilter: FC<FilterProps> = ({
   states,
+  addressesList,
   propertyTypes,
   setLoader,
   onSendData,
   onSaveData,
+  onAddressAutocomplete,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-
+  const [locationQuery, setLocationQuery] = useState("");
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [filter, setFilter] = useState<AgencyPropertyViewSearchPayloadV2>({
     propertyTypeId: "",
     stateId: "",
@@ -98,6 +103,13 @@ export const AgencyPropertyViewPropertyFilter: FC<FilterProps> = ({
     squareFootage: {
       start: undefined as number | undefined,
       end: undefined as number | undefined,
+    },
+    location: {
+      searchRadiusInKm: undefined as number | undefined,
+      startLocation: {
+        latitude: undefined as number | undefined,
+        longitude: undefined as number | undefined,
+      },
     },
   });
 
@@ -126,6 +138,13 @@ export const AgencyPropertyViewPropertyFilter: FC<FilterProps> = ({
       squareFootage: {
         start: undefined as number | undefined,
         end: undefined as number | undefined,
+      },
+      location: {
+        searchRadiusInKm: undefined as number | undefined,
+        startLocation: {
+          latitude: undefined as number | undefined,
+          longitude: undefined as number | undefined,
+        },
       },
     });
     setLoader(false);
@@ -165,6 +184,15 @@ export const AgencyPropertyViewPropertyFilter: FC<FilterProps> = ({
 
     setLoader(true);
     onSaveData(cleanObject(payload));
+  };
+
+  const addressUpdate = (address: string) => {
+    setLocationQuery(address);
+    setShowLocationDropdown(true);
+
+    setTimeout(() => {
+      onAddressAutocomplete(address);
+    }, 5000);
   };
 
   return (
@@ -395,6 +423,50 @@ export const AgencyPropertyViewPropertyFilter: FC<FilterProps> = ({
               ))}
             </div>
 
+            {/* Location Filter */}
+            <h3 className="pl-5 pt-4">
+              <b>Geo Point Search*</b>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border-bottom">
+              {/* Address Search */}
+              <div className="relative md:col-span-3">
+                <Input
+                  type="text"
+                  placeholder="Search starting geo_point..."
+                  value={locationQuery}
+                  onChange={(e) => addressUpdate(e.target.value)}
+                  className="h-12"
+                />
+
+                {showLocationDropdown && addressesList?.length > 0 && (
+                  <div className="absolute z-50 bg-white border w-full rounded-lg shadow mt-1 max-h-60 overflow-y-auto">
+                    {addressesList.map((item, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setShowLocationDropdown(false);
+                          setLocationQuery(item.formattedAddress);
+                          setFilter({
+                            ...filter,
+                            location: {
+                              ...filter.location,
+                              startLocation: {
+                                latitude: +item.geolocation.latitude,
+                                longitude: +item.geolocation.longitude,
+                              },
+                            },
+                          });
+                        }}
+                      >
+                        {item.formattedAddress}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="w-full flex justify-end gap-4 p-4">
               <Button className="cursor-pointer" onClick={applyFilters}>
                 Apply Filter
@@ -422,7 +494,6 @@ const AgentProperties = () => {
   const router = useRouter();
   const [agency, setAgency] = useState<AgencyInterface>({} as AgencyInterface);
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
@@ -434,6 +505,7 @@ const AgentProperties = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
   const [states, setStates] = useState<any[]>([]);
+  const [addressesList, setAddressesList] = useState<any[]>([]);
 
   const allProperties = agency && agency?.properties ? agency?.properties : []; //agent ? generatePropertiesForAgent(agent.id) : [];
 
@@ -471,7 +543,7 @@ const AgentProperties = () => {
     }
   };
 
-  const fetchProperties = async (pageNumber = 1, pageSize = 3) => {
+  const fetchProperties = async (pageNumber = 1, pageSize = 10) => {
     const url = `/property/customer-listings/by-agency/${id}?pageNumber=${pageNumber}&pageSize=${pageSize}`;
     try {
       const response = await axiosInstance.get(url);
@@ -592,6 +664,25 @@ const AgentProperties = () => {
     const response = await axiosInstance.get(url);
     if (response.data?.success) {
       setAgency(response.data.data);
+    }
+  };
+
+  const handleOnAddressAutocomplete = async (address: string) => {
+    if (!address) return;
+
+    const url = `/map/address-autocomplete/${address}`;
+    try {
+      const result = await axiosInstance.get(url);
+      if (result.data?.success) {
+        setAddressesList(result.data.data);
+      }
+    } catch (error) {
+      let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
     }
   };
 
@@ -731,9 +822,11 @@ const AgentProperties = () => {
               loader={isLoading}
               states={states}
               propertyTypes={propertyTypes}
+              addressesList={addressesList}
               setLoader={setIsLoading}
               onSendData={handleChildData}
               onSaveData={handleSaveSearch}
+              onAddressAutocomplete={handleOnAddressAutocomplete}
             />
 
             {properties.length <= 0 ? (

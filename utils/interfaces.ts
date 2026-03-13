@@ -715,3 +715,18 @@ export interface PaginationControlInterface {
   totalCount: number;
   totalPages: number;
 }
+
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+
+export interface AddressAutocompletion {
+  meta?: any;
+  state: string;
+  placeId: string;
+  country: string;
+  countryCode: string;
+  formattedAddress: string;
+  geolocation: GeoPoint;
+}

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { PropertyUpFor } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AddressAutocompletion } from "../../../../utils/interfaces";
 
 export interface PropertySearchPayload {
   propertyTypeId: string;
@@ -42,6 +43,14 @@ export interface PropertySearchPayload {
     start?: number;
     end?: number;
   };
+
+  location: {
+    searchRadiusInKm?: number;
+    startLocation: {
+      latitude?: number;
+      longitude?: number;
+    };
+  };
 }
 
 interface Props {
@@ -50,8 +59,10 @@ interface Props {
   propertyTypes: { id: string; name: string; tag: string }[];
   states: { id: string; name: string }[];
   agencies: { id: string; name: string }[];
+  addressesList: AddressAutocompletion[];
   setLoader: (v: boolean) => void;
   onSendData: (data: any) => void;
+  onAddressAutocomplete: (address: string) => void;
 }
 
 const PropertySearchForm: FC<Props> = ({
@@ -61,14 +72,12 @@ const PropertySearchForm: FC<Props> = ({
   onSendData,
   states,
   agencies,
+  addressesList,
   preSelectedCategory,
+  onAddressAutocomplete,
 }) => {
-  const getPropertyType = (propertyTypeId: string) => {
-    if (!propertyTypes.length) return;
-
-    return propertyTypes.find(({ id }) => id === propertyTypeId);
-  };
-
+  const [locationQuery, setLocationQuery] = useState("");
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [filter, setFilter] = useState<PropertySearchPayload>({
     propertyTypeId: "",
     stateId: "",
@@ -93,7 +102,20 @@ const PropertySearchForm: FC<Props> = ({
       start: undefined as number | undefined,
       end: undefined as number | undefined,
     },
+    location: {
+      searchRadiusInKm: undefined as number | undefined,
+      startLocation: {
+        latitude: undefined as number | undefined,
+        longitude: undefined as number | undefined,
+      },
+    },
   });
+
+  const getPropertyType = (propertyTypeId: string) => {
+    if (!propertyTypes.length) return;
+
+    return propertyTypes.find(({ id }) => id === propertyTypeId);
+  };
 
   const updateAmenity = (key: keyof typeof filter, value: boolean) => {
     setFilter((prev) => ({ ...prev, [key]: value }));
@@ -131,8 +153,24 @@ const PropertySearchForm: FC<Props> = ({
         start: undefined as number | undefined,
         end: undefined as number | undefined,
       },
+      location: {
+        searchRadiusInKm: undefined as number | undefined,
+        startLocation: {
+          latitude: undefined as number | undefined,
+          longitude: undefined as number | undefined,
+        },
+      },
     });
     setLoader(false);
+  };
+
+  const addressUpdate = (address: string) => {
+    setLocationQuery(address);
+    setShowLocationDropdown(true);
+
+    setTimeout(() => {
+      onAddressAutocomplete(address);
+    }, 5000);
   };
 
   return (
@@ -400,6 +438,69 @@ const PropertySearchForm: FC<Props> = ({
                     },
                   }));
                 }}
+              />
+            </div>
+          </div>
+        </>
+
+        <>
+          <h2 className="mb-3">
+            <b>Geo Point Search*</b>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border-bottom">
+            {/* Address Search */}
+            <div className="relative md:col-span-3">
+              <Input
+                type="text"
+                placeholder="Search starting geo_point..."
+                value={locationQuery}
+                onChange={(e) => addressUpdate(e.target.value)}
+                className="h-12"
+              />
+
+              {showLocationDropdown && addressesList?.length > 0 && (
+                <div className="absolute z-50 bg-white border w-full rounded-lg shadow mt-1 max-h-60 overflow-y-auto">
+                  {addressesList.map((item, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setShowLocationDropdown(false);
+                        setLocationQuery(item.formattedAddress);
+                        setFilter({
+                          ...filter,
+                          location: {
+                            ...filter.location,
+                            startLocation: {
+                              latitude: +item.geolocation.latitude,
+                              longitude: +item.geolocation.longitude,
+                            },
+                          },
+                        });
+                      }}
+                    >
+                      {item.formattedAddress}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Search Radius */}
+            <div className="relative md:col-span-1">
+              <Input
+                type="number"
+                placeholder="Search Radius (km)"
+                className="h-12"
+                onChange={(e) =>
+                  setFilter({
+                    ...filter,
+                    location: {
+                      ...filter.location,
+                      searchRadiusInKm: +e.target.value,
+                    },
+                  })
+                }
               />
             </div>
           </div>

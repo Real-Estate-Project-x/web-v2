@@ -57,9 +57,9 @@ export function hasFeatures(data: Partial<PropertyInterface>): boolean {
   );
 }
 
-export function isUserLoggedIn(): boolean {
+export const isUserLoggedIn = (): boolean => {
   return !!getLocalStorageField("token");
-}
+};
 
 export function reformatDate(date: string): string {
   const splitDate = date?.split("/");
