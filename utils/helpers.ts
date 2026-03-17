@@ -154,9 +154,15 @@ export const parseDDMMYYYY = (dateString: string): Date => {
 
 export const removeStoredKeys = () => {
   // remove items from short_term storage
-  deleteLocalStorageField("token");
-  deleteLocalStorageField("userInfo");
   deleteCookie("access_token");
+  deleteCookie("refresh_token");
+
+  // Local_storage
+  ["userInfo", "agentId", "token", "user_email", "last_tracked_url"].forEach(
+    (key) => {
+      deleteLocalStorageField(key);
+    }
+  );
 };
 
 export const getBrowserName = () => {
