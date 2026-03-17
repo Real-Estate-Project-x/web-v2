@@ -45,6 +45,7 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-select";
 import { BoostPropertyPrompt } from "./agent-property-view";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import Link from "next/link";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -233,10 +234,16 @@ const AgentPropertiesManager = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setUploadProperty(true)}>
+            {/* <Button variant="outline" onClick={() => setUploadProperty(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Upload Property
-            </Button>
+            </Button> */}
+            <Link href={"/agent-dashboard/properties/create"}>
+              <Button variant="outline">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Property
+              </Button>
+            </Link>
           </div>
         </div>
 

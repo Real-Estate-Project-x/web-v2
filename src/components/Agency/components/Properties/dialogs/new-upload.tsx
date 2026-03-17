@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,13 +40,16 @@ import { Label } from "@/components/ui/label";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { LoaderProcessor } from "@/components/shared/loader-cards";
 import axios from "axios";
-import { CountryStatesInterface, PropertyTypesInterface } from "../../../../../../utils/interfaces";
+import {
+  CountryStatesInterface,
+  PropertyTypesInterface,
+} from "../../../../../../utils/interfaces";
 import { getLocalStorageFieldRaw } from "../../../../../../utils/helpers";
 import { LowResolutionPrompt } from "./imageResolution-prompt";
 
 const additionalCostSchema = z.object({
   title: z.string().optional().or(z.literal("")), //.min(1,""),
-  price: z.number().optional().or(z.literal(0)) //.min(1,'0')
+  price: z.number().optional().or(z.literal(0)), //.min(1,'0')
 });
 
 const propertySchema = z.object({
@@ -55,39 +58,66 @@ const propertySchema = z.object({
   address: z.string().min(5, "Address is required"),
   upFor: z.enum(["SALE", "RENT"]),
   propertyCategory: z.enum(["RESIDENTIAL", "COMMERCIAL_SHOP", "OFFICE"]),
-  description: z.string().min(10, "Description must be at least 10 characters").max(1000),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(1000),
   photoIds: z.array(z.string()).min(1, "At least one photo is required"),
-  price: z.string().regex(/^\d+$/, "Price must contain only digits").min(5, "Price must be at least 5 digits"), // z.number().min(0, "Price must be positive"),
+  price: z
+    .string()
+    .regex(/^\d+$/, "Price must contain only digits")
+    .min(5, "Price must be at least 5 digits"), // z.number().min(0, "Price must be positive"),
   additionalCosts: z.array(additionalCostSchema),
   paymentCoverageDuration: z.enum(["MONTHLY", "YEARLY", "ONE_TIME"]),
   agencyId: z.string().min(1, "Agency ID is required"),
   stateId: z.string().min(1, "State is required"),
-  sizeInSquareFeet:z.string().regex(/^\d+$/, "Square feet must contain only digits").min(1, "Square feet is required"),
+  sizeInSquareFeet: z
+    .string()
+    .regex(/^\d+$/, "Square feet must contain only digits")
+    .min(1, "Square feet is required"),
   geoCoordinates: z.object({
-    latitude: z.string().regex(
-    /^-?\d+(\.\d+)?$/,
-    "Latitude must be a valid decimal number"
-  ).refine(val => {
-    const num = Number(val)
-    return num >= -90 && num <= 90
-  }, {
-    message: "Latitude must be between -90 and 90",
+    latitude: z
+      .string()
+      .regex(/^-?\d+(\.\d+)?$/, "Latitude must be a valid decimal number")
+      .refine(
+        (val) => {
+          const num = Number(val);
+          return num >= -90 && num <= 90;
+        },
+        {
+          message: "Latitude must be between -90 and 90",
+        }
+      ),
+    longitude: z
+      .string()
+      .regex(/^-?\d+(\.\d+)?$/, "Longitude must be a valid decimal number")
+      .refine(
+        (val) => {
+          const num = Number(val);
+          return num >= -180 && num <= 180;
+        },
+        {
+          message: "Longitude must be between -180 and 180",
+        }
+      ), //z.number().min(-180).max(180),
   }),
-    longitude: z.string().regex(
-    /^-?\d+(\.\d+)?$/,
-    "Longitude must be a valid decimal number"
-  ).refine(val => {
-    const num = Number(val)
-    return num >= -180 && num <= 180
-  }, {
-    message: "Longitude must be between -180 and 180",
-  }),//z.number().min(-180).max(180),
-  }),
-  averageBroadbandSpeedInMegabytes: z.string().regex(/^\d+$/, "Average broadband speed must contain only digits").min(2, "Average broadband speed is required"),
+  averageBroadbandSpeedInMegabytes: z
+    .string()
+    .regex(/^\d+$/, "Average broadband speed must contain only digits")
+    .min(2, "Average broadband speed is required"),
   architecturalPlanIds: z.array(z.string()).optional().or(z.literal("")),
-  noOfBedrooms: z.string().regex(/^\d+$/, "Number of Bedrooms must contain only digits").min(1, "Number of Bedrooms is required"), //z.number().min(1),
-  noOfToilets:z.string().regex(/^\d+$/, "Number of Toilets must contain only digits").min(1, "Number of Toilets is required"), //z.number().min(1),
-  noOfKitchens: z.string().regex(/^\d+$/, "Number of Kitchens must contain only digits").min(1, "Number of Kitchens is required"), //z.number().min(1),
+  noOfBedrooms: z
+    .string()
+    .regex(/^\d+$/, "Number of Bedrooms must contain only digits")
+    .min(1, "Number of Bedrooms is required"), //z.number().min(1),
+  noOfToilets: z
+    .string()
+    .regex(/^\d+$/, "Number of Toilets must contain only digits")
+    .min(1, "Number of Toilets is required"), //z.number().min(1),
+  noOfKitchens: z
+    .string()
+    .regex(/^\d+$/, "Number of Kitchens must contain only digits")
+    .min(1, "Number of Kitchens is required"), //z.number().min(1),
   threeDimensionalModelUrl: z.string().url().optional().or(z.literal("")),
   hasLaundry: z.boolean(),
   hasWifi: z.boolean(),
@@ -96,7 +126,7 @@ const propertySchema = z.object({
   hasCctv: z.boolean(),
   hasGym: z.boolean(),
   isNewBuilding: z.boolean(),
-  videoId : z.string().optional().or(z.literal(null))
+  videoId: z.string().optional().or(z.literal(null)),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -110,242 +140,279 @@ export default function PropertyListingDialog({
   open,
   onOpenChange,
 }: PropertyListingDialogProps) {
-    const [activeTab, setActiveTab] = useState("basic");
-    const [images, setImages] = useState<File[]>([]);
-    const [imageUploadErr, setImageUploadError] = useState({
-      isError : false,
-      message : ""
-    });
+  const [activeTab, setActiveTab] = useState("basic");
+  const [images, setImages] = useState<File[]>([]);
+  const [imageUploadErr, setImageUploadError] = useState({
+    isError: false,
+    message: "",
+  });
 
-    const [videos, setVideos] = useState<File[]>([]);
-    const [architechturalImages, setArchitechturalImages] = useState<File[]>([]);
-    const [videoUploadErr, setVideoUploaderError] = useState({
-      isError :false,
-      message : ""
-    });
-    const [videoLoading , setVideoLoading] = useState(false);
+  const [videos, setVideos] = useState<File[]>([]);
+  const [architechturalImages, setArchitechturalImages] = useState<File[]>([]);
+  const [videoUploadErr, setVideoUploaderError] = useState({
+    isError: false,
+    message: "",
+  });
+  const [videoLoading, setVideoLoading] = useState(false);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [propertTypes, setPropertyTypes] = useState<PropertyTypesInterface[]>([] as PropertyTypesInterface[]);
-    const [countryStates, setCountryStates] =  useState<CountryStatesInterface[]>([]);
-  
-    const form = useForm<PropertyFormData, any, PropertyFormData>({
-      resolver: zodResolver(propertySchema),
-      mode : "onChange",
-      defaultValues: {
-        propertyTypeId: "",
-        title: "",
-        address: "",
-        upFor: "SALE",
-        propertyCategory: "RESIDENTIAL",
-        description: "",
-        photoIds: [],
-        price: "",
-        additionalCosts: [{title: "Agency fee", price: 1000}],
-        paymentCoverageDuration: "YEARLY",
-        agencyId: getLocalStorageFieldRaw('agentId') as string,
-        stateId: "",
-        sizeInSquareFeet: "",
-        geoCoordinates: {
-          latitude: "",
-          longitude: "",
-        },
-        averageBroadbandSpeedInMegabytes: "",
-        architecturalPlanIds: [],
-        noOfBedrooms: "",
-        noOfToilets: "",
-        noOfKitchens: "",
-        threeDimensionalModelUrl: "",
-        hasLaundry: false,
-        hasWifi: false,
-        hasCarParking: false,
-        hasKidsPlayArea: false,
-        hasCctv: false,
-        hasGym: false,
-        isNewBuilding: false,
-        videoId : null
+  const [isLoading, setIsLoading] = useState(false);
+  const [propertTypes, setPropertyTypes] = useState<PropertyTypesInterface[]>(
+    [] as PropertyTypesInterface[]
+  );
+  const [countryStates, setCountryStates] = useState<CountryStatesInterface[]>(
+    []
+  );
+
+  const form = useForm<PropertyFormData, any, PropertyFormData>({
+    resolver: zodResolver(propertySchema),
+    mode: "onChange",
+    defaultValues: {
+      propertyTypeId: "",
+      title: "",
+      address: "",
+      upFor: "SALE",
+      propertyCategory: "RESIDENTIAL",
+      description: "",
+      photoIds: [],
+      price: "",
+      additionalCosts: [{ title: "Agency fee", price: 1000 }],
+      paymentCoverageDuration: "YEARLY",
+      agencyId: getLocalStorageFieldRaw("agentId") as string,
+      stateId: "",
+      sizeInSquareFeet: "",
+      geoCoordinates: {
+        latitude: "",
+        longitude: "",
       },
+      averageBroadbandSpeedInMegabytes: "",
+      architecturalPlanIds: [],
+      noOfBedrooms: "",
+      noOfToilets: "",
+      noOfKitchens: "",
+      threeDimensionalModelUrl: "",
+      hasLaundry: false,
+      hasWifi: false,
+      hasCarParking: false,
+      hasKidsPlayArea: false,
+      hasCctv: false,
+      hasGym: false,
+      isNewBuilding: false,
+      videoId: null,
+    },
+  });
+
+  const handleFileUpload = (
+    files: FileList | null,
+    type: "image" | "video" | "architecture"
+  ) => {
+    if (!files) return;
+
+    const fileArray = Array.from(files);
+    const validFiles = fileArray.filter((file) => {
+      if (type === "image") {
+        return file.type.startsWith("image/");
+      } else if (type === "architecture") {
+        return file.type.startsWith("image/");
+      } else {
+        return file.type.startsWith("video/");
+      }
     });
 
-    const handleFileUpload = (files: FileList | null, type: 'image' | 'video' | 'architecture') => {
-      if (!files) return;
-      
-      const fileArray = Array.from(files);
-      const validFiles = fileArray.filter(file => {
-        if (type === 'image') {
-          return file.type.startsWith('image/');
-        } else if( type === 'architecture') {
-            return file.type.startsWith('image/');
-        }else {
-          return file.type.startsWith('video/');
-        }
-      });
-  
-      if (type === 'image') {
-        setImages(prev => [...prev, ...validFiles]);
-      } else if (type === 'architecture') {
-        setArchitechturalImages(prev => [...prev, ...validFiles]);
-      }
-      else{
-        setVideos(validFiles);
-      }
-    };
-  
-    const removeFile = (index: number, type: 'image' | 'video' | 'architecture') => {
-      if (type === 'image') {
-        setImages(prev => prev.filter((_, i) => i !== index));
-      }else if( type === 'architecture') {
-        setArchitechturalImages(prev => prev.filter((_, i) => i !== index));
-      }else {
-        setVideos(prev => prev.filter((_, i) => i !== index));
-      }
-    };
-    const newUploadFiles = async (array : any, type : 'image'|'architecture') => {
-      try{
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}property/upload-images`, {
-          files : array
-        }, {headers : {
-          'Content-Type' : 'multipart/form-data'
-        }});
-        if(response?.data?.success){
-            switch(type){
-              case 'image' : 
-                form.setValue('photoIds', response.data?.data?.map((item : any) => item.id), {
-                  shouldValidate: true,
-                  shouldDirty : true
-                });
-                
-              break;
-              case 'architecture' : 
-                form.setValue('architecturalPlanIds',response.data?.data?.map((item : any) => item.id));
-              break;
-              default : 
-                console.log('');
-              break;
-            }
-        }
-      }catch(err : any){
-        const message = err?.response?.data?.message;
-        setImageUploadError({...imageUploadErr, isError : true, message});
-      }finally{
-        setTimeout(() => {
-          setImageUploadError({...imageUploadErr, isError : false, message : ""})
-        }, 5000);
-      }
-     
+    if (type === "image") {
+      setImages((prev) => [...prev, ...validFiles]);
+    } else if (type === "architecture") {
+      setArchitechturalImages((prev) => [...prev, ...validFiles]);
+    } else {
+      setVideos(validFiles);
     }
-    const uploadVideoFile = async(videoFile : any) => {
-      setVideoLoading(true);
-      try{
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}property/upload-video`, {
-          file : videoFile?.[0]
-        }, {headers : {
-          'Content-Type' : 'multipart/form-data'
-        }});
-        if(response?.data?.success){
-          //setVideosUrl(res.data?.data);
-          form.setValue('videoId', response.data?.data?.[0]?.id);
-        }
-      }catch(err : any){
-        const message = err?.response?.data?.message;
-        setVideoUploaderError({...videoUploadErr, isError : true, message});
-      }finally{
-        setVideoLoading(false);
-        setTimeout(() => {
-          setVideoUploaderError({...videoUploadErr, isError : false, message : ""});
-        }, 5000);
-      } 
-    }
+  };
 
-    const onSubmit = (data: PropertyFormData) => {
-      setIsLoading(true);
-      // agency id should be added automatically from agents information
-      const newData = {
-        ...data,
-        price : parseInt(data.price),
-        sizeInSquareFeet : parseInt(data.sizeInSquareFeet),
-        averageBroadbandSpeedInMegabytes : parseInt(data.averageBroadbandSpeedInMegabytes),
-        noOfBedrooms : parseInt(data.noOfBedrooms),
-        noOfKitchens : parseInt(data.noOfKitchens),
-        noOfToilets : parseInt(data.noOfToilets),
-        geoCoordinates : {
-          latitude : parseFloat(data.geoCoordinates.latitude),
-          longitude : parseFloat(data.geoCoordinates.longitude)
+  const removeFile = (
+    index: number,
+    type: "image" | "video" | "architecture"
+  ) => {
+    if (type === "image") {
+      setImages((prev) => prev.filter((_, i) => i !== index));
+    } else if (type === "architecture") {
+      setArchitechturalImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setVideos((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const newUploadFiles = async (array: any, type: "image" | "architecture") => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}property/upload-images`,
+        {
+          files: array,
         },
-        videoId: data?.videoId ?? null
-        
-      };
-      try {
-        axiosInstance.post("/property",{
-          ...newData
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response?.data?.success) {
+        switch (type) {
+          case "image":
+            form.setValue(
+              "photoIds",
+              response.data?.data?.map((item: any) => item.id),
+              {
+                shouldValidate: true,
+                shouldDirty: true,
+              }
+            );
+
+            break;
+          case "architecture":
+            form.setValue(
+              "architecturalPlanIds",
+              response.data?.data?.map((item: any) => item.id)
+            );
+            break;
+          default:
+            console.log("");
+            break;
+        }
+      }
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+      setImageUploadError({ ...imageUploadErr, isError: true, message });
+    } finally {
+      setTimeout(() => {
+        setImageUploadError({ ...imageUploadErr, isError: false, message: "" });
+      }, 5000);
+    }
+  };
+  const uploadVideoFile = async (videoFile: any) => {
+    setVideoLoading(true);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}property/upload-video`,
+        {
+          file: videoFile?.[0],
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response?.data?.success) {
+        //setVideosUrl(res.data?.data);
+        form.setValue("videoId", response.data?.data?.[0]?.id);
+      }
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+      setVideoUploaderError({ ...videoUploadErr, isError: true, message });
+    } finally {
+      setVideoLoading(false);
+      setTimeout(() => {
+        setVideoUploaderError({
+          ...videoUploadErr,
+          isError: false,
+          message: "",
+        });
+      }, 5000);
+    }
+  };
+
+  const onSubmit = (data: PropertyFormData) => {
+    setIsLoading(true);
+    // agency id should be added automatically from agents information
+    const newData = {
+      ...data,
+      price: parseInt(data.price),
+      sizeInSquareFeet: parseInt(data.sizeInSquareFeet),
+      averageBroadbandSpeedInMegabytes: parseInt(
+        data.averageBroadbandSpeedInMegabytes
+      ),
+      noOfBedrooms: parseInt(data.noOfBedrooms),
+      noOfKitchens: parseInt(data.noOfKitchens),
+      noOfToilets: parseInt(data.noOfToilets),
+      geoCoordinates: {
+        latitude: parseFloat(data.geoCoordinates.latitude),
+        longitude: parseFloat(data.geoCoordinates.longitude),
+      },
+      videoId: data?.videoId ?? null,
+    };
+    try {
+      axiosInstance
+        .post("/property", {
+          ...newData,
         })
         .then((response) => {
           toast.success(response?.data?.message);
           onOpenChange(false);
           setIsLoading(false);
-          
+
           form.reset();
         })
-        .catch((error : any) => {
+        .catch((error: any) => {
           toast.error(error?.response?.data?.message);
           setIsLoading(false);
         });
-      } catch (error) {
-          
-      }finally{
-        // onOpenChange(false);
-        // setIsLoading(false);
-        // form.reset();
-      }
+    } catch (error) {
+    } finally {
+      // onOpenChange(false);
+      // setIsLoading(false);
+      // form.reset();
+    }
+  };
 
-    };
-
-    useEffect(() => {
-      // get property Types
-      axiosInstance.get('property-type')
-      .then(res => {
+  useEffect(() => {
+    // get property Types
+    axiosInstance
+      .get("property-type")
+      .then((res) => {
         setPropertyTypes(res.data.data);
-      }).catch(err => {
-        console.error({err});
+      })
+      .catch((err) => {
+        console.error({ err });
       });
 
-      // get country 0b7c1c4d-65a5-484d-9b03-8c6b36d09634
-      axiosInstance.get('country/states/all?countryId=0b7c1c4d-65a5-484d-9b03-8c6b36d09634')
-      .then(res => {
+    // get country 0b7c1c4d-65a5-484d-9b03-8c6b36d09634
+    axiosInstance
+      .get("country/states/all?countryId=0b7c1c4d-65a5-484d-9b03-8c6b36d09634")
+      .then((res) => {
         setCountryStates(res?.data?.data);
-      }).catch(err => {
-        console.error({err});
+      })
+      .catch((err) => {
+        console.error({ err });
       });
-    },[]);
+  }, []);
 
-    useEffect(() => {
-      if (images.length > 0) {
-        const formData = new FormData();
-        images.forEach(file => formData.append('files[]', file));
-        newUploadFiles(images, 'image');
-      }
-    },[images]);
+  useEffect(() => {
+    if (images.length > 0) {
+      const formData = new FormData();
+      images.forEach((file) => formData.append("files[]", file));
+      newUploadFiles(images, "image");
+    }
+  }, [images]);
 
-    useEffect(() => {
-      if (videos) {
-        const formData = new FormData();
-        videos.forEach(file => formData.append('files[]', file));
-        uploadVideoFile(videos);
-      }
-  },[videos]);
+  useEffect(() => {
+    if (videos) {
+      const formData = new FormData();
+      videos.forEach((file) => formData.append("files[]", file));
+      uploadVideoFile(videos);
+    }
+  }, [videos]);
 
   useEffect(() => {
     if (architechturalImages.length > 0) {
       const formData = new FormData();
-      architechturalImages.forEach(file => formData.append('files[]', file));
-      newUploadFiles(architechturalImages, 'architecture');
+      architechturalImages.forEach((file) => formData.append("files[]", file));
+      newUploadFiles(architechturalImages, "architecture");
     }
-  },[architechturalImages]);
+  }, [architechturalImages]);
 
   return (
-    
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby={undefined} className="
+      <DialogContent
+        aria-describedby={undefined}
+        className="
         w-[95vw]
         max-w-full
         sm:max-w-[95vw]
@@ -353,7 +420,8 @@ export default function PropertyListingDialog({
         lg:max-w-6xl
         max-h-[90vh]
         overflow-y-auto
-        bg-white">
+        bg-white"
+      >
         <DialogHeader className="px-2 md:px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
@@ -364,8 +432,15 @@ export default function PropertyListingDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col h-full"
+          >
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="flex-1"
+            >
               <TabsList className="mx-2 md:mx-6 grid w-auto grid-cols-4 gap-2">
                 <TabsTrigger value="basic" className="gap-2">
                   <Info className="h-4 w-4" />
@@ -395,7 +470,11 @@ export default function PropertyListingDialog({
                         <FormItem className="col-span-2">
                           <FormLabel>Property Title</FormLabel>
                           <FormControl>
-                            <Input required placeholder="Modern 3BR Apartment..." {...field} />
+                            <Input
+                              required
+                              placeholder="Modern 3BR Apartment..."
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -408,16 +487,29 @@ export default function PropertyListingDialog({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Property Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} required>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            required
+                          >
                             <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select Property Type" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {propertTypes && propertTypes?.map((data : PropertyTypesInterface, i : number) => 
-                                <SelectItem key={`index_${i}`} className="capitalize" value={data.id}>{data.name}</SelectItem>
-                              )}
+                              {propertTypes &&
+                                propertTypes?.map(
+                                  (data: PropertyTypesInterface, i: number) => (
+                                    <SelectItem
+                                      key={`index_${i}`}
+                                      className="capitalize"
+                                      value={data.id}
+                                    >
+                                      {data.name}
+                                    </SelectItem>
+                                  )
+                                )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -431,7 +523,11 @@ export default function PropertyListingDialog({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Listing Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} required>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            required
+                          >
                             <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select type" />
@@ -453,16 +549,26 @@ export default function PropertyListingDialog({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Category</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} required>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            required
+                          >
                             <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="RESIDENTIAL">Residential</SelectItem>
-                              <SelectItem value="COMMERCIAL_SHOP">Commercial</SelectItem>
-                              <SelectItem value="OFFICE">Office&nbsp;Space</SelectItem>
+                              <SelectItem value="RESIDENTIAL">
+                                Residential
+                              </SelectItem>
+                              <SelectItem value="COMMERCIAL_SHOP">
+                                Commercial
+                              </SelectItem>
+                              <SelectItem value="OFFICE">
+                                Office&nbsp;Space
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -477,7 +583,11 @@ export default function PropertyListingDialog({
                         <FormItem className="col-span-2">
                           <FormLabel>Address</FormLabel>
                           <FormControl>
-                            <Input placeholder="123 Main Street, City, State" {...field}  required/>
+                            <Input
+                              placeholder="123 Main Street, City, State"
+                              {...field}
+                              required
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -490,16 +600,26 @@ export default function PropertyListingDialog({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>State</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} required>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            required
+                          >
                             <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select state" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {countryStates.map((data) => 
-                                <SelectItem value={data.id} key={data.id} className="capitalize">{data.name}</SelectItem>
-                              )}
+                              {countryStates.map((data) => (
+                                <SelectItem
+                                  value={data.id}
+                                  key={data.id}
+                                  className="capitalize"
+                                >
+                                  {data.name}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -518,7 +638,7 @@ export default function PropertyListingDialog({
                               placeholder="500000"
                               required
                               {...field}
-                            onChange={(e) => field.onChange(e.target.value)}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -532,7 +652,11 @@ export default function PropertyListingDialog({
                       render={({ field }) => (
                         <FormItem className="col-span-2">
                           <FormLabel>Payment Duration</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} required>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            required
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select duration" />
@@ -688,7 +812,9 @@ export default function PropertyListingDialog({
                                   required
                                   placeholder="Enter latitude of building. E.g., 40.7128"
                                   {...field}
-                                  onChange={(e) => field.onChange(e.target.value)}
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value)
+                                  }
                                 />
                               </FormControl>
                               <FormMessage />
@@ -709,7 +835,9 @@ export default function PropertyListingDialog({
                                   placeholder="Enter longitude of building. E.g., -74.0060"
                                   required
                                   {...field}
-                                  onChange={(e) => field.onChange(e.target.value)}
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value)
+                                  }
                                 />
                               </FormControl>
                               <FormMessage />
@@ -736,7 +864,9 @@ export default function PropertyListingDialog({
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">WiFi</FormLabel>
+                            <FormLabel className="font-normal cursor-pointer">
+                              WiFi
+                            </FormLabel>
                           </FormItem>
                         )}
                       />
@@ -770,7 +900,9 @@ export default function PropertyListingDialog({
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">Laundry</FormLabel>
+                            <FormLabel className="font-normal cursor-pointer">
+                              Laundry
+                            </FormLabel>
                           </FormItem>
                         )}
                       />
@@ -786,7 +918,9 @@ export default function PropertyListingDialog({
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">Gym</FormLabel>
+                            <FormLabel className="font-normal cursor-pointer">
+                              Gym
+                            </FormLabel>
                           </FormItem>
                         )}
                       />
@@ -802,7 +936,9 @@ export default function PropertyListingDialog({
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">CCTV</FormLabel>
+                            <FormLabel className="font-normal cursor-pointer">
+                              CCTV
+                            </FormLabel>
                           </FormItem>
                         )}
                       />
@@ -857,13 +993,18 @@ export default function PropertyListingDialog({
                       <CardContent className="p-6">
                         <FormField
                           control={form.control}
-                          rules={{required : "Please Upload at least one Image"}}
+                          rules={{
+                            required: "Please Upload at least one Image",
+                          }}
                           name="photoIds"
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
                                 <div className="text-center">
-                                  <Label htmlFor="images" className="cursor-pointer">
+                                  <Label
+                                    htmlFor="images"
+                                    className="cursor-pointer"
+                                  >
                                     <Image className="mx-auto h-12 w-12 text-muted-foreground" />
                                   </Label>
                                   <Input
@@ -874,24 +1015,25 @@ export default function PropertyListingDialog({
                                     className="hidden"
                                     onChange={(e) => {
                                       const files = e.target.files;
-                                      handleFileUpload(files, 'image');
+                                      handleFileUpload(files, "image");
                                     }}
                                   />
-                                  <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 2MB each</p>
+                                  <p className="text-xs text-muted-foreground mt-2">
+                                    PNG, JPG, GIF up to 2MB each
+                                  </p>
                                 </div>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        
                       </CardContent>
                     </Card>
-                  
+
                     {images.length > 0 && (
                       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
                         {(images as File[]).map((file, index) => (
-                            <div key={index} className="relative">
+                          <div key={index} className="relative">
                             <img
                               src={URL.createObjectURL(file as File)}
                               alt={`Upload ${index + 1}`}
@@ -902,10 +1044,11 @@ export default function PropertyListingDialog({
                               variant="destructive"
                               size="icon"
                               className="absolute -top-2 -right-2 h-6 w-6"
-                              onClick={() => removeFile(index, 'image')}>
-                                <X className="h-3 w-3" />
+                              onClick={() => removeFile(index, "image")}
+                            >
+                              <X className="h-3 w-3" />
                             </Button>
-                            </div>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -913,113 +1056,131 @@ export default function PropertyListingDialog({
                   {/* Videos */}
                   <div>
                     <Label>Property Video (Optional)</Label>
+                    <FormDescription>Upload Property Video</FormDescription>
+                    <div className="mt-2">
+                      <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                        <CardContent className="p-6">
+                          <FormField
+                            control={form.control}
+                            // rules={{required : "Video is required"}}
+                            name="videoId"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <div className="text-center">
+                                    <Label
+                                      htmlFor="videos"
+                                      className="cursor-pointer"
+                                    >
+                                      {videoLoading ? (
+                                        <UploadIcon className="mx-auto h-12 w-12 text-muted-foreground " />
+                                      ) : (
+                                        <Video className="mx-auto h-12 w-12 text-muted-foreground cursor-pointer" />
+                                      )}
+                                    </Label>
+                                    <Input
+                                      id="videos"
+                                      type="file"
+                                      accept=".mp4,.mkv"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const files = e.target.files;
+                                        handleFileUpload(files, "video");
+                                      }}
+                                    />
+
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                      {videoLoading
+                                        ? "Uploading...."
+                                        : `${
+                                            videos
+                                              ? videos?.[0]?.name
+                                              : "only .mp4, .mkv allowed and Size should not be greater than 10mb"
+                                          }`}
+                                    </p>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                  {/* Architechture */}
+                  <div className="space-y-2">
+                    <FormLabel>Architectural Plans (Optional)</FormLabel>
                     <FormDescription>
-                      Upload Property Video
+                      Upload floor plans and architectural drawings
                     </FormDescription>
                     <div className="mt-2">
                       <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
                         <CardContent className="p-6">
                           <FormField
-                          control={form.control}
-                          // rules={{required : "Video is required"}}
-                          name="videoId"
-                          render={({ field }) => (
-                            <FormItem>
-                              
-                              <FormControl>
-                                <div className="text-center">
-                                  <Label htmlFor="videos" className="cursor-pointer">
-                                    {videoLoading ? <UploadIcon className="mx-auto h-12 w-12 text-muted-foreground "/> :  <Video className="mx-auto h-12 w-12 text-muted-foreground cursor-pointer" />}
-                                  </Label>
-                                  <Input
-                                    id="videos"
-                                    type="file"
-                                    accept=".mp4,.mkv"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                      const files = e.target.files;
-                                      handleFileUpload(files, 'video');
-                                    }}
-                                  />
-                                  
-                                  <p className="text-sm text-muted-foreground mt-2">
-                                    {videoLoading ? "Uploading...." : `${videos ? videos?.[0]?.name : "only .mp4, .mkv allowed and Size should not be greater than 10mb"}`}
-                                  </p>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                            control={form.control}
+                            name="architecturalPlanIds"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <div className="text-center">
+                                    <Label
+                                      htmlFor="architecture"
+                                      className="cursor-pointer"
+                                    >
+                                      <Image className="mx-auto h-12 w-12 text-muted-foreground" />
+                                    </Label>
+                                    <Input
+                                      id="architecture"
+                                      type="file"
+                                      multiple
+                                      accept="image/jpeg, application/pdf"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const files = e.target.files;
+                                        handleFileUpload(files, "architecture");
+                                        //field.onChange(architechturalImagesUrl); // update form value manually
+                                      }}
+                                    />
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                      PNG, JPG, PDF up to 2MB each
+                                    </p>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
                         </CardContent>
                       </Card>
-                        
-                    </div>
-                  </div>
-                  {/* Architechture */}
-                  <div className="space-y-2">
-                  <FormLabel>Architectural Plans (Optional)</FormLabel>
-                      <FormDescription>
-                      Upload floor plans and architectural drawings
-                      </FormDescription>
-                      <div className="mt-2">
-                          <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
-                            <CardContent className="p-6">
-                              <FormField
-                                control={form.control}
-                                name="architecturalPlanIds"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormControl>
-                                      <div className="text-center">
-                                          <Label htmlFor="architecture" className="cursor-pointer">
-                                          <Image className="mx-auto h-12 w-12 text-muted-foreground" />
-                                          </Label>
-                                          <Input
-                                          id="architecture"
-                                          type="file"
-                                          multiple
-                                          accept="image/jpeg, application/pdf"
-                                          className="hidden"
-                                          onChange={(e) => {
-                                            const files = e.target.files;
-                                            handleFileUpload(files, 'architecture');
-                                            //field.onChange(architechturalImagesUrl); // update form value manually
-                                          }}
-                                        />
-                                        <p className="text-xs text-muted-foreground mt-2">PNG, JPG, PDF up to 2MB each</p>
-                                      </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              </CardContent>
-                          </Card>
-                      
-                          {architechturalImages.length > 0 && (
-                              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                              {(architechturalImages as File[]).map((file, index) => (
-                                  <div key={index} className="relative">
-                                  <img
-                                    src={URL.createObjectURL(file)}
-                                    alt={`Upload ${index + 1}`}
-                                    className="w-full h-20 object-cover rounded border"
-                                  />
-                                  <Button
-                                      type="button"
-                                      variant="destructive"
-                                      size="icon"
-                                      className="absolute -top-2 -right-2 h-6 w-6"
-                                      onClick={() => removeFile(index, 'architecture')}
-                                  >
-                                      <X className="h-3 w-3" />
-                                  </Button>
-                                  </div>
-                              ))}
+
+                      {architechturalImages.length > 0 && (
+                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {(architechturalImages as File[]).map(
+                            (file, index) => (
+                              <div key={index} className="relative">
+                                <img
+                                  src={URL.createObjectURL(file)}
+                                  alt={`Upload ${index + 1}`}
+                                  className="w-full h-20 object-cover rounded border"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute -top-2 -right-2 h-6 w-6"
+                                  onClick={() =>
+                                    removeFile(index, "architecture")
+                                  }
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
                               </div>
+                            )
                           )}
-                      </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
               </ScrollArea>
@@ -1029,7 +1190,8 @@ export default function PropertyListingDialog({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}>
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <div className="flex gap-2">
@@ -1040,7 +1202,8 @@ export default function PropertyListingDialog({
                     onClick={() => {
                       const tabs = ["basic", "details", "amenities", "media"];
                       const currentIndex = tabs.indexOf(activeTab);
-                      if (currentIndex > 0) setActiveTab(tabs[currentIndex -1]);
+                      if (currentIndex > 0)
+                        setActiveTab(tabs[currentIndex - 1]);
                     }}
                   >
                     Previous
@@ -1053,7 +1216,7 @@ export default function PropertyListingDialog({
                       const tabs = ["basic", "details", "amenities", "media"];
                       const currentIndex = tabs.indexOf(activeTab);
                       if (currentIndex < tabs.length - 1) {
-                        console.log({currentIndex});
+                        console.log({ currentIndex });
                         setActiveTab(tabs[currentIndex + 1]);
                       }
                     }}
@@ -1061,8 +1224,11 @@ export default function PropertyListingDialog({
                     Next
                   </Button>
                 ) : (
-                  <Button type="submit" className="disabled:bg-slate-500 disabled:text-white cursor-default" 
-                  disabled={!form.formState.isValid ? true : false}>
+                  <Button
+                    type="submit"
+                    className="disabled:bg-slate-500 disabled:text-white cursor-default"
+                    disabled={!form.formState.isValid ? true : false}
+                  >
                     Create Listing
                   </Button>
                 )}
@@ -1070,10 +1236,12 @@ export default function PropertyListingDialog({
             </div>
           </form>
         </Form>
-        <LowResolutionPrompt show={imageUploadErr?.isError} message={imageUploadErr?.message}/>
+        <LowResolutionPrompt
+          show={imageUploadErr?.isError}
+          message={imageUploadErr?.message}
+        />
       </DialogContent>
-      {isLoading && <LoaderProcessor/>}
+      {isLoading && <LoaderProcessor />}
     </Dialog>
-  
   );
 }

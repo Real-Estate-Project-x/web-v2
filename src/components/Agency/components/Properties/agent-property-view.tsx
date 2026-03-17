@@ -55,6 +55,7 @@ const AgentPropertyDetailPage = () => {
   const [propertyData, setProperty] = useState<PropertyInterface>(
     {} as PropertyInterface
   );
+  const [viewCount, setViewCount] = useState(0);
   const [isBoosted, setIsBoosted] = useState(propertyData?.isBoosted);
   const [isTaken, setIsTaken] = useState(propertyData?.isPropertyTaken);
   const [isLoading, setIsLoading] = useState(false);
@@ -155,18 +156,28 @@ const AgentPropertyDetailPage = () => {
     }
   }, []);
 
-  useEffect(() => {
+  const fetchProperty = async () => {
     setIsLoading(true);
-    axiosInstance
-      .get(`/property/customer-listings/detail/${id}`)
-      .then((response) => {
-        setProperty(response?.data?.data?.property);
+    const url = `/property/customer-listings/detail/${id}`;
+    try {
+      const response = await axiosInstance.get(url);
+      if (response) {
+        const { data } = response;
+        setProperty(data.data.property);
+        setViewCount(data.data.viewCount);
+        console.log({ result: data });
+
         setIsLoading(false);
-      })
-      .catch((err) => {
-        setIsLoading(false);
-        console.log({ err });
-      });
+      }
+    } catch (ex) {
+      setIsLoading(false);
+      console.error({ ex });
+      throw ex;
+    }
+  };
+
+  useEffect(() => {
+    fetchProperty();
   }, [isTaken, isBoosted]);
   if (isLoading) {
     return <LoaderViewProperty />;
@@ -513,7 +524,7 @@ const AgentPropertyDetailPage = () => {
                         Total View(s)
                       </span>
                     </div>
-                    <span className="font-bold text-lg">{0}</span>
+                    <span className="font-bold text-lg">{viewCount}</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                     <div className="flex items-center gap-2">
