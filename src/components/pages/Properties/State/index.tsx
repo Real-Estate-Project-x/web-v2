@@ -12,6 +12,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { toast } from "sonner";
+import { PropertyList } from "..";
 import { AxiosError } from "axios";
 import { PropertyUpFor } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,44 +28,48 @@ import { Button } from "@/components/ui/button";
 import { FC, useState, Fragment, useEffect } from "react";
 import Footer from "../../Home/Footer";
 import Navbar from "../../Home/Nav";
-import { PropertyFilter, PropertyList } from "..";
 import LoadingCard from "@/components/shared/loader-cards";
 import {
+  AddressAutocompletion,
   PaginationControlInterface,
   PropertyInterface,
 } from "../../../../../utils/interfaces";
 import { getCookie } from "@/lib/helpers";
 import { useSearchParams } from "next/navigation";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { cleanObject } from "../../../../../utils/helpers";
+import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { PropertySearchPayload } from "../../Search-properties/search-form";
 
 interface FilterProps {
   loader: boolean;
   propertyTypes: { id: string; name: string; tag: string }[];
   agencies: { id: string; name: string }[];
+  addressesList: AddressAutocompletion[];
   setLoader: (v: boolean) => void;
   onSendData: (data: Partial<StateViewSearchPayloadV2>) => void;
   onSaveData: (data: Partial<StateViewSearchPayloadV2>) => void;
+  onAddressAutocomplete: (address: string) => void;
 }
 
 interface StateViewSearchPayloadV2
   extends Omit<PropertySearchPayload, "stateId"> {
   searchTerm: string;
-
   removeBoostedProperties: boolean;
 }
 
 export const StateViewPropertyFilter: FC<FilterProps> = ({
   agencies,
   propertyTypes,
+  addressesList,
   setLoader,
   onSendData,
   onSaveData,
+  onAddressAutocomplete,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-
+  const [locationQuery, setLocationQuery] = useState("");
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [filter, setFilter] = useState<StateViewSearchPayloadV2>({
     propertyTypeId: "",
     agencyId: "",
@@ -89,6 +94,13 @@ export const StateViewPropertyFilter: FC<FilterProps> = ({
     squareFootage: {
       start: undefined as number | undefined,
       end: undefined as number | undefined,
+    },
+    location: {
+      searchRadiusInKm: undefined as number | undefined,
+      startLocation: {
+        latitude: undefined as number | undefined,
+        longitude: undefined as number | undefined,
+      },
     },
   });
 
@@ -118,8 +130,24 @@ export const StateViewPropertyFilter: FC<FilterProps> = ({
         start: undefined as number | undefined,
         end: undefined as number | undefined,
       },
+      location: {
+        searchRadiusInKm: undefined as number | undefined,
+        startLocation: {
+          latitude: undefined as number | undefined,
+          longitude: undefined as number | undefined,
+        },
+      },
     });
     setLoader(false);
+  };
+
+  const addressUpdate = (address: string) => {
+    setLocationQuery(address);
+    setShowLocationDropdown(true);
+
+    setTimeout(() => {
+      onAddressAutocomplete(address);
+    }, 5000);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -182,7 +210,8 @@ export const StateViewPropertyFilter: FC<FilterProps> = ({
           <Button
             className="cursor-pointer"
             variant="outline"
-            onClick={() => setShowAdvanced(!showAdvanced)}>
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
             {" "}
             <SlidersHorizontal />
             {showAdvanced ? "Hide Advanced" : "Show Advanced"}
@@ -196,7 +225,8 @@ export const StateViewPropertyFilter: FC<FilterProps> = ({
               type="button"
               className="cursor-pointer"
               variant="secondary"
-              onClick={saveSearch}>
+              onClick={saveSearch}
+            >
               <SaveAll /> Save Search
             </Button>
           </div>
@@ -385,6 +415,68 @@ export const StateViewPropertyFilter: FC<FilterProps> = ({
               ))}
             </div>
 
+            {/* Location Filter */}
+            <h3 className="pl-5 pt-4">
+              <b>Geo Point Search*</b>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border-bottom">
+              {/* Address Search */}
+              <div className="relative md:col-span-3">
+                <Input
+                  type="text"
+                  placeholder="Search starting geo_point..."
+                  value={locationQuery}
+                  onChange={(e) => addressUpdate(e.target.value)}
+                  className="h-12"
+                />
+
+                {showLocationDropdown && addressesList?.length > 0 && (
+                  <div className="absolute z-50 bg-white border w-full rounded-lg shadow mt-1 max-h-60 overflow-y-auto">
+                    {addressesList.map((item, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setShowLocationDropdown(false);
+                          setLocationQuery(item.formattedAddress);
+                          setFilter({
+                            ...filter,
+                            location: {
+                              ...filter.location,
+                              startLocation: {
+                                latitude: +item.geolocation.latitude,
+                                longitude: +item.geolocation.longitude,
+                              },
+                            },
+                          });
+                        }}
+                      >
+                        {item.formattedAddress}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Search Radius */}
+              <div className="relative md:col-span-1">
+                <Input
+                  type="number"
+                  placeholder="Search Radius (km)"
+                  className="h-12"
+                  onChange={(e) =>
+                    setFilter({
+                      ...filter,
+                      location: {
+                        ...filter.location,
+                        searchRadiusInKm: +e.target.value,
+                      },
+                    })
+                  }
+                />
+              </div>
+            </div>
+
             <div className="w-full flex justify-end gap-4 p-4">
               <Button className="cursor-pointer" onClick={applyFilters}>
                 Apply Filter
@@ -427,9 +519,10 @@ export const StatePropertyList: FC = () => {
   );
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
   const [agencies, setAgencies] = useState<any[]>([]);
+  const [addressesList, setAddressesList] = useState<any[]>([]);
 
   const fetchPropertiesByState = async (pageNumber = 1, pageSize = 10) => {
-    const url = `property/customer-listings/by-state/${stateName}/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    const url = `/property/customer-listings/by-state/${stateName}/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
 
     try {
       const response = await axiosInstance.get(url);
@@ -552,6 +645,25 @@ export const StatePropertyList: FC = () => {
     }
   };
 
+  const handleOnAddressAutocomplete = async (address: string) => {
+    if (!address) return;
+
+    const url = `/map/address-autocomplete/${address}`;
+    try {
+      const result = await axiosInstance.get(url);
+      if (result.data?.success) {
+        setAddressesList(result.data.data);
+      }
+    } catch (error) {
+      let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
+    }
+  };
+
   useEffect(() => {
     Promise.all([loadData(1), fetchAgencies(), fetchPropertyTypes()]);
   }, []);
@@ -568,9 +680,11 @@ export const StatePropertyList: FC = () => {
           loader={isLoading}
           agencies={agencies}
           propertyTypes={propertyTypes}
+          addressesList={addressesList}
           setLoader={setIsLoading}
           onSendData={handleChildData}
           onSaveData={handleSaveSearch}
+          onAddressAutocomplete={handleOnAddressAutocomplete}
         />
 
         {isLoading ? (

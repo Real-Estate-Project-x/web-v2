@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Navbar from "../Home/Nav";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, use, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Bath,
@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  AddressAutocompletion,
   PaginationControlInterface,
   PropertyInterface,
 } from "../../../../utils/interfaces";
@@ -55,13 +56,14 @@ type Props = {
 
 interface FilterProps {
   loader: boolean;
-  // preSelectedCategory?: PropertyUpFor;
   propertyTypes: { id: string; name: string; tag: string }[];
   states: { id: string; name: string }[];
   agencies: { id: string; name: string }[];
+  addressesList: AddressAutocompletion[];
   setLoader: (v: boolean) => void;
   onSendData: (data: Partial<PropertySearchPayloadV2>) => void;
   onSaveData: (data: Partial<PropertySearchPayloadV2>) => void;
+  onAddressAutocomplete: (address: string) => void;
 }
 
 interface PropertySearchPayloadV2 extends PropertySearchPayload {
@@ -71,13 +73,17 @@ interface PropertySearchPayloadV2 extends PropertySearchPayload {
 export const PropertyFilter: FC<FilterProps> = ({
   agencies,
   propertyTypes,
+  addressesList,
   states,
   setLoader,
   onSendData,
   onSaveData,
+  onAddressAutocomplete,
 }) => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [locationQuery, setLocationQuery] = useState("");
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [filter, setFilter] = useState<PropertySearchPayloadV2>({
     propertyTypeId: "",
     stateId: "",
@@ -102,6 +108,13 @@ export const PropertyFilter: FC<FilterProps> = ({
     squareFootage: {
       start: undefined as number | undefined,
       end: undefined as number | undefined,
+    },
+    location: {
+      searchRadiusInKm: undefined as number | undefined,
+      startLocation: {
+        latitude: undefined as number | undefined,
+        longitude: undefined as number | undefined,
+      },
     },
   });
 
@@ -131,8 +144,24 @@ export const PropertyFilter: FC<FilterProps> = ({
         start: undefined as number | undefined,
         end: undefined as number | undefined,
       },
+      location: {
+        searchRadiusInKm: undefined as number | undefined,
+        startLocation: {
+          latitude: undefined as number | undefined,
+          longitude: undefined as number | undefined,
+        },
+      },
     });
     setLoader(false);
+  };
+
+  const addressUpdate = (address: string) => {
+    setLocationQuery(address);
+    setShowLocationDropdown(true);
+
+    setTimeout(() => {
+      onAddressAutocomplete(address);
+    }, 5000);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -417,6 +446,68 @@ export const PropertyFilter: FC<FilterProps> = ({
               ))}
             </div>
 
+            {/* Location Filter */}
+            <h3 className="pl-5 pt-4">
+              <b>Geo Point Search*</b>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border-bottom">
+              {/* Address Search */}
+              <div className="relative md:col-span-3">
+                <Input
+                  type="text"
+                  placeholder="Search starting geo_point..."
+                  value={locationQuery}
+                  onChange={(e) => addressUpdate(e.target.value)}
+                  className="h-12"
+                />
+
+                {showLocationDropdown && addressesList?.length > 0 && (
+                  <div className="absolute z-50 bg-white border w-full rounded-lg shadow mt-1 max-h-60 overflow-y-auto">
+                    {addressesList.map((item, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setShowLocationDropdown(false);
+                          setLocationQuery(item.formattedAddress);
+                          setFilter({
+                            ...filter,
+                            location: {
+                              ...filter.location,
+                              startLocation: {
+                                latitude: +item.geolocation.latitude,
+                                longitude: +item.geolocation.longitude,
+                              },
+                            },
+                          });
+                        }}
+                      >
+                        {item.formattedAddress}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Search Radius */}
+              <div className="relative md:col-span-1">
+                <Input
+                  type="number"
+                  placeholder="Search Radius (km)"
+                  className="h-12"
+                  onChange={(e) =>
+                    setFilter({
+                      ...filter,
+                      location: {
+                        ...filter.location,
+                        searchRadiusInKm: +e.target.value,
+                      },
+                    })
+                  }
+                />
+              </div>
+            </div>
+
             <div className="w-full flex justify-end gap-4 p-4">
               <Button className="cursor-pointer" onClick={applyFilters}>
                 Apply Filter
@@ -516,6 +607,7 @@ const Properties = () => {
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
   const [states, setStates] = useState<any[]>([]);
   const [agencies, setAgencies] = useState<any[]>([]);
+  const [addressesList, setAddressesList] = useState<any[]>([]);
 
   const handleChildData = async (filter: any) => {
     // Query api
@@ -526,6 +618,25 @@ const Properties = () => {
     setIsLoading(true);
     await fetchSearchResults(pageNumber, pageSize, payload);
     setIsLoading(false);
+  };
+
+  const handleOnAddressAutocomplete = async (address: string) => {
+    if (!address) return;
+
+    const url = `/map/address-autocomplete/${address}`;
+    try {
+      const result = await axiosInstance.get(url);
+      if (result.data?.success) {
+        setAddressesList(result.data.data);
+      }
+    } catch (error) {
+      let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
+    }
   };
 
   const fetchSearchResults = async (
@@ -680,9 +791,11 @@ const Properties = () => {
           loader={isLoading}
           agencies={agencies}
           propertyTypes={propertyTypes}
+          addressesList={addressesList}
           setLoader={setIsLoading}
           onSendData={handleChildData}
           onSaveData={handleSaveSearch}
+          onAddressAutocomplete={handleOnAddressAutocomplete}
         />
 
         {isLoading ? (

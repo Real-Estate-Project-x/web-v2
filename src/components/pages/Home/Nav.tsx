@@ -13,7 +13,6 @@ import {
   LockOpen,
   Lock,
   User,
-  UserCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,17 +40,23 @@ const defaultNavData = [
 const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const pathname = usePathname();
+
+  const handleScroll = () => {
+    const heroHeight = window.innerHeight * 0.7; // Approximately when the hero section ends
+    if (window.scrollY > heroHeight) {
+      setScrolled(true);
+    } else {
+      setScrolled(false);
+    }
+  };
+
   // Handle scroll events to change navbar background
   useEffect(() => {
-    const handleScroll = () => {
-      const heroHeight = window.innerHeight * 0.7; // Approximately when the hero section ends
-      if (window.scrollY > heroHeight) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+    setMounted(true);
+    setLoggedIn(isUserLoggedIn());
 
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -120,7 +125,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
             />
           </Link>
 
-          {!isUserLoggedIn() ? (
+          {!loggedIn ? (
             <Link
               href="/login"
               className={
@@ -213,7 +218,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
             {/* <Link href={"/properties/search"}>
               <Search size={18} className="text-black"/>
            </Link> */}
-            {!isUserLoggedIn() ? (
+            {!loggedIn ? (
               <Link
                 href="/login"
                 className="flex flex-row gap-2 items-center pt-2 text-black"

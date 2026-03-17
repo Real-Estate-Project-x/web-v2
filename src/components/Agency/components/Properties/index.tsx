@@ -117,6 +117,7 @@ const AgentPropertiesManager = () => {
     pageSize = 10,
     queryParams = {}
   ) => {
+    console.log({ agencyId });
     const url = `/property/agency-property-list/${agencyId}/`;
     try {
       const response = await axiosInstance.get(url, {

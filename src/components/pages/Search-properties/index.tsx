@@ -27,8 +27,7 @@ const SearchResults = () => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const filter = searchParams.get("filter") as string;
-  const query = searchParams.get("query") as string;
+  const [addressesList, setAddressesList] = useState<any[]>([]);
   const [togglePrice, setTogglePrice] = useState<boolean>(false);
   const [toggleDate, setToggleDate] = useState<boolean>(false);
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
@@ -224,6 +223,25 @@ const SearchResults = () => {
     }
   };
 
+  const handleOnAddressAutocomplete = async (address: string) => {
+    if (!address) return;
+
+    const url = `/map/address-autocomplete/${address}`;
+    try {
+      const result = await axiosInstance.get(url);
+      if (result.data?.success) {
+        setAddressesList(result.data.data);
+      }
+    } catch (error) {
+      let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const query = searchParams.get("query");
     if (query) {
@@ -305,8 +323,10 @@ const SearchResults = () => {
               agencies={agencies}
               preSelectedCategory={upFor}
               onSendData={handleChildData}
+              addressesList={addressesList}
               setLoader={setLoading}
               loader={loading}
+              onAddressAutocomplete={handleOnAddressAutocomplete}
             />
           </div>
         )}
