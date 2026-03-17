@@ -81,10 +81,12 @@ const Footer = () => {
 
           {/* <LogoComponent color={pathname === "/" ? scrolled ? "#1E3A8A" : "#FFFFFF" :"#1E3A8A"}/> */}
         </div>
-        <div className=" border-gray-800 pt-2 text-center">
+        <div className=" border-gray-800 text-center">
           <p className="mt-4">
-            &copy; {currentYear} Blupodd.com.Seamless Integration. Home Hunting, Reimagined. All rights reserved.
+            &copy; {currentYear} Blupodd.com
           </p>
+          <p className="italic text-gray-500 py-2 text-sm">Seamless Integration. Home Hunting, Reimagined.</p>
+          <p className="">All rights reserved.</p>
         </div>
       </div>
     </footer>

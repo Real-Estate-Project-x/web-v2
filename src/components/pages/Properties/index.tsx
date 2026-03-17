@@ -50,7 +50,7 @@ import { toast } from "sonner";
 import { PropertyUpFor } from "@/lib/constants";
 
 type Props = {
-  array: PropertyInterface[];
+  array: PropertyInterface[] | any[];
 };
 
 interface FilterProps {

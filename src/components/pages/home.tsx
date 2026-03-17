@@ -83,7 +83,7 @@ const LandingPage = () => {
   }, [userIp]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-sans">
       <Navbar />
       <Hero />
       <FeaturedProperties data={featured_properties} />

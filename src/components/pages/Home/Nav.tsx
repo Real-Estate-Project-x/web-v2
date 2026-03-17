@@ -70,7 +70,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
       }`}
     >
       {/* container */}
-      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16 font-serif">
         <Link href="/" className="flex items-center">
           {/* <Home className={`h-8 w-8 mr-2 ${pathname === "/" ? scrolled ? "text-gray-800" : "text-gray-200" :"text-black"}`} /> */}
           <h1 className={`text-2xl font-medium inline-block font-serif`}>
