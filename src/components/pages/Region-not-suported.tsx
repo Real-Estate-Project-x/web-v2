@@ -40,9 +40,6 @@ export default function RegionNotSupported() {
       {/* Logo */}
       <div className="mb-12">
         <LogoComponent />
-        {/* <span className="font-serif text-2xl text-blue-900 tracking-tight select-none">
-          Blu<span className="text-amber-400">podd</span>
-        </span> */}
       </div>
 
       {/* Card */}
