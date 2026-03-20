@@ -9,6 +9,11 @@ import { AmenitiesStep } from "./components/amenties-step";
 import { DetailsStep } from "./components/details-step";
 import { BasicStep } from "./components/basic-step";
 import { MediaStep } from "./components/media-step";
+import {
+  cleanObject,
+  getLocalStorageFieldRaw,
+} from "../../../../../utils/helpers";
+import { ApiRequests } from "@/lib/api.request";
 
 const steps = ["Basic", "Details", "Amenities", "Media"];
 
@@ -54,29 +59,25 @@ export const CreateProperty = ({}) => {
     isNewBuilding: false,
 
     // media
-    photoIds: [],
     videoId: "",
+    photoIds: [],
     architecturalPlanIds: [],
   });
 
   const fetchPropertyTypes = async () => {
-    const url = "/property-type/?fields=success,data(id,name,status,tag)";
-    try {
-      const response = await axiosInstance.get(url);
-      if (response.data?.success) {
-        const result = response.data;
-        setPropertyTypes(result.data);
+    const result = await new ApiRequests().fetchPropertyTypes(
+      "success,data(id,name,status,tag)"
+    );
+    if (!result) return;
 
-        return result;
-      }
-    } catch (error) {
-      throw error;
-    }
+    setPropertyTypes(result.data);
   };
 
   useEffect(() => {
     fetchPropertyTypes();
-    const agencyId = "";
+
+    // Pre_set agencyId into form_data
+    const agencyId = getLocalStorageFieldRaw("agentId");
     update("agencyId", agencyId);
   }, []);
 
@@ -88,20 +89,12 @@ export const CreateProperty = ({}) => {
     });
   };
 
-  const fetchStateByName = async (stateName: string) => {
-    const url = `/country/states/by-name/${stateName}/?fields=success,data(id,code,name,capital)`;
-    try {
-      const result = await axiosInstance.get(url);
-      if (result.data?.success) {
-        return result.data;
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const handleOnAddressSelection = async (stateName: string) => {
-    const state = await fetchStateByName(stateName);
+    // const state = await fetchStateByName(stateName);
+    const state = await new ApiRequests().fetchStateByName(
+      stateName,
+      "success,data(id,code,name,capital)"
+    );
     update("stateId", state.data.id);
   };
 
@@ -122,6 +115,16 @@ export const CreateProperty = ({}) => {
       toast(message, { description: JSON.stringify(error) });
       throw error;
     }
+  };
+
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const cleanForm = cleanObject(form);
+    console.log({ form, cleanForm });
+
+    const result = await new ApiRequests().createProperty(cleanForm);
+    console.log({ result });
   };
 
   return (
@@ -146,59 +149,65 @@ export const CreateProperty = ({}) => {
           </button>
         ))}
       </div>
-      {/* Step Content */}
-      {step === 0 && (
-        <BasicStep
-          addressesList={addressesList}
-          onAddressSelection={handleOnAddressSelection}
-          onAddressAutocomplete={handleOnAddressAutocomplete}
-          form={form}
-          update={update}
-        />
-      )}
-      {step === 1 && propertyTypes && (
-        <DetailsStep
-          propertyTypes={propertyTypes}
-          form={form}
-          update={update}
-        />
-      )}
-      {step === 2 && <AmenitiesStep form={form} update={update} />}
-      {step === 3 && <MediaStep form={form} update={update} />}
 
-      {/* Footer */}
-      <div className="flex justify-between mt-8">
-        <button
-          onClick={() => setStep(0)}
-          className="px-4 py-2 border rounded-lg"
-        >
-          Cancel
-        </button>
+      <form onSubmit={handleSubmit}>
+        {/* Step Content */}
+        {step === 0 && (
+          <BasicStep
+            addressesList={addressesList}
+            onAddressSelection={handleOnAddressSelection}
+            onAddressAutocomplete={handleOnAddressAutocomplete}
+            form={form}
+            update={update}
+          />
+        )}
+        {step === 1 && propertyTypes && (
+          <DetailsStep
+            propertyTypes={propertyTypes}
+            form={form}
+            update={update}
+          />
+        )}
+        {step === 2 && <AmenitiesStep form={form} update={update} />}
+        {step === 3 && <MediaStep form={form} update={update} />}
 
-        <div className="flex gap-2">
-          {step > 0 && (
-            <button
-              onClick={() => setStep((s) => s - 1)}
-              className="px-4 py-2 border rounded-lg"
-            >
-              Previous
-            </button>
-          )}
+        {/* Footer */}
+        <div className="flex justify-between mt-8">
+          <button
+            onClick={() => setStep(0)}
+            className="cursor-pointer px-4 py-2 border rounded-lg"
+          >
+            Cancel
+          </button>
 
-          {step < 3 ? (
-            <button
-              onClick={() => setStep((s) => s + 1)}
-              className="px-4 py-2 bg-black text-white rounded-lg"
-            >
-              Next
-            </button>
-          ) : (
-            <button className="px-4 py-2 bg-black text-white rounded-lg">
-              Create Listing
-            </button>
-          )}
+          <div className="flex gap-2">
+            {step > 0 && (
+              <button
+                onClick={() => setStep((s) => s - 1)}
+                className="cursor-pointer px-4 py-2 border rounded-lg"
+              >
+                Previous
+              </button>
+            )}
+
+            {step < 3 ? (
+              <button
+                onClick={() => setStep((s) => s + 1)}
+                className="cursor-pointer px-4 py-2 bg-black text-white rounded-lg"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="cursor-pointer px-4 py-2 bg-black text-white rounded-lg"
+              >
+                Create Listing
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

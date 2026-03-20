@@ -4,8 +4,9 @@ import { useState, useCallback, useRef } from "react";
 
 export interface UploadedFile {
   id: string;
-  file: File;
-  preview?: string;
+  url: string;
+  mimeType: string;
+  cloudFileId: string;
 }
 
 interface DropZoneProps {
@@ -79,17 +80,23 @@ function FileThumb({
   uf: UploadedFile;
   onRemove: () => void;
 }) {
-  const isImage = uf.file.type.startsWith("image/");
-  const isVideo = uf.file.type.startsWith("video/");
+  const isImage = uf.mimeType.startsWith("image/");
+  const isVideo = uf.mimeType.startsWith("video/");
+  const nameComponent = uf.url.split("/").pop()?.split(".").shift();
+
+  if (!nameComponent) return;
+
   const name =
-    uf.file.name.length > 18 ? uf.file.name.slice(0, 15) + "…" : uf.file.name;
+    nameComponent.length > 18
+      ? nameComponent.slice(0, 15) + "…"
+      : nameComponent;
 
   return (
     <div className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex flex-col items-center justify-center gap-1 p-2 h-24 w-24 shrink-0">
-      {isImage && uf.preview ? (
+      {isImage && uf.url ? (
         <img
-          src={uf.preview}
-          alt={uf.file.name}
+          src={uf.url}
+          alt={name}
           className="w-full h-full object-cover absolute inset-0 rounded-xl"
         />
       ) : isVideo ? (
@@ -104,7 +111,7 @@ function FileThumb({
       )}
       <button
         onClick={onRemove}
-        className="absolute top-1 right-1 bg-white/90 backdrop-blur-sm rounded-full p-0.5 shadow opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:text-red-500 text-slate-500"
+        className="absolute cursor-pointer top-1 right-1 bg-white/90 backdrop-blur-sm rounded-full p-0.5 shadow opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:text-red-500 text-slate-500"
       >
         <XIcon />
       </button>

@@ -503,7 +503,6 @@ export const StatePropertyList: FC = () => {
   const searchParams = useSearchParams();
   const stateName = searchParams.get("name") || "State";
   const [stateId, setStateId] = useState<string>("");
-  //const [type, setType] = useState<string>("");
   const [copyData, setCopyData] = useState<PropertyInterface[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
     const savedPage = getCookie("page");

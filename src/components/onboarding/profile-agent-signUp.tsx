@@ -97,7 +97,7 @@ export default function ProfileForm() {
         const formatData = new FormData();
         formatData.append("files[]", file);
 
-        const url = "upload-files";
+        const url = "/upload-files";
         const headers = { "Content-Type": "multipart/form-data" };
         const responseData = await axiosInstance.post(url, formatData, {
           headers,
