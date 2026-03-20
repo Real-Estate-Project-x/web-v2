@@ -65,3 +65,12 @@ export function reformatDate(date: string): string {
   const splitDate = date?.split("/");
   return `${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`;
 }
+
+export const getPropertyType = (
+  propertyTypeId: string,
+  propertyTypes: any[]
+) => {
+  if (!propertyTypes.length) return;
+
+  return propertyTypes.find(({ id }) => id === propertyTypeId);
+};

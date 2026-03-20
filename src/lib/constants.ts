@@ -25,3 +25,10 @@ export enum PropertyUpFor {
   RENT = "RENT",
   SALE = "SALE",
 }
+
+export enum PaymentDuration {
+  WEEKLY = "WEEKLY",
+  YEARLY = "YEARLY",
+  MONTHLY = "MONTHLY",
+  BI_ANNUALLY = "BI_ANNUALLY",
+}

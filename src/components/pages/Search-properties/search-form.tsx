@@ -14,6 +14,7 @@ import {
 import { PropertyUpFor } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AddressAutocompletion } from "../../../../utils/interfaces";
+import { getPropertyType } from "@/lib/utils";
 
 export interface PropertySearchPayload {
   propertyTypeId: string;
@@ -110,12 +111,6 @@ const PropertySearchForm: FC<Props> = ({
       },
     },
   });
-
-  const getPropertyType = (propertyTypeId: string) => {
-    if (!propertyTypes.length) return;
-
-    return propertyTypes.find(({ id }) => id === propertyTypeId);
-  };
 
   const updateAmenity = (key: keyof typeof filter, value: boolean) => {
     setFilter((prev) => ({ ...prev, [key]: value }));
@@ -235,7 +230,8 @@ const PropertySearchForm: FC<Props> = ({
             </Select>
           </div>
 
-          {getPropertyType(filter.propertyTypeId)?.tag === "RESIDENTIAL" && (
+          {getPropertyType(filter.propertyTypeId, propertyTypes)?.tag ===
+            "RESIDENTIAL" && (
             <>
               {/* Bedrooms (Input) */}
               <div className="space-y-2">
