@@ -49,6 +49,7 @@ import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { PropertyUpFor } from "@/lib/constants";
+import { ApiRequests } from "@/lib/api.request";
 
 type Props = {
   array: PropertyInterface[] | any[];
@@ -623,11 +624,10 @@ const Properties = () => {
   const handleOnAddressAutocomplete = async (address: string) => {
     if (!address) return;
 
-    const url = `/map/address-autocomplete/${address}`;
     try {
-      const result = await axiosInstance.get(url);
-      if (result.data?.success) {
-        setAddressesList(result.data.data);
+      const result = await new ApiRequests().addressAutocompletion(address);
+      if (result) {
+        setAddressesList(result);
       }
     } catch (error) {
       let message = "An error occurred";

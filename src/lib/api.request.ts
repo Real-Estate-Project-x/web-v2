@@ -1,0 +1,112 @@
+import axios from "axios";
+import { axiosInstance } from "./axios-interceptor";
+
+export class ApiRequests {
+  private BASE_URL: string;
+
+  constructor() {
+    this.BASE_URL = String(process.env.NEXT_PUBLIC_API_URL);
+  }
+
+  async uploadPropertyVideo(file: File) {
+    const url = `${this.BASE_URL}property/upload-video`;
+    const payload = new FormData();
+    payload.append("file", file);
+
+    try {
+      const response = await axios.post(url, payload);
+
+      if (response.data?.success) {
+        return response.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadPropertyImages(files: File[]) {
+    const url = `${this.BASE_URL}property/upload-images`;
+    const payload = new FormData();
+    files.forEach((file) => {
+      payload.append("files[]", file);
+    });
+
+    try {
+      const response = await axios.post(url, payload);
+
+      if (response.data?.success) {
+        return response.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteFile(uploadId: string) {
+    const url = `/delete-file/${uploadId}`;
+    try {
+      const response = await axiosInstance.delete(url);
+      console.log({ dito: response.data });
+      if (response.data?.success) {
+        return response.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async fetchStateByName(stateName: string, fields?: string) {
+    const params = new URLSearchParams({
+      ...(fields && { fields }),
+    });
+    const url = `/country/states/by-name/${stateName}/?${params.toString()}`;
+    try {
+      const result = await axiosInstance.get(url);
+      if (result.data?.success) {
+        return result.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async fetchPropertyTypes(fields?: string) {
+    const params = new URLSearchParams({
+      ...(fields && { fields }),
+    });
+    const url = `/property-type/?${params.toString()}`;
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createProperty<T>(payload: T): Promise<any> {
+    const url = "/property";
+    try {
+      const response = await axiosInstance.post(url, payload);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addressAutocompletion(address: string): Promise<any> {
+    const url = `/map/address-autocomplete/${address}`;
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+}

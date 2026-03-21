@@ -40,6 +40,7 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import { cleanObject } from "../../../../../utils/helpers";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { PropertySearchPayload } from "../../Search-properties/search-form";
+import { ApiRequests } from "@/lib/api.request";
 
 interface FilterProps {
   loader: boolean;
@@ -503,7 +504,6 @@ export const StatePropertyList: FC = () => {
   const searchParams = useSearchParams();
   const stateName = searchParams.get("name") || "State";
   const [stateId, setStateId] = useState<string>("");
-  //const [type, setType] = useState<string>("");
   const [copyData, setCopyData] = useState<PropertyInterface[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(() => {
     const savedPage = getCookie("page");
@@ -648,11 +648,10 @@ export const StatePropertyList: FC = () => {
   const handleOnAddressAutocomplete = async (address: string) => {
     if (!address) return;
 
-    const url = `/map/address-autocomplete/${address}`;
     try {
-      const result = await axiosInstance.get(url);
-      if (result.data?.success) {
-        setAddressesList(result.data.data);
+      const result = await new ApiRequests().addressAutocompletion(address);
+      if (result) {
+        setAddressesList(result);
       }
     } catch (error) {
       let message = "An error occurred";

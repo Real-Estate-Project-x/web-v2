@@ -45,6 +45,7 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-select";
 import { BoostPropertyPrompt } from "./agent-property-view";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import Link from "next/link";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -233,10 +234,16 @@ const AgentPropertiesManager = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setUploadProperty(true)}>
+            {/* <Button variant="outline" onClick={() => setUploadProperty(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Upload Property
-            </Button>
+            </Button> */}
+            <Link href={"/agent-dashboard/properties/create"}>
+              <Button variant="outline">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Property
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -251,15 +258,14 @@ const AgentPropertiesManager = () => {
             >
               <div className="space-y-4">
                 {/* 🔍 Row 1: Search + Sorting */}
-                <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] uppercase inline lg:hidden">
+                <p className="text-lg mb-10 font-medium text-gray-500 text-sm text-center tracking-[0.3em] uppercase inline lg:hidden">
                   Search Filters
                 </p>
-                <br />
-                <br />
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                  {/* Search */}
-                  <div className="relative lg:col-span-5">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                  {/* Search (2/4) */}
+                  <div className="md:col-span-2">
+                    {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" /> */}
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
                       placeholder="Search properties..."
                       value={searchTerm}
@@ -267,43 +273,36 @@ const AgentPropertiesManager = () => {
                       className="pl-10 py-6"
                     />
                   </div>
-                  <section className="grid grid-cols-2 gap-1">
-                    {/* Sort By */}
-                    <div className="lg:col-span-3">
-                      <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="w-full">
-                          <BarChart3 />
-                          <SelectValue placeholder="Sort By" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="PRICE">Price</SelectItem>
-                          <SelectItem value="VIEWS">Views</SelectItem>
-                          <SelectItem value="DAYS_ON_MARKET">
-                            Days On Market
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
 
-                    {/* Sort Order */}
-                    <div className="col-span-1 lg:col-span-2">
-                      <Select value={sortOrder} onValueChange={setSortOrder}>
-                        <SelectTrigger className="w-full">
-                          <SortDesc />
-                          <SelectValue placeholder="Order" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="DESC">Desc</SelectItem>
-                          <SelectItem value="ASC">Asc</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </section>
-                  {/* Submit Button */}
-                  <div className="lg:col-span-2">
-                    <Button type="submit" className="w-full">
-                      Search
-                    </Button>
+                  {/* View */}
+                  <div>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-full py-6">
+                        <BarChart3 />
+                        <SelectValue placeholder="Sort By" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PRICE">Price</SelectItem>
+                        <SelectItem value="VIEWS">Views</SelectItem>
+                        <SelectItem value="DAYS_ON_MARKET">
+                          Days On Market
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Sort */}
+                  <div>
+                    <Select value={sortOrder} onValueChange={setSortOrder}>
+                      <SelectTrigger className="w-full py-6">
+                        <SortDesc />
+                        <SelectValue placeholder="Order" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DESC">Desc</SelectItem>
+                        <SelectItem value="ASC">Asc</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -312,7 +311,6 @@ const AgentPropertiesManager = () => {
                 <p className="text-lg font-medium text-gray-500 text-sm text-center tracking-[0.3em] py-4 uppercase inline lg:hidden">
                   Extra Filters
                 </p>
-                <br />
                 <br />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {/* State */}
@@ -387,6 +385,10 @@ const AgentPropertiesManager = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <Button type="submit" className="w-full">
+                  Search
+                </Button>
                 {/* </section> */}
               </div>
             </form>

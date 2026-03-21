@@ -192,6 +192,11 @@ export const cleanObject = (obj: Record<string, any>): Record<string, any> => {
       return;
     }
 
+    // Handle empty arrays
+    if (Array.isArray(value) && value.length <= 0) {
+      return;
+    }
+
     // Handle nested objects
     if (typeof value === "object" && !Array.isArray(value)) {
       const nested = cleanObject(value);

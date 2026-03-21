@@ -49,6 +49,7 @@ import {
 import { cleanObject, formatPrice } from "../../../../utils/helpers";
 import { PropertySearchPayload } from "../Search-properties/search-form";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import { ApiRequests } from "@/lib/api.request";
 
 interface FilterProps {
   loader: boolean;
@@ -670,11 +671,10 @@ const AgentProperties = () => {
   const handleOnAddressAutocomplete = async (address: string) => {
     if (!address) return;
 
-    const url = `/map/address-autocomplete/${address}`;
     try {
-      const result = await axiosInstance.get(url);
-      if (result.data?.success) {
-        setAddressesList(result.data.data);
+      const result = await new ApiRequests().addressAutocompletion(address);
+      if (result) {
+        setAddressesList(result);
       }
     } catch (error) {
       let message = "An error occurred";
