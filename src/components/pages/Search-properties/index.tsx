@@ -20,6 +20,7 @@ import { PropertyUpFor } from "@/lib/constants";
 import { cleanObject } from "../../../../utils/helpers";
 import { SearchResultsLoaderCard } from "@/components/shared/loader-cards";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import { ApiRequests } from "@/lib/api.request";
 
 const SearchResults = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -226,11 +227,10 @@ const SearchResults = () => {
   const handleOnAddressAutocomplete = async (address: string) => {
     if (!address) return;
 
-    const url = `/map/address-autocomplete/${address}`;
     try {
-      const result = await axiosInstance.get(url);
-      if (result.data?.success) {
-        setAddressesList(result.data.data);
+      const result = await new ApiRequests().addressAutocompletion(address);
+      if (result) {
+        setAddressesList(result);
       }
     } catch (error) {
       let message = "An error occurred";

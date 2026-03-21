@@ -91,7 +91,7 @@ export const BasicStep = ({
                 <button
                   key={index}
                   type="button"
-                  className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm"
+                  className="cursor-pointer w-full text-left px-4 py-3 hover:bg-gray-100 text-sm"
                   onClick={() => {
                     if (!item) return;
 

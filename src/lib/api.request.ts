@@ -96,4 +96,17 @@ export class ApiRequests {
       throw error;
     }
   }
+
+  async addressAutocompletion(address: string): Promise<any> {
+    const url = `/map/address-autocomplete/${address}`;
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

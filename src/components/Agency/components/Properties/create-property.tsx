@@ -4,16 +4,15 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { PropertyUpFor } from "@/lib/constants";
-import { axiosInstance } from "@/lib/axios-interceptor";
-import { AmenitiesStep } from "./components/amenties-step";
-import { DetailsStep } from "./components/details-step";
+import { ApiRequests } from "@/lib/api.request";
 import { BasicStep } from "./components/basic-step";
 import { MediaStep } from "./components/media-step";
+import { DetailsStep } from "./components/details-step";
+import { AmenitiesStep } from "./components/amenties-step";
 import {
   cleanObject,
   getLocalStorageFieldRaw,
 } from "../../../../../utils/helpers";
-import { ApiRequests } from "@/lib/api.request";
 
 const steps = ["Basic", "Details", "Amenities", "Media"];
 
@@ -73,12 +72,56 @@ export const CreateProperty = ({}) => {
     setPropertyTypes(result.data);
   };
 
+  const resetForm = () => {
+    setStep(0);
+    setForm({
+      // Basic
+      propertyTypeId: "",
+      title: "",
+      address: "",
+      stateId: "",
+      description: "",
+      upFor: PropertyUpFor.SALE,
+      propertyCategory: "",
+      geoCoordinates: {
+        latitude: undefined as number | undefined,
+        longitude: undefined as number | undefined,
+      },
+
+      // Details
+      price: undefined as number | undefined,
+      paymentCoverageDuration: "YEARLY",
+      agencyId: "",
+      sizeInSquareFeet: undefined as number | undefined,
+      additionalCosts: [
+        { title: "Agency Fee", price: undefined as number | undefined },
+      ],
+      averageBroadbandSpeedInMegabytes: undefined as number | undefined,
+      noOfBedrooms: undefined as number | undefined,
+      noOfToilets: undefined as number | undefined,
+      noOfKitchens: undefined as number | undefined,
+
+      // amenities
+      hasLaundry: false,
+      hasWifi: false,
+      hasCarParking: false,
+      hasKidsPlayArea: false,
+      hasCctv: false,
+      hasGym: false,
+      isNewBuilding: false,
+
+      // media
+      videoId: "",
+      photoIds: [],
+      architecturalPlanIds: [],
+    });
+  };
+
   useEffect(() => {
     fetchPropertyTypes();
 
     // Pre_set agencyId into form_data
-    const agencyId = getLocalStorageFieldRaw("agentId");
-    update("agencyId", agencyId);
+    update("agencyId", getLocalStorageFieldRaw("agentId"));
   }, []);
 
   const update = (key: string, value: any) => {
@@ -90,7 +133,6 @@ export const CreateProperty = ({}) => {
   };
 
   const handleOnAddressSelection = async (stateName: string) => {
-    // const state = await fetchStateByName(stateName);
     const state = await new ApiRequests().fetchStateByName(
       stateName,
       "success,data(id,code,name,capital)"
@@ -101,11 +143,10 @@ export const CreateProperty = ({}) => {
   const handleOnAddressAutocomplete = async (address: string) => {
     if (!address) return;
 
-    const url = `/map/address-autocomplete/${address}`;
     try {
-      const result = await axiosInstance.get(url);
-      if (result.data?.success) {
-        setAddressesList(result.data.data);
+      const result = await new ApiRequests().addressAutocompletion(address);
+      if (result) {
+        setAddressesList(result);
       }
     } catch (error) {
       let message = "An error occurred";
@@ -120,11 +161,46 @@ export const CreateProperty = ({}) => {
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const cleanForm = cleanObject(form);
-    console.log({ form, cleanForm });
+    // Clean_data and remove null/undefined values
+    const payload = cleanObject(form);
 
-    const result = await new ApiRequests().createProperty(cleanForm);
-    console.log({ result });
+    // Cast numbers from strings before making request
+    const castedPayload = {
+      ...payload,
+      ...(payload.price && {
+        price: +payload.price,
+      }),
+      ...(payload.sizeInSquareFeet && {
+        sizeInSquareFeet: +payload.sizeInSquareFeet,
+      }),
+      ...(payload.noOfBedrooms && {
+        noOfBedrooms: +payload.noOfBedrooms,
+      }),
+      ...(payload.noOfToilets && {
+        noOfToilets: +payload.noOfToilets,
+      }),
+      ...(payload.noOfKitchens && {
+        noOfKitchens: +payload.noOfKitchens,
+      }),
+      ...(payload.additionalCosts && {
+        additionalCosts: (payload.additionalCosts as any[]).map((fee) => ({
+          ...fee,
+          price: +fee.price,
+        })),
+        ...(payload.averageBroadbandSpeedInMegabytes && {
+          averageBroadbandSpeedInMegabytes:
+            +payload.averageBroadbandSpeedInMegabytes,
+        }),
+      }),
+    };
+
+    const result = await new ApiRequests().createProperty(castedPayload);
+    if (result?.success) {
+      resetForm();
+      toast(result.message, {
+        dismissible: true,
+      });
+    }
   };
 
   return (
