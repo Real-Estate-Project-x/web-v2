@@ -33,7 +33,7 @@ export default function RegionNotSupported() {
 
   useEffect(() => {
     fetchSupportedCountries();
-  });
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-6 py-16 font-sans">

@@ -89,7 +89,7 @@ const SignUpForm: React.FC = () => {
           return;
         }
 
-        const url = "user/sign-up";
+        const url = "/user/sign-up";
         const payload = {
           firstName: form.firstName,
           lastName: form.lastName,
@@ -112,7 +112,7 @@ const SignUpForm: React.FC = () => {
         }
       } else {
         // type == 'agent'
-        const url = "agency/create-agency";
+        const url = "/agency/create-agency";
         const payload = {
           firstName: form.firstName,
           lastName: form.lastName,
@@ -151,7 +151,9 @@ const SignUpForm: React.FC = () => {
     >
       <h2 className="text-3xl text-start font-playfair font-semibold text-primary mb-1">
         Create your account
-        <p className="text-gray-500 text-base font-normal py-1">Join us and start exploring right away.</p>
+        <p className="text-gray-500 text-base font-normal py-1">
+          Join us and start exploring right away.
+        </p>
       </h2>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">

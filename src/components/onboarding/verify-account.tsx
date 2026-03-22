@@ -49,7 +49,7 @@ const VerifyAccountForm: React.FC = () => {
     }
 
     const code = otp.join("");
-    const url = "user/sign-up/verify";
+    const url = "/user/sign-up/verify";
     const payload = {
       otp: code,
       email: userEmail,
@@ -83,7 +83,9 @@ const VerifyAccountForm: React.FC = () => {
     >
       <h2 className="text-3xl text-start font-playfair font-semibold text-primary mb-1">
         Verify Account
-        <p className="text-gray-500 text-base font-normal py-1">Enter the verification code sent to your email.</p>
+        <p className="text-gray-500 text-base font-normal py-1">
+          Enter the verification code sent to your email.
+        </p>
       </h2>
       <div className="flex gap-3">
         {otp.map((digit, index) => (

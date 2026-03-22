@@ -16,7 +16,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { User, Mail, Phone, UserPlus } from "lucide-react";
 import { axiosInstance } from "@/lib/axios-interceptor";
-import { decryptData, validatePhoneNumber } from "../../../../../../utils/helpers";
+import {
+  decryptData,
+  validatePhoneNumber,
+} from "../../../../../../utils/helpers";
 
 const userFormSchema = z.object({
   firstName: z
@@ -49,7 +52,7 @@ type UserFormData = z.infer<typeof userFormSchema>;
 
 interface UserFormDialogProps {
   trigger?: React.ReactNode;
-  setRefresh : (flag : boolean) => void; 
+  setRefresh: (flag: boolean) => void;
 }
 
 export function AddAgent({ trigger, setRefresh }: UserFormDialogProps) {
@@ -74,31 +77,32 @@ export function AddAgent({ trigger, setRefresh }: UserFormDialogProps) {
     //console.log({descrypted : JSON.parse(descrypted)});
     //get agencyId from data
 
-    if(!validatePhoneNumber(data.phoneNumber)){
-        toast.error("Invalid Phone Number format", {
+    if (!validatePhoneNumber(data.phoneNumber)) {
+      toast.error("Invalid Phone Number format", {
         description: `Valid Format e.g(09087039240)`,
-        });
-        return;
+      });
+      return;
     }
-    const response = await axiosInstance.post(`agency/sub-agents/create`, {
-        firstName :  data.firstName ,
-        lastName :  data.lastName ,
-        email :  data.email ,
-        agencyId :  "8b6c7c37-72b5-4db8-9184-214f32b8b68d",//data.firstName,
-        phoneNumber :  data.phoneNumber 
+    const response = await axiosInstance.post(`/agency/sub-agents/create`, {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      agencyId: "8b6c7c37-72b5-4db8-9184-214f32b8b68d", //data.firstName,
+      phoneNumber: data.phoneNumber,
     });
 
-    if(response?.data?.code === 201){
-        setRefresh(true);
-        setTimeout(() => {
-            toast.success(response?.data?.message, {description : "New Agent added to Agency!"});
-        }, 3000);
-        reset();
-        setOpen(false);
-    }else{
-        toast.error("Error",{description : response?.data?.message});
+    if (response?.data?.code === 201) {
+      setRefresh(true);
+      setTimeout(() => {
+        toast.success(response?.data?.message, {
+          description: "New Agent added to Agency!",
+        });
+      }, 3000);
+      reset();
+      setOpen(false);
+    } else {
+      toast.error("Error", { description: response?.data?.message });
     }
-
   };
 
   return (
