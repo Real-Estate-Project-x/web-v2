@@ -11,21 +11,31 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Get IP address of current_user on site
- * @returns user ip_address
- */
-// export const getUserIp = async () => {
-//   const url = "https://api.ipify.org/?format=json";
-//   const userIPAddress = await axios<any, { ip: string }>(url);
-//   return userIPAddress.ip;
-// };
-
-export const getUserIp = async (): Promise<string> => {
-  const url = "https://api.ipify.org/?format=json";
-  const response = await axios.get<{ ip: string }>(url);
-  return response.data.ip;
+const ipCache = {
+  value: null as string | null,
+  promise: null as Promise<string> | null, // ← prevents parallel calls during first fetch
 };
+
+export async function getUserIp(): Promise<string> {
+  // Return cached value immediately
+  if (ipCache.value) return ipCache.value;
+
+  // If a fetch is already in-flight, reuse it instead of making a new call
+  if (!ipCache.promise) {
+    ipCache.promise = axios
+      .get("https://api.ipify.org?format=json")
+      .then(({ data }) => {
+        ipCache.value = data.ip;
+        return data.ip;
+      })
+      .catch((err) => {
+        ipCache.promise = null; // reset so it can retry on failure
+        throw err;
+      });
+  }
+
+  return ipCache.promise;
+}
 
 export const returnHeaders = (
   ip = "104.28.204.233",

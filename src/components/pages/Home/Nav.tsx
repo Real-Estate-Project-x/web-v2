@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { handleLoggingOff } from "@/lib/helpers";
+import { onLogOff } from "@/lib/helpers";
 
 type NavData = {
   data?: NavDataInterface[];
@@ -159,7 +159,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => handleLoggingOff()}
+                    onClick={() => onLogOff()}
                   >
                     <Lock className="h-4 w-4 mr-2" />
                     Logout
@@ -243,7 +243,7 @@ const Navbar: FC<NavData> = ({ data = defaultNavData }) => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => handleLoggingOff()}
+                      onClick={() => onLogOff()}
                     >
                       <Lock className="h-4 w-4 mr-2" />
                       Logout

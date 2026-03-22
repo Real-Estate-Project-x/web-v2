@@ -123,7 +123,7 @@ export default function ProfileForm() {
       return;
     }
 
-    const url = "agency/create-agency/profile";
+    const url = "/agency/create-agency/profile";
     const payload = {
       userId,
       logoId: logo.id,

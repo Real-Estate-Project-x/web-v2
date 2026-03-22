@@ -1,77 +1,166 @@
-import axios, { AxiosRequestHeaders } from "axios";
-import { getCookie, handleLoggingOff, setCookie } from "./helpers";
-import { returnHeaders } from "./utils";
+import axios, {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { getUserIp } from "./utils";
+import { getCookie, onLogOff, onRegionNotSupported } from "./helpers";
 
-const apiBaseURL = process.env.NEXT_PUBLIC_API_URL;
+interface ApiErrorResponse {
+  name: string;
+  message: string;
+  success: boolean;
+  code: number;
+  time: string;
+  url: string;
+}
+
+enum ERROR_CODES {
+  TOKEN_HAS_EXPIRED = "forbidden_expired_token",
+  REGION_NOT_SUPPORTED = "region_not_currently_supported",
+}
+
+// Extend AxiosRequestConfig to track retry state
+interface RetryableRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
+const apiBaseURL = String(process.env.NEXT_PUBLIC_API_URL);
 
 export const axiosInstance = axios.create({
-  withCredentials: false,
-  baseURL: apiBaseURL,
   timeout: 20000,
-  //headers: { ...returnHeaders(getCookie("user_ip")) },
+  baseURL: apiBaseURL,
+  withCredentials: false,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
+// ── Queue of requests waiting for a token refresh ──────────────────────────
+let isRefreshing = false;
+let refreshQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null = null): void {
+  refreshQueue.forEach(({ resolve, reject }) => {
+    if (error) reject(error);
+    else resolve(token as string);
+  });
+  refreshQueue = [];
+}
+
+// ── Request interceptor — attach Bearer token ──────────────────────────────
 axiosInstance.interceptors.request.use(
-  (config) => {
+  async (
+    req: InternalAxiosRequestConfig
+  ): Promise<InternalAxiosRequestConfig> => {
     const token = getCookie("access_token");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-      config.headers["Content-Type"] = 'application/json';
-      config.headers["Access-Control-Allow-Origin"] = "*";
-      config.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-      config.headers["x-user-ip"] = `${getCookie("user_ip")}`
-      // config.headers = Object.assign(config.headers,{
-      //   ...returnHeaders(getCookie("user_ip")),
-      //   Authorization : `Bearer ${token}`
-      // }) as AxiosRequestHeaders
+    if (token && req.headers) {
+      req.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
+
+    // Fetch and attach user IP
+    try {
+      const ipAddress = await getUserIp();
+      req.headers["x-user-ip"] = ipAddress;
+    } catch {
+      // Fail silently — don't block the request if IP fetch fails
+    }
+
+    return req;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error: AxiosError) => Promise.reject(error)
 );
+
+// ── Response interceptor — handle errors ───────────────────────────────────
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  // ✅ Pass successful responses straight through
+  (response: AxiosResponse) => response,
 
-  async function (error) {
-    const originalRequest = error.config;
-    // check if error is === 401 or 403 and then retry request for refresh token
-    if (
-      (error.status === 401 || error.status === 403) &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true; // Mark the request as retried to avoid loops
-      // refresh token logic below
-      handleLoggingOff();
-      // for now ...since no refresh endpiont is available
-      return;
-      try {
-        const response = await axios.get(`${apiBaseURL}auth/refresh`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${getCookie("access_token")}`,
-            ...returnHeaders(),
-          },
-        });
+  // ❌ Handle errors
+  async (error: AxiosError<ApiErrorResponse>) => {
+    const originalRequest = error.config as RetryableRequestConfig;
+    const errorMessage = error.response?.data?.message;
+    const status = error.response?.status;
 
-        const newAccessToken = response.data?.data?.accessToken;
-        setCookie("access_token", newAccessToken);
-
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-        return axiosInstance(originalRequest);
-      } catch (error: any) {
-        // Handle 403 response from refresh token endpoint
-        if (error?.response?.status === 403) {
-          handleLoggingOff();
-        }
-        // Throw other errors to stop further processing
-        return Promise.reject(error);
-      }
+    // ── 1. Region not supported ──────────────────────────────────────────
+    if (errorMessage === ERROR_CODES.REGION_NOT_SUPPORTED) {
+      onRegionNotSupported();
+      return Promise.reject(error);
     }
+
+    // ── 2. Token expired — attempt refresh (once) ────────────────────────
+    const isExpiredError =
+      status === 401 || errorMessage === ERROR_CODES.TOKEN_HAS_EXPIRED;
+
+    if (isExpiredError && !originalRequest._retry) {
+      // If a refresh is already in-flight, queue this request
+      if (isRefreshing) {
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          refreshQueue.push({
+            resolve: (token: string) => {
+              if (originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+              }
+              resolve(axiosInstance(originalRequest));
+            },
+            reject,
+          });
+        });
+      }
+
+      // Mark as retried so we don't loop infinitely
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      //====> Refresh_token login <==== //
+
+      // try {
+      //   const refreshToken = tokenStore.getRefreshToken();
+
+      //   if (!refreshToken) {
+      //     throw new Error("No refresh token available");
+      //   }
+
+      //   const { data } = await instance.post<RefreshTokenResponse>(
+      //     refreshTokenEndpoint,
+      //     { refreshToken },
+      //     // Skip the interceptor for this internal call to avoid loops
+      //     { _retry: true } as AxiosRequestConfig
+      //   );
+
+      //   const { accessToken, refreshToken: newRefreshToken } = data;
+
+      //   // Persist new tokens
+      //   tokenStore.setAccessToken(accessToken);
+      //   if (newRefreshToken) {
+      //     tokenStore.setRefreshToken(newRefreshToken);
+      //   }
+
+      //   // Unblock queued requests with the fresh token
+      //   processQueue(null, accessToken);
+
+      //   // Retry the original request
+      //   if (originalRequest.headers) {
+      //     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      //   }
+      //   return instance(originalRequest);
+      // } catch (refreshError) {
+      //   // Refresh failed — clear tokens, unblock queue with error, redirect
+      //   processQueue(refreshError, null);
+      //   return Promise.reject(refreshError);
+      // } finally {
+      //   isRefreshing = false;
+      // }
+    }
+
+    // ── 3. Explicit "token_has_expired" after retry already attempted ─────
+    if (errorMessage !== ERROR_CODES.TOKEN_HAS_EXPIRED) {
+      onLogOff();
+    }
+
     return Promise.reject(error);
   }
 );

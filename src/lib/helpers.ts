@@ -17,9 +17,13 @@ export function formatNumber(value: number) {
   return new Intl.NumberFormat().format(value);
 }
 
-export function handleLoggingOff() {
+export function onLogOff() {
   removeStoredKeys();
   window.location.href = "/login";
+}
+
+export function onRegionNotSupported() {
+  window.location.href = "/region-not-supported";
 }
 
 export function getUserGeolocation(): Promise<{

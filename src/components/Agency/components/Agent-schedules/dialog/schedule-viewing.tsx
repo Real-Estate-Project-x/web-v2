@@ -61,7 +61,7 @@ export function ScheduleDialog({ refresh }: Props) {
   const getAvailabilityHours = async () => {
     try {
       const response = await axiosInstance.get(
-        "agency-availability/generate-hourly-windows"
+        "/agency-availability/generate-hourly-windows"
       );
       setHours(response.data.data);
     } catch (err) {
@@ -79,7 +79,7 @@ export function ScheduleDialog({ refresh }: Props) {
     }));
 
     try {
-      const response = await axiosInstance.post("agency-availability", {
+      const response = await axiosInstance.post("/agency-availability", {
         schedule: formattedSchedule,
       });
       if (response.data.success) {

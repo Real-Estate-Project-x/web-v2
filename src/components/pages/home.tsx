@@ -51,19 +51,16 @@ const LandingPage = () => {
   useEffect(() => {
     // setAlert();
     getUserIpAddress(setUserIp);
-    axios.get(``, {headers : {...returnHeaders()}})
-    .then((response) => {
-      console.log({response});
+    axios.get(``, { headers: { ...returnHeaders() } }).then((response) => {
+      console.log({ response });
     });
     axios
       .all([
-        axiosInstance.get(`${API_BASE_URL}agency/list/top-agents`),
+        axiosInstance.get(`/agency/list/top-agents`),
         axiosInstance.get(
-          `${API_BASE_URL}property/customer-listings/featured-properties?pageSize=3&pageNumber=1`
+          `/property/customer-listings/featured-properties?pageSize=3&pageNumber=1`
         ),
-        axiosInstance.get(
-          `${API_BASE_URL}property/customer-listings/popular-locations`
-        ),
+        axiosInstance.get(`/property/customer-listings/popular-locations`),
         // Add more API calls as needed {/property/list/popular-locations}
       ])
       .then(
@@ -87,7 +84,7 @@ const LandingPage = () => {
       <Navbar />
       <Hero />
       <FeaturedProperties data={featured_properties} />
-      <PopularLocations data={popular_locations} /> 
+      <PopularLocations data={popular_locations} />
       <Services />
       <Testimonials _data_for_TopAgents={top_agents} />
       <CTA />

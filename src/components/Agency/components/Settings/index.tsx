@@ -50,7 +50,7 @@ const Settings = () => {
 
     const userId = pickUserId();
 
-    const url = "/user?fields=success,message";
+    const url = "/user/?fields=success,message";
     const payload = {
       userId,
       email: form.email,
