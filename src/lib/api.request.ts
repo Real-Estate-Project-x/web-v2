@@ -109,4 +109,16 @@ export class ApiRequests {
       throw error;
     }
   }
+
+  async joinWaitlist(email: string): Promise<any> {
+    const url = "/waitlist/join";
+    try {
+      const response = await axiosInstance.post(url, { email });
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }
