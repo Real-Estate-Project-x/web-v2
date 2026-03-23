@@ -158,7 +158,7 @@ axiosInstance.interceptors.response.use(
 
     // ── 3. Explicit "token_has_expired" after retry already attempted ─────
     if (errorMessage !== ERROR_CODES.TOKEN_HAS_EXPIRED) {
-      onLogOff();
+      onLogOff(true);
     }
 
     return Promise.reject(error);

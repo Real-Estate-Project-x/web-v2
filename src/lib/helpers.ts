@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { removeStoredKeys } from "../../utils/helpers";
+import { removeStoredKeys, setLocalStorageField } from "../../utils/helpers";
 
 export function deleteCookie(key: string) {
   Cookies.remove(key);
@@ -17,8 +17,15 @@ export function formatNumber(value: number) {
   return new Intl.NumberFormat().format(value);
 }
 
-export function onLogOff() {
+export function onLogOff(saveCurrentRoute = false) {
   removeStoredKeys();
+
+  if (saveCurrentRoute) {
+    const currentUrl = window.location.href;
+    setLocalStorageField("last_tracked_url", { currentUrl });
+  }
+
+  // Navigate to login_screen
   window.location.href = "/login";
 }
 

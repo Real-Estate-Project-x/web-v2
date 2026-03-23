@@ -118,7 +118,6 @@ const AgentPropertiesManager = () => {
     pageSize = 10,
     queryParams = {}
   ) => {
-    console.log({ agencyId });
     const url = `/property/agency-property-list/${agencyId}/`;
     try {
       const response = await axiosInstance.get(url, {
@@ -146,6 +145,8 @@ const AgentPropertiesManager = () => {
   };
 
   useEffect(() => {
+    if (!agencyId) return;
+
     loadData(1);
 
     const key = "boost_payment_reference";
