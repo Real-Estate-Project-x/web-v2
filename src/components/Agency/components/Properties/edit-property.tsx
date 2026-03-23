@@ -165,7 +165,7 @@ export const EditProperty = ({}) => {
   return (
     <div className="max-w-5xl mx-auto p-6">
       {/* Header */}
-      <h1 className="text-2xl font-semibold">Create Property Listing</h1>
+      <h1 className="text-2xl font-semibold">Update Property Listing</h1>
       <p className="text-gray-500 text-sm mb-6">
         Fill in the details below to list your property
       </p>
