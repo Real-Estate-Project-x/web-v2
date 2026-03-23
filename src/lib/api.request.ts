@@ -121,4 +121,17 @@ export class ApiRequests {
       throw error;
     }
   }
+
+  async findPropertyById(propertyId: string) {
+    const url = `/property/${propertyId}`;
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

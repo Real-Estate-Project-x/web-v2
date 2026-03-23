@@ -7,17 +7,18 @@ import { getUserIp } from "./utils";
 import { getCookie, onLogOff, onRegionNotSupported } from "./helpers";
 
 interface ApiErrorResponse {
+  url: string;
+  code: number;
+  time: string;
   name: string;
   message: string;
   success: boolean;
-  code: number;
-  time: string;
-  url: string;
 }
 
 enum ERROR_CODES {
   TOKEN_HAS_EXPIRED = "forbidden_expired_token",
   REGION_NOT_SUPPORTED = "region_not_currently_supported",
+  BLACK_LISTED_TOKEN = "blacklisted_token_user_already_logged_out",
 }
 
 // Extend AxiosRequestConfig to track retry state
@@ -95,71 +96,8 @@ axiosInstance.interceptors.response.use(
     const isExpiredError =
       status === 401 || errorMessage === ERROR_CODES.TOKEN_HAS_EXPIRED;
 
-    if (isExpiredError && !originalRequest._retry) {
-      // If a refresh is already in-flight, queue this request
-      if (isRefreshing) {
-        return new Promise<AxiosResponse>((resolve, reject) => {
-          refreshQueue.push({
-            resolve: (token: string) => {
-              if (originalRequest.headers) {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-              }
-              resolve(axiosInstance(originalRequest));
-            },
-            reject,
-          });
-        });
-      }
-
-      // Mark as retried so we don't loop infinitely
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      //====> Refresh_token login <==== //
-
-      // try {
-      //   const refreshToken = tokenStore.getRefreshToken();
-
-      //   if (!refreshToken) {
-      //     throw new Error("No refresh token available");
-      //   }
-
-      //   const { data } = await instance.post<RefreshTokenResponse>(
-      //     refreshTokenEndpoint,
-      //     { refreshToken },
-      //     // Skip the interceptor for this internal call to avoid loops
-      //     { _retry: true } as AxiosRequestConfig
-      //   );
-
-      //   const { accessToken, refreshToken: newRefreshToken } = data;
-
-      //   // Persist new tokens
-      //   tokenStore.setAccessToken(accessToken);
-      //   if (newRefreshToken) {
-      //     tokenStore.setRefreshToken(newRefreshToken);
-      //   }
-
-      //   // Unblock queued requests with the fresh token
-      //   processQueue(null, accessToken);
-
-      //   // Retry the original request
-      //   if (originalRequest.headers) {
-      //     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-      //   }
-      //   return instance(originalRequest);
-      // } catch (refreshError) {
-      //   // Refresh failed — clear tokens, unblock queue with error, redirect
-      //   processQueue(refreshError, null);
-      //   return Promise.reject(refreshError);
-      // } finally {
-      //   isRefreshing = false;
-      // }
-    }
-
-    // ── 3. Explicit "token_has_expired" after retry already attempted ─────
-    if (errorMessage !== ERROR_CODES.TOKEN_HAS_EXPIRED) {
-      onLogOff(true);
-    }
+    // if (isExpiredError && !originalRequest._retry) {
+    if (isExpiredError) onLogOff(true);
 
     return Promise.reject(error);
   }

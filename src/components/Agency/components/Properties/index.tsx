@@ -470,14 +470,19 @@ const AgentPropertiesManager = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          setProperty(property);
-                          setIndex(index);
-                          setEditProperty(true);
-                        }}
+                        className="cursor-pointer"
+                        onClick={() =>
+                          router.push(
+                            `/agent-dashboard/properties/edit?id=${property.slug}`
+                          )
+                        }
+                        // onClick={() => {
+                        //   setProperty(property);
+                        //   setIndex(index);
+                        //   setEditProperty(true);
+                        // }}
                       >
                         <Edit className="h-4 w-4 mr-1" />
-                        {/* Edit */}
                       </Button>
                     </div>
                     <Button

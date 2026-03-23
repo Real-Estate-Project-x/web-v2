@@ -3,21 +3,21 @@
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import { PropertyUpFor } from "@/lib/constants";
 import { ApiRequests } from "@/lib/api.request";
+import { PropertyUpFor } from "@/lib/constants";
+import { useSearchParams } from "next/navigation";
+import { Property } from "../../../../../utils/interfaces";
 import { BasicStep } from "./components/basic-step";
-import { MediaStep } from "./components/media-step";
 import { DetailsStep } from "./components/details-step";
 import { AmenitiesStep } from "./components/amenties-step";
-import {
-  cleanObject,
-  getLocalStorageFieldRaw,
-} from "../../../../../utils/helpers";
 
 const steps = ["Basic", "Details", "Amenities", "Media"];
 
-export const CreateProperty = ({}) => {
+export const EditProperty = ({}) => {
   const [step, setStep] = useState(0);
+  const searchParams = useSearchParams();
+  const [slug, setSlug] = useState<string>("");
+  const [property, setProperty] = useState(null);
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
   const [addressesList, setAddressesList] = useState<any[]>([]);
   const [form, setForm] = useState({
@@ -62,6 +62,15 @@ export const CreateProperty = ({}) => {
     architecturalPlanIds: [],
   });
 
+  const loadData = async (slug: string) => {
+    const result = await new ApiRequests().findPropertyById(slug);
+
+    if (!result) return;
+
+    setProperty(result.data);
+    presetFormData(result.data);
+  };
+
   const fetchPropertyTypes = async () => {
     const result = await new ApiRequests().fetchPropertyTypes(
       "success,data(id,name,status,tag)"
@@ -71,57 +80,39 @@ export const CreateProperty = ({}) => {
     setPropertyTypes(result.data);
   };
 
-  const resetForm = () => {
-    setStep(0);
-    setForm({
-      // Basic
-      propertyTypeId: "",
-      title: "",
-      address: "",
-      stateId: "",
-      description: "",
-      upFor: PropertyUpFor.SALE,
-      propertyCategory: "",
-      geoCoordinates: {
-        latitude: undefined as number | undefined,
-        longitude: undefined as number | undefined,
-      },
-
-      // Details
-      price: undefined as number | undefined,
-      paymentCoverageDuration: "YEARLY",
-      agencyId: "",
-      sizeInSquareFeet: undefined as number | undefined,
-      additionalCosts: [
-        { title: "Agency Fee", price: undefined as number | undefined },
-      ],
-      averageBroadbandSpeedInMegabytes: undefined as number | undefined,
-      noOfBedrooms: undefined as number | undefined,
-      noOfToilets: undefined as number | undefined,
-      noOfKitchens: undefined as number | undefined,
-
-      // amenities
-      hasLaundry: false,
-      hasWifi: false,
-      hasCarParking: false,
-      hasKidsPlayArea: false,
-      hasCctv: false,
-      hasGym: false,
-      isNewBuilding: false,
-
-      // media
-      videoId: "",
-      photoIds: [],
-      architecturalPlanIds: [],
-    });
+  const presetFormData = (property: any) => {
+    setForm((prev) => ({
+      ...prev,
+      price: property.price,
+      title: property.title,
+      upFor: property.upFor,
+      stateId: property.stateId,
+      noOfToilets: property.noOfToilets,
+      noOfKitchens: property.noOfKitchens,
+      noOfBedrooms: property.noOfBedrooms,
+      address: property.address,
+      agencyId: property.agencyId,
+      description: property.description,
+      propertyTypeId: property.propertyTypeId,
+      additionalCosts: property.additionalCosts,
+      hasCctv: property.hasCctv,
+      isNewBuilding: property.isNewBuilding,
+      hasKidsPlayArea: property.hasKidsPlayArea,
+      hasGym: property.hasGym,
+      averageBroadbandSpeedInMegabytes:
+        property.averageBroadbandSpeedInMegabytes,
+      hasLaundry: property.hasLaundry,
+      hasWifi: property.hasWifi,
+      hasCarParking: property.hasCarParking,
+      sizeInSquareFeet: property.sizeInSquareFeet,
+      ...(property.geoCoordinates && {
+        geoCoordinates: {
+          latitude: +property.geoCoordinates.coordinates[0],
+          longitude: +property.geoCoordinates.coordinates[1],
+        },
+      }),
+    }));
   };
-
-  useEffect(() => {
-    fetchPropertyTypes();
-
-    // Pre_set agencyId into form_data
-    update("agencyId", getLocalStorageFieldRaw("agentId"));
-  }, []);
 
   const update = (key: string, value: any) => {
     setForm((prev) => {
@@ -159,48 +150,17 @@ export const CreateProperty = ({}) => {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Clean_data and remove null/undefined values
-    const payload = cleanObject(form);
-
-    // Cast numbers from strings before making request
-    const castedPayload = {
-      ...payload,
-      ...(payload.price && {
-        price: +payload.price,
-      }),
-      ...(payload.sizeInSquareFeet && {
-        sizeInSquareFeet: +payload.sizeInSquareFeet,
-      }),
-      ...(payload.noOfBedrooms && {
-        noOfBedrooms: +payload.noOfBedrooms,
-      }),
-      ...(payload.noOfToilets && {
-        noOfToilets: +payload.noOfToilets,
-      }),
-      ...(payload.noOfKitchens && {
-        noOfKitchens: +payload.noOfKitchens,
-      }),
-      ...(payload.additionalCosts && {
-        additionalCosts: (payload.additionalCosts as any[]).map((fee) => ({
-          ...fee,
-          price: +fee.price,
-        })),
-        ...(payload.averageBroadbandSpeedInMegabytes && {
-          averageBroadbandSpeedInMegabytes:
-            +payload.averageBroadbandSpeedInMegabytes,
-        }),
-      }),
-    };
-
-    const result = await new ApiRequests().createProperty(castedPayload);
-    if (result?.success) {
-      resetForm();
-      toast(result.message, {
-        dismissible: true,
-      });
-    }
   };
+
+  useEffect(() => {
+    const slug = searchParams.get("id");
+
+    if (!slug) return;
+
+    setSlug(slug);
+
+    Promise.all([loadData(slug), fetchPropertyTypes()]);
+  }, [slug]);
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -236,6 +196,8 @@ export const CreateProperty = ({}) => {
             update={update}
           />
         )}
+
+        {/* Detail Content */}
         {step === 1 && propertyTypes && (
           <DetailsStep
             propertyTypes={propertyTypes}
@@ -243,8 +205,9 @@ export const CreateProperty = ({}) => {
             update={update}
           />
         )}
+
+        {/* Amenities */}
         {step === 2 && <AmenitiesStep form={form} update={update} />}
-        {step === 3 && <MediaStep form={form} update={update} />}
 
         {/* Footer */}
         <div className="flex justify-between mt-8">
