@@ -6,16 +6,26 @@ import { DynamicPagination } from "@/components/shared/dynamic-pagination";
 import { PaginationControlInterface } from "../../../../utils/interfaces";
 import { PropertyList } from "../Properties";
 import Footer from "../Home/Footer";
+import { axiosInstance } from "@/lib/axios-interceptor";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { formatPrice } from "../../../../utils/helpers";
 
-const FILTERS = [
-  { icon: "📍", label: "Lagos Island" },
-  { icon: "💰", label: "₦800k – ₦1.5m/mo" },
-  { icon: "🛏", label: "3 bedrooms" },
-  { icon: "🍳", label: "Modern kitchen" },
-  { icon: "🏠", label: "Apartment" },
-  { icon: "🔑", label: "For rent" },
+
+const returnFilters = ( data : any) => {
+  const startPriceWithoutNairaSign = formatPrice(data?.startPriceRange);
+  const endPriceWithoutNairaSign = formatPrice(data?.endPriceRange);
+  // `${startPriceWithoutNairaSign.length <= 7 ? startPriceWithoutNairaSign?.split(',')[0].concat("k")
+  // ${((endPriceWithoutNairaSign.length > 7) || parseInt(endPriceWithoutNairaSign?.split(',')[1]))  }
+  return [
+  { icon: "📍", label: data?.searchTerm },
+  { icon: "💰", label: `${startPriceWithoutNairaSign} - ${endPriceWithoutNairaSign}/yr`},
+  { icon: "🛏", label: `${data?.numberOfBeds} bedrooms` },
+  { icon: "🍳", label: `${data?.noOfKitchens} kitchen` },
+  { icon: "🏠", label: `${data?.propertyType}` },
+  { icon: "🔑", label: `For ${data?.upFor}`},
 ];
-
+}
 const PROPERTIES = [
   {
     id: 1,
@@ -213,18 +223,43 @@ function PropertyCard({ property }: { property: any }) {
 export default function SavedSearches() {
   const searchParams = useSearchParams();
   const [sortBy, setSortBy] = useState("newest");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [alertDismissed, setAlertDismissed] = useState(false);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [alertDismissed, setAlertDismissed] = useState(false);
+  const [responseData, setResponseData] = useState<any>({} as any);
   const [pagination, setPagination] = useState<PaginationControlInterface>(
     {} as PaginationControlInterface
   );
 
   useEffect(() => {
-    const slug = searchParams.get("sId");
-    console.log({ slug });
+    const getSavedSearches = async () => {
+      const slug = searchParams.get("id");
+      try {
+        const response = await axiosInstance.get(`saved-search/edb1fab1-3261-4574-b3bb-7f8a526bda0e`);
+        console.log({response});
+        if (response.data?.success) {
+          setResponseData(response?.data?.data);
+        }
+    } catch (error) {
+       let message = "An error occurred";
+      if (error instanceof AxiosError) {
+        message = error.message;
+      }
+      toast(message, { description: JSON.stringify(error) });
+      throw error;
+    }
+  }
+  getSavedSearches();
   }, []);
 
-  const loadData = (page: number) => {};
+  const loadData = (page: number) => {
+
+  };
+
+  if((!responseData) || responseData?.savedSearchResults?.length <= 0){
+    return <p className="text-center text-base">
+      No Results for this filter
+    </p>
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -254,46 +289,46 @@ export default function SavedSearches() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2.5 mb-1">
-                  <span className="font-medium text-gray-900 text-sm">
-                    Lagos Island — 3-bed apartments
+                  <span className="font-medium text-gray-900 text-sm capitalize">
+                    {responseData?.searchTerm}
                   </span>
-                  {!alertDismissed && (
+                  {/* {!alertDismissed && (
                     <span className="flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
-                      4 new matches
+                      {responseData?.savedSearchResults?.length} new matches
                       <button
                         onClick={() => setAlertDismissed(true)}
-                        className="ml-0.5 text-amber-400 hover:text-amber-600 leading-none"
-                      >
+                        className="ml-0.5 text-amber-400 hover:text-amber-600 leading-none">
                         ×
                       </button>
                     </span>
-                  )}
+                  )} */}
+
                 </div>
                 <p className="text-xs text-gray-400">
-                  Last updated 2 hours ago · 18 total results
+                  {/* Last updated 2 hours ago · */}
+                  {responseData?.savedSearchResults?.length} total results
                 </p>
               </div>
 
-              <div className="flex gap-2">
+              {/* <div className="flex gap-2">
                 <button className="text-xs text-gray-400 border border-gray-200 px-3 py-1 rounded-full hover:border-blue-800 hover:text-blue-800 transition-all">
                   Edit
                 </button>
                 <button className="text-xs text-gray-400 border border-gray-200 px-3 py-1 rounded-full hover:border-red-400 hover:text-red-500 transition-all">
                   Delete
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">
               Active filters
             </p>
             <div className="flex flex-wrap gap-2">
-              {FILTERS.map((f, i) => (
+              {returnFilters(responseData).map((f, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-1.5 bg-blue-50 text-blue-800 text-xs px-3 py-1.5 rounded-full"
-                >
+                  className="flex items-center gap-1.5 bg-blue-50 text-blue-800 text-xs px-3 py-1.5 rounded-full">
                   <span>{f.icon}</span>
                   {f.label}
                 </div>
@@ -304,7 +339,7 @@ export default function SavedSearches() {
           {/* Results bar */}
           <div className="flex items-center justify-between mb-5">
             <p className="text-sm text-gray-400">
-              <span className="text-gray-800 font-medium">18 properties</span>{" "}
+              <span className="text-gray-800 font-medium">{responseData?.savedSearchResults?.length} properties</span>{" "}
               match your search
             </p>
             <select
@@ -320,7 +355,7 @@ export default function SavedSearches() {
           </div>
 
           {/* Grid */}
-          <PropertyList array={PROPERTIES} />
+          <PropertyList array={responseData?.savedSearchResults} />
 
           {/* Pagination */}
           {pagination?.currentPage && (
