@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Navbar from "../Home/Nav";
-import React, { FC, use, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Bath,
@@ -534,10 +534,9 @@ export const PropertyList: FC<Props> = ({ array }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-8">
-      {array?.map((property) => (
-        <div key={property?.id}>
+      {array?.map((property, index) => (
+        <div key={index}>
           <Card
-            key={property?.id}
             className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white cursor-pointer group"
             onClick={() => router.push(`/properties/view?id=${property?.slug}`)}
           >

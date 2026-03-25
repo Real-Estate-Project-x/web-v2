@@ -33,9 +33,9 @@ export default function SavedSearchCard({ search }: Props) {
 
               {/* <!-- Search criteria badges --> */}
               <div className="flex flex-wrap gap-2 mt-2">
-                {search.noOfBedrooms && (
+                {search.numberOfBeds && (
                   <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
-                    {search.noOfBedrooms} Bedrooms
+                    {search.numberOfBeds} Bedrooms
                   </span>
                 )}
                 {search.noOfKitchens && (
@@ -43,9 +43,9 @@ export default function SavedSearchCard({ search }: Props) {
                     {search.noOfKitchens} Kitchens
                   </span>
                 )}
-                {search.noOfToilets && (
+                {search.numberOfToilets && (
                   <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
-                    2 Toilets
+                    {search.numberOfToilets} Toilets
                   </span>
                 )}
 
@@ -62,7 +62,7 @@ export default function SavedSearchCard({ search }: Props) {
                 )}
 
                 {search.propertyType && (
-                  <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
+                  <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded capitalize">
                     {search.propertyType.name}
                   </span>
                 )}
@@ -104,8 +104,14 @@ export default function SavedSearchCard({ search }: Props) {
                 )}
 
                 {search.agency && (
-                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded capitalize">
                     From: {search.agency.name}
+                  </span>
+                )}
+
+                {search.state && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded capitalize">
+                    In: {search.state.name}
                   </span>
                 )}
 

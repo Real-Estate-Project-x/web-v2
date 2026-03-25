@@ -84,3 +84,42 @@ export const getPropertyType = (
 
   return propertyTypes.find(({ id }) => id === propertyTypeId);
 };
+
+export const timeAgo = (inputDate: string | Date): string => {
+  const now = new Date();
+  const date = new Date(inputDate);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  const units = [
+    { name: "year", seconds: 60 * 60 * 24 * 365 },
+    { name: "month", seconds: 60 * 60 * 24 * 30 },
+    { name: "week", seconds: 60 * 60 * 24 * 7 },
+    { name: "day", seconds: 60 * 60 * 24 },
+    { name: "hour", seconds: 60 * 60 },
+    { name: "minute", seconds: 60 },
+    { name: "second", seconds: 1 },
+  ];
+
+  for (const unit of units) {
+    const value = Math.floor(diffInSeconds / unit.seconds);
+    if (value >= 1) {
+      return `${value} ${unit.name}${value > 1 ? "s" : ""} ago`;
+    }
+  }
+
+  return "just now";
+};
+
+export const sortBy = <T, K extends keyof T>(
+  data: T[],
+  order: "asc" | "desc",
+  key: K
+): T[] => {
+  console.log({ key, order });
+  return [...data].sort((a, b) => {
+    const aTime = new Date(a[key] as unknown as string | Date).getTime();
+    const bTime = new Date(b[key] as unknown as string | Date).getTime();
+
+    return order === "desc" ? bTime - aTime : aTime - bTime;
+  });
+};

@@ -1,117 +1,19 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Navbar from "../Home/Nav";
-import { DynamicPagination } from "@/components/shared/dynamic-pagination";
-import { PaginationControlInterface } from "../../../../utils/interfaces";
-import { PropertyList } from "../Properties";
-import Footer from "../Home/Footer";
-import { axiosInstance } from "@/lib/axios-interceptor";
+
+import Link from "next/link";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import { formatPrice } from "../../../../utils/helpers";
-import { ApiRequests } from "@/lib/api.request";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-
-const returnFilters = (data: any) => {
-  const startPriceWithoutNairaSign = formatPrice(data?.startPriceRange);
-  const endPriceWithoutNairaSign = formatPrice(data?.endPriceRange);
-  // `${startPriceWithoutNairaSign.length <= 7 ? startPriceWithoutNairaSign?.split(',')[0].concat("k")
-  // ${((endPriceWithoutNairaSign.length > 7) || parseInt(endPriceWithoutNairaSign?.split(',')[1]))  }
-  return [
-    { icon: "📍", label: data?.searchTerm },
-    {
-      icon: "💰",
-      label: `${startPriceWithoutNairaSign} - ${endPriceWithoutNairaSign}/yr`,
-    },
-    { icon: "🛏", label: `${data?.numberOfBeds} bedrooms` },
-    { icon: "🍳", label: `${data?.noOfKitchens} kitchen` },
-    { icon: "🏠", label: `${data?.propertyType}` },
-    { icon: "🔑", label: `For ${data?.upFor}` },
-  ];
-};
-const PROPERTIES = [
-  {
-    id: 1,
-    price: "₦1,250,000",
-    address: "14 Ozumba Mbadiwe Ave, Lagos Island",
-    beds: 3,
-    baths: 2,
-    sqm: 95,
-    bgClass: "bg-blue-100",
-    emoji: "🏙️",
-    isNew: true,
-    isBoosted: true,
-    hasVirtual: true,
-  },
-  {
-    id: 2,
-    price: "₦950,000",
-    address: "7 Kofo Abayomi St, Victoria Island",
-    beds: 3,
-    baths: 2,
-    sqm: 80,
-    bgClass: "bg-green-100",
-    emoji: "🏢",
-    isNew: false,
-    isBoosted: false,
-    hasVirtual: false,
-  },
-  {
-    id: 3,
-    price: "₦1,450,000",
-    address: "22 Awolowo Rd, Ikoyi, Lagos",
-    beds: 3,
-    baths: 3,
-    sqm: 112,
-    bgClass: "bg-orange-100",
-    emoji: "🏗️",
-    isNew: true,
-    isBoosted: false,
-    hasVirtual: true,
-  },
-  {
-    id: 4,
-    price: "₦870,000",
-    address: "3 Bode Thomas St, Surulere",
-    beds: 3,
-    baths: 2,
-    sqm: 88,
-    bgClass: "bg-indigo-100",
-    emoji: "🏠",
-    isNew: false,
-    isBoosted: true,
-    hasVirtual: false,
-  },
-  {
-    id: 5,
-    price: "₦1,100,000",
-    address: "11 Glover Rd, Ikoyi, Lagos",
-    beds: 3,
-    baths: 2,
-    sqm: 102,
-    bgClass: "bg-red-100",
-    emoji: "🌇",
-    isNew: true,
-    isBoosted: false,
-    hasVirtual: true,
-  },
-  {
-    id: 6,
-    price: "₦820,000",
-    address: "5 Karimu Kotun St, VI",
-    beds: 3,
-    baths: 2,
-    sqm: 76,
-    bgClass: "bg-emerald-100",
-    emoji: "🏘️",
-    isNew: false,
-    isBoosted: false,
-    hasVirtual: false,
-  },
-];
+import { useEffect, useState } from "react";
+import { timeAgo, sortBy } from "@/lib/utils";
+import { formatNumber } from "@/lib/helpers";
+import { NAIRA_SIGN } from "@/lib/constants";
+import { ApiRequests } from "@/lib/api.request";
+import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
+import Footer from "../Home/Footer";
+import Navbar from "../Home/Nav";
+import { PropertyList } from "../Properties";
 
 const BedIcon = () => (
   <svg
@@ -228,13 +130,9 @@ function PropertyCard({ property }: { property: any }) {
 
 export default function SavedSearches() {
   const searchParams = useSearchParams();
-  const [sortBy, setSortBy] = useState("newest");
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [alertDismissed, setAlertDismissed] = useState(false);
   const [responseData, setResponseData] = useState<any>({} as any);
-  const [pagination, setPagination] = useState<PaginationControlInterface>(
-    {} as PaginationControlInterface
-  );
+  const [sortedBy, setSortedBy] = useState<any>("");
+  const [propertyList, setPropertyList] = useState<any[]>([]);
 
   useEffect(() => {
     const slug = searchParams.get("id");
@@ -247,8 +145,11 @@ export default function SavedSearches() {
     try {
       const result = await new ApiRequests().findSavedSearchById(sId);
       if (result?.success) {
-        console.log({ result });
         setResponseData(result.data);
+        const list = (result.data.savedSearchResults as any[]).map(
+          (item) => item.property
+        );
+        setPropertyList(list);
       }
     } catch (error) {
       let message = "An error occurred";
@@ -258,6 +159,19 @@ export default function SavedSearches() {
       toast(message, { description: JSON.stringify(error) });
       throw error;
     }
+  };
+
+  const sortDataBy = (value: string) => {
+    setSortedBy(value);
+    const [field, order] = value.split("_");
+
+    if (!field || !order) return;
+
+    setPropertyList((prev) => {
+      const sorted = sortBy(prev, order as "asc" | "desc", field);
+      console.log({ field, order, length: sorted.length });
+      return sorted;
+    });
   };
 
   return (
@@ -291,51 +205,146 @@ export default function SavedSearches() {
                   <span className="font-medium text-gray-900 text-sm capitalize">
                     {responseData?.searchTerm}
                   </span>
-                  {/* {!alertDismissed && (
-                    <span className="flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
-                      {responseData?.savedSearchResults?.length} new matches
-                      <button
-                        onClick={() => setAlertDismissed(true)}
-                        className="ml-0.5 text-amber-400 hover:text-amber-600 leading-none">
-                        ×
-                      </button>
-                    </span>
-                  )} */}
                 </div>
                 <p className="text-xs text-gray-400">
-                  {/* Last updated 2 hours ago · */}
-                  {responseData?.savedSearchResults?.length} total results
+                  {responseData &&
+                    responseData.savedSearchResults?.length > 0 && (
+                      <>
+                        Last updated{" "}
+                        <b>
+                          {timeAgo(
+                            responseData.savedSearchResults[0].dateCreated
+                          )}
+                        </b>{" "}
+                        ●{" "}
+                      </>
+                    )}
+                  ({responseData?.savedSearchResults?.length ?? 0}) total
+                  results
                 </p>
               </div>
-
-              {/* <div className="flex gap-2">
-                <button className="text-xs text-gray-400 border border-gray-200 px-3 py-1 rounded-full hover:border-blue-800 hover:text-blue-800 transition-all">
-                  Edit
-                </button>
-                <button className="text-xs text-gray-400 border border-gray-200 px-3 py-1 rounded-full hover:border-red-400 hover:text-red-500 transition-all">
-                  Delete
-                </button>
-              </div> */}
             </div>
 
             <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">
               Active filters
             </p>
-            <div className="flex flex-wrap gap-2">
-              {returnFilters(responseData).map((f, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-1.5 bg-blue-50 text-blue-800 text-xs px-3 py-1.5 rounded-full"
-                >
-                  <span>{f.icon}</span>
-                  {f.label}
-                </div>
-              ))}
+            {/* <!-- Search criteria badges --> */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {responseData.numberOfBeds && (
+                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+                  {responseData.numberOfBeds} Bedrooms
+                </span>
+              )}
+              {responseData.noOfKitchens && (
+                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+                  {responseData.noOfKitchens} Kitchens
+                </span>
+              )}
+              {responseData.numberOfToilets && (
+                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
+                  {responseData.numberOfToilets} Toilets
+                </span>
+              )}
+              {responseData.upFor && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  For: {responseData.upFor}
+                </span>
+              )}
+
+              {responseData.xKmOfStartLocation && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Within {responseData.xKmOfStartLocation}km of location
+                </span>
+              )}
+
+              {responseData.propertyType && (
+                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded capitalize">
+                  {responseData.propertyType.name}
+                </span>
+              )}
+
+              {"hasGym" in responseData && responseData.hasGym && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Has: Gym
+                </span>
+              )}
+
+              {"hasWifi" in responseData && responseData.hasWifi && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Has: Wifi
+                </span>
+              )}
+
+              {"hasCarParking" in responseData &&
+                responseData.hasCarParking && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Parking space
+                  </span>
+                )}
+
+              {"hasKidsPlayArea" in responseData &&
+                responseData.hasKidsPlayArea && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Has: Kids Play Area
+                  </span>
+                )}
+
+              {"hasLaundry" in responseData && responseData.hasLaundry && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Has: Laundry
+                </span>
+              )}
+
+              {"hasCctv" in responseData && responseData.hasCctv && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Has: CCTV Surviallance
+                </span>
+              )}
+
+              {responseData.agency && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded capitalize">
+                  From: {responseData.agency.name}
+                </span>
+              )}
+
+              {responseData.state && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded capitalize">
+                  In: {responseData.state.name}
+                </span>
+              )}
+
+              {responseData.startPriceRange && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Pricing: {NAIRA_SIGN}
+                  {formatNumber(responseData.startPriceRange)}- {NAIRA_SIGN}
+                  {formatNumber(responseData.endPriceRange)}
+                </span>
+              )}
+
+              {responseData.roomSpaceSizeStartRange && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                  Floor Size: {responseData.roomSpaceSizeStartRange} sqFt -{" "}
+                  {responseData.roomSpaceSizeEndRange} sqFT
+                </span>
+              )}
+
+              {"isNewBuilding" in responseData &&
+                responseData.isNewBuilding && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Is: New Building
+                  </span>
+                )}
+
+              {"isPetFriendly" in responseData &&
+                responseData.isPetFriendly && (
+                  <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded">
+                    Is: Pet Friendly
+                  </span>
+                )}
             </div>
           </div>
 
-          {responseData && responseData?.savedSearchResults?.length > 0 ? (
+          {propertyList && propertyList?.length > 0 ? (
             <>
               {/* Results bar */}
               <div className="flex items-center justify-between mb-5">
@@ -346,19 +355,19 @@ export default function SavedSearches() {
                   match your search
                 </p>
                 <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  value={sortedBy}
+                  onChange={(e) => sortDataBy(e.target.value)}
                   className="text-xs text-gray-500 border border-gray-200 bg-white px-3 py-1.5 rounded-full outline-none cursor-pointer"
                 >
-                  <option value="newest">Sort: Newest first</option>
-                  <option value="low">Price: Low to high</option>
-                  <option value="high">Price: High to low</option>
-                  <option value="relevant">Most relevant</option>
+                  <option value="grandTotalPrice_desc">Highest Price</option>
+                  <option value="grandTotalPrice_asc">Lowest Price</option>
+                  <option value="dateCreated_desc">Most Recent</option>
+                  <option value="dateCreated_asc">Least Recent</option>
                 </select>
               </div>
 
               {/* Grid */}
-              <PropertyList array={responseData?.savedSearchResults} />
+              <PropertyList array={propertyList} />
             </>
           ) : (
             <div className="text-center text-base">

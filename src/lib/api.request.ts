@@ -46,7 +46,6 @@ export class ApiRequests {
     const url = `/delete-file/${uploadId}`;
     try {
       const response = await axiosInstance.delete(url);
-      console.log({ dito: response.data });
       if (response.data?.success) {
         return response.data.data;
       }
