@@ -134,4 +134,17 @@ export class ApiRequests {
       throw error;
     }
   }
+
+  async findSavedSearchById(sId: string) {
+    const url = `/saved-search/${sId}`;
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

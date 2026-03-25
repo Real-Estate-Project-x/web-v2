@@ -10,22 +10,28 @@ import { axiosInstance } from "@/lib/axios-interceptor";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { formatPrice } from "../../../../utils/helpers";
+import { ApiRequests } from "@/lib/api.request";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
-
-const returnFilters = ( data : any) => {
+const returnFilters = (data: any) => {
   const startPriceWithoutNairaSign = formatPrice(data?.startPriceRange);
   const endPriceWithoutNairaSign = formatPrice(data?.endPriceRange);
   // `${startPriceWithoutNairaSign.length <= 7 ? startPriceWithoutNairaSign?.split(',')[0].concat("k")
   // ${((endPriceWithoutNairaSign.length > 7) || parseInt(endPriceWithoutNairaSign?.split(',')[1]))  }
   return [
-  { icon: "📍", label: data?.searchTerm },
-  { icon: "💰", label: `${startPriceWithoutNairaSign} - ${endPriceWithoutNairaSign}/yr`},
-  { icon: "🛏", label: `${data?.numberOfBeds} bedrooms` },
-  { icon: "🍳", label: `${data?.noOfKitchens} kitchen` },
-  { icon: "🏠", label: `${data?.propertyType}` },
-  { icon: "🔑", label: `For ${data?.upFor}`},
-];
-}
+    { icon: "📍", label: data?.searchTerm },
+    {
+      icon: "💰",
+      label: `${startPriceWithoutNairaSign} - ${endPriceWithoutNairaSign}/yr`,
+    },
+    { icon: "🛏", label: `${data?.numberOfBeds} bedrooms` },
+    { icon: "🍳", label: `${data?.noOfKitchens} kitchen` },
+    { icon: "🏠", label: `${data?.propertyType}` },
+    { icon: "🔑", label: `For ${data?.upFor}` },
+  ];
+};
 const PROPERTIES = [
   {
     id: 1,
@@ -231,35 +237,28 @@ export default function SavedSearches() {
   );
 
   useEffect(() => {
-    const getSavedSearches = async () => {
-      const slug = searchParams.get("id");
-      try {
-        const response = await axiosInstance.get(`saved-search/edb1fab1-3261-4574-b3bb-7f8a526bda0e`);
-        console.log({response});
-        if (response.data?.success) {
-          setResponseData(response?.data?.data);
-        }
+    const slug = searchParams.get("id");
+    if (!slug) return;
+
+    loadData(slug);
+  }, []);
+
+  const loadData = async (sId: string) => {
+    try {
+      const result = await new ApiRequests().findSavedSearchById(sId);
+      if (result?.success) {
+        console.log({ result });
+        setResponseData(result.data);
+      }
     } catch (error) {
-       let message = "An error occurred";
+      let message = "An error occurred";
       if (error instanceof AxiosError) {
         message = error.message;
       }
       toast(message, { description: JSON.stringify(error) });
       throw error;
     }
-  }
-  getSavedSearches();
-  }, []);
-
-  const loadData = (page: number) => {
-
   };
-
-  if((!responseData) || responseData?.savedSearchResults?.length <= 0){
-    return <p className="text-center text-base">
-      No Results for this filter
-    </p>
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -303,7 +302,6 @@ export default function SavedSearches() {
                       </button>
                     </span>
                   )} */}
-
                 </div>
                 <p className="text-xs text-gray-400">
                   {/* Last updated 2 hours ago · */}
@@ -328,7 +326,8 @@ export default function SavedSearches() {
               {returnFilters(responseData).map((f, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-1.5 bg-blue-50 text-blue-800 text-xs px-3 py-1.5 rounded-full">
+                  className="flex items-center gap-1.5 bg-blue-50 text-blue-800 text-xs px-3 py-1.5 rounded-full"
+                >
                   <span>{f.icon}</span>
                   {f.label}
                 </div>
@@ -336,36 +335,44 @@ export default function SavedSearches() {
             </div>
           </div>
 
-          {/* Results bar */}
-          <div className="flex items-center justify-between mb-5">
-            <p className="text-sm text-gray-400">
-              <span className="text-gray-800 font-medium">{responseData?.savedSearchResults?.length} properties</span>{" "}
-              match your search
-            </p>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="text-xs text-gray-500 border border-gray-200 bg-white px-3 py-1.5 rounded-full outline-none cursor-pointer"
-            >
-              <option value="newest">Sort: Newest first</option>
-              <option value="low">Price: Low to high</option>
-              <option value="high">Price: High to low</option>
-              <option value="relevant">Most relevant</option>
-            </select>
-          </div>
+          {responseData && responseData?.savedSearchResults?.length > 0 ? (
+            <>
+              {/* Results bar */}
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-sm text-gray-400">
+                  <span className="text-gray-800 font-medium">
+                    {responseData?.savedSearchResults?.length} properties
+                  </span>{" "}
+                  match your search
+                </p>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="text-xs text-gray-500 border border-gray-200 bg-white px-3 py-1.5 rounded-full outline-none cursor-pointer"
+                >
+                  <option value="newest">Sort: Newest first</option>
+                  <option value="low">Price: Low to high</option>
+                  <option value="high">Price: High to low</option>
+                  <option value="relevant">Most relevant</option>
+                </select>
+              </div>
 
-          {/* Grid */}
-          <PropertyList array={responseData?.savedSearchResults} />
+              {/* Grid */}
+              <PropertyList array={responseData?.savedSearchResults} />
+            </>
+          ) : (
+            <div className="text-center text-base">
+              <p>
+                oops...no results found yet. We'll keep searching and let you
+                know
+              </p>
 
-          {/* Pagination */}
-          {pagination?.currentPage && (
-            <DynamicPagination
-              currentPage={pagination?.currentPage}
-              totalPages={pagination?.totalPages}
-              hasNext={pagination?.hasNext}
-              hasPrevious={pagination?.hasPrevious}
-              onPageChange={loadData}
-            />
+              <Link href={"/properties"}>
+                <Button className="gap-2 mt-4 cursor-pointer">
+                  <Search /> Continue browsing
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </div>
