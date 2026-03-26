@@ -1,5 +1,6 @@
 import axios from "axios";
 import { axiosInstance } from "./axios-interceptor";
+import { PropertyViewingFilter } from "./constants";
 
 export class ApiRequests {
   private BASE_URL: string;
@@ -152,6 +153,23 @@ export class ApiRequests {
 
     try {
       const response = await axiosInstance.patch(url, payload);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async fetchCustomerViewingSchedule(
+    pageNumber = 1,
+    pageSize = 10,
+    filter = PropertyViewingFilter.ALL
+  ) {
+    const url = `/agent-property-viewing/customer/viewing-list/?filter=${filter}&pageNumber=${pageNumber}&pageSize=${pageSize}`;
+
+    try {
+      const response = await axiosInstance.get(url);
       if (response.data?.success) {
         return response.data;
       }

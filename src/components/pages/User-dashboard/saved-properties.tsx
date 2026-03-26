@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
+import { formatNumber } from "@/lib/helpers";
 
 export const DashboardFavorites = () => {
   const [loading, setLoading] = useState(false);
@@ -84,7 +85,7 @@ export const DashboardFavorites = () => {
             </div>
             <CardHeader className="p-4">
               <CardTitle className="text-lg">{property.title}</CardTitle>
-              <CardDescription>₦{property.price}</CardDescription>
+              <CardDescription>₦{formatNumber(property.price)}</CardDescription>
             </CardHeader>
             <CardContent className="p-4 pt-0">
               <p className="text-sm">

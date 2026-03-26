@@ -1,13 +1,51 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ScheduledViewing } from "@/components/shared";
 import {
   Card,
+  CardTitle,
+  CardHeader,
   CardContent,
   CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
+import { ApiRequests } from "@/lib/api.request";
+import { PaginationControlInterface } from "../../../../utils/interfaces";
 
 export const DashboardSchedule = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [viewings, setViewings] = useState<any[]>([]);
+  const [pagination, setPagination] = useState<PaginationControlInterface>(
+    {} as PaginationControlInterface
+  );
+
+  const fetchViewings = async (pageNumber = 1, pageSize = 10) => {
+    setIsLoading(true);
+
+    try {
+      const response = await new ApiRequests().fetchCustomerViewingSchedule(
+        pageNumber,
+        pageSize
+      );
+      if (response.success) {
+        const { data, paginationControl } = response;
+        setViewings(data);
+        setPagination(paginationControl);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const loadData = async (page = 1) => {
+    await fetchViewings(page);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">Scheduled Viewings</h1>
