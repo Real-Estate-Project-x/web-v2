@@ -146,4 +146,17 @@ export class ApiRequests {
       throw error;
     }
   }
+
+  async updateProperty<T>(payload: T) {
+    const url = "/property";
+
+    try {
+      const response = await axiosInstance.patch(url, payload);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

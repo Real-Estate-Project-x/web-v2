@@ -3,7 +3,13 @@ import { DropZone } from "./upload-box";
 import { ApiRequests } from "@/lib/api.request";
 import { VideoIcon, ImageIcon, StickyNoteIcon } from "lucide-react";
 
-export const MediaStep = ({ form, update }: any) => {
+interface Props {
+  form: any;
+  update: (key: string, value: any) => void;
+  type: "edit" | "create";
+}
+
+export const MediaStep = ({ form, update, type }: Props) => {
   const [videos, setVideos] = useState<any[]>([]);
   const [images, setImages] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
@@ -112,6 +118,11 @@ export const MediaStep = ({ form, update }: any) => {
       <DropZone
         label="Property Video (Optional)"
         sublabel="Upload Property Video"
+        warninglabel={
+          type === "edit"
+            ? "NOTE: This field overwrites the previous video"
+            : ""
+        }
         accept="video/*"
         multiple={false}
         icon={<VideoIcon />}
@@ -123,7 +134,12 @@ export const MediaStep = ({ form, update }: any) => {
 
       {/* Images */}
       <DropZone
-        label="Property Images (Required)"
+        warninglabel={
+          type === "edit"
+            ? "NOTE: This field overwrites all previous images"
+            : ""
+        }
+        label="Property Images (Optional)"
         sublabel="Upload Property Images (You can upload multiple images)"
         accept="image/png,image/jpeg,image/gif,image/webp"
         multiple={true}
@@ -137,6 +153,11 @@ export const MediaStep = ({ form, update }: any) => {
       {/* Arch_plans */}
       <DropZone
         label="Architectural Plans (Optional)"
+        warninglabel={
+          type === "edit"
+            ? "NOTE: This field overwrites all previous plans"
+            : ""
+        }
         sublabel="Upload floor plans and architectural drawings"
         accept="image/*,application/pdf"
         multiple={true}

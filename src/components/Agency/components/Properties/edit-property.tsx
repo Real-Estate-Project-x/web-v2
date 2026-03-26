@@ -10,6 +10,8 @@ import { Property } from "../../../../../utils/interfaces";
 import { BasicStep } from "./components/basic-step";
 import { DetailsStep } from "./components/details-step";
 import { AmenitiesStep } from "./components/amenties-step";
+import { MediaStep } from "./components/media-step";
+import { cleanObject } from "../../../../../utils/helpers";
 
 const steps = ["Basic", "Details", "Amenities", "Media"];
 
@@ -17,7 +19,7 @@ export const EditProperty = ({}) => {
   const [step, setStep] = useState(0);
   const searchParams = useSearchParams();
   const [slug, setSlug] = useState<string>("");
-  const [property, setProperty] = useState(null);
+  const [property, setProperty] = useState<any>(null);
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
   const [addressesList, setAddressesList] = useState<any[]>([]);
   const [form, setForm] = useState({
@@ -150,6 +152,51 @@ export const EditProperty = ({}) => {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!property?.id) return;
+
+    // Clean_data and remove null/undefined values
+    const payload = cleanObject({
+      ...form,
+      propertyId: property.id,
+    });
+
+    // Cast numbers from strings before making request
+    const castedPayload = {
+      ...payload,
+      ...(payload.price && {
+        price: +payload.price,
+      }),
+      ...(payload.sizeInSquareFeet && {
+        sizeInSquareFeet: +payload.sizeInSquareFeet,
+      }),
+      ...(payload.noOfBedrooms && {
+        noOfBedrooms: +payload.noOfBedrooms,
+      }),
+      ...(payload.noOfToilets && {
+        noOfToilets: +payload.noOfToilets,
+      }),
+      ...(payload.noOfKitchens && {
+        noOfKitchens: +payload.noOfKitchens,
+      }),
+      ...(payload.additionalCosts && {
+        additionalCosts: (payload.additionalCosts as any[]).map((fee) => ({
+          ...fee,
+          price: +fee.price,
+        })),
+        ...(payload.averageBroadbandSpeedInMegabytes && {
+          averageBroadbandSpeedInMegabytes:
+            +payload.averageBroadbandSpeedInMegabytes,
+        }),
+      }),
+    };
+    const result = await new ApiRequests().updateProperty(castedPayload);
+    if (result?.success) {
+      setStep(0);
+      toast(result.message, {
+        dismissible: true,
+      });
+    }
   };
 
   useEffect(() => {
@@ -209,6 +256,9 @@ export const EditProperty = ({}) => {
         {/* Amenities */}
         {step === 2 && <AmenitiesStep form={form} update={update} />}
 
+        {/* Media */}
+        {step === 3 && <MediaStep type={"edit"} form={form} update={update} />}
+
         {/* Footer */}
         <div className="flex justify-between mt-8">
           <button
@@ -217,7 +267,7 @@ export const EditProperty = ({}) => {
           >
             Cancel
           </button>
-
+          {/*.  */}
           <div className="flex gap-2">
             {step > 0 && (
               <button
@@ -240,7 +290,7 @@ export const EditProperty = ({}) => {
                 type="submit"
                 className="cursor-pointer px-4 py-2 bg-black text-white rounded-lg"
               >
-                Create Listing
+                Update Listing
               </button>
             )}
           </div>

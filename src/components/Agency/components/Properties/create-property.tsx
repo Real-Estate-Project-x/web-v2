@@ -243,8 +243,11 @@ export const CreateProperty = ({}) => {
             update={update}
           />
         )}
+
         {step === 2 && <AmenitiesStep form={form} update={update} />}
-        {step === 3 && <MediaStep form={form} update={update} />}
+        {step === 3 && (
+          <MediaStep type={"create"} form={form} update={update} />
+        )}
 
         {/* Footer */}
         <div className="flex justify-between mt-8">

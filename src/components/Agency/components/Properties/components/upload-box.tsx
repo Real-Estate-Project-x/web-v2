@@ -12,6 +12,7 @@ export interface UploadedFile {
 interface DropZoneProps {
   label: string;
   sublabel: string;
+  warninglabel?: string;
   accept: string;
   multiple?: boolean;
   icon: React.ReactNode;
@@ -122,6 +123,7 @@ function FileThumb({
 export function DropZone({
   label,
   sublabel,
+  warninglabel,
   accept,
   multiple = false,
   icon,
@@ -155,6 +157,9 @@ export function DropZone({
       <div>
         <p className="text-sm font-semibold text-slate-800">{label}</p>
         <p className="text-xs text-blue-500 font-medium">{sublabel}</p>
+        {warninglabel && warninglabel !== "" && (
+          <p className="text-xs text-red-500 font-bold">{warninglabel}</p>
+        )}
       </div>
 
       {/* Drop area */}

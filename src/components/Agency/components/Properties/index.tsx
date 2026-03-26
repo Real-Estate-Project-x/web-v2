@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -24,10 +25,11 @@ import {
   SortDesc,
   BarChart3,
   MapPin,
-  Building,
   Building2,
   CircleCheck,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Separator } from "@radix-ui/react-select";
 import PropertyEditForm from "./dialogs/edit-property";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import {
@@ -41,11 +43,8 @@ import {
   getLocalStorageFieldRaw,
 } from "../../../../../utils/helpers";
 import PropertyListingDialog from "./dialogs/new-upload";
-import { useRouter } from "next/navigation";
-import { Separator } from "@radix-ui/react-select";
 import { BoostPropertyPrompt } from "./agent-property-view";
 import { DynamicPagination } from "@/components/shared/dynamic-pagination";
-import Link from "next/link";
 
 const AgentPropertiesManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
