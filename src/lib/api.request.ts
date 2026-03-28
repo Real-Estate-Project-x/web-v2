@@ -166,10 +166,16 @@ export class ApiRequests {
     pageSize = 10,
     filter = PropertyViewingFilter.ALL
   ) {
-    const url = `/agent-property-viewing/customer/viewing-list/?filter=${filter}&pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    const url = `/agent-property-viewing/customer/viewing-list/`;
 
     try {
-      const response = await axiosInstance.get(url);
+      const response = await axiosInstance.get(url, {
+        params: {
+          filter,
+          pageSize,
+          pageNumber,
+        },
+      });
       if (response.data?.success) {
         return response.data;
       }

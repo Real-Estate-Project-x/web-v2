@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import DashboardLayout from "./layout";
 import { AgentMessages } from "./Agent/message-agent";
 import { AgentProperties } from "./Agent/properties";
-import DashboardLayout from "./layout";
 import { DashboardOverview } from "./overview";
+import { DashboardSettings } from "./settings";
 import { DashboardFavorites } from "./saved-properties";
 import { DashboardSchedule } from "./scheduled-viewings";
-import { DashboardSettings } from "./settings";
-import { Agent, Message } from "../../../../utils/interfaces";
 import { DashboardSavedSearch } from "./saved-searches";
+import { Agent, Message } from "../../../../utils/interfaces";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState<string>("overview");
