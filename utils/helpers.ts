@@ -270,3 +270,32 @@ export const fetchPropertyTypes = async (setPropertyTypes: Function) => {
     throw error;
   }
 };
+
+export const capitalize = (value: string): string => {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+};
+
+export const formatDateTime = (dateString: string) => {
+  const date = new Date(dateString);
+
+  const formattedDate = date.toLocaleDateString(undefined, {
+    weekday: "short", // Wed
+    year: "numeric", // 2026
+    month: "short", // Mar
+    day: "numeric", // 4
+    timeZone: "Africa/Lagos",
+  });
+
+  const formattedTime = date.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true, // 👈 ensures 12-hour format
+    timeZone: "Africa/Lagos",
+  });
+
+  return {
+    date: formattedDate,
+    time: formattedTime,
+  };
+};

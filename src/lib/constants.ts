@@ -10,10 +10,10 @@ export enum BLUPODD {
 }
 
 export enum PropertyViewingFilter {
-  ALL = "ALL",
-  PAST = "PAST",
   TODAY = "TODAY",
   UPCOMING = "UPCOMING",
+  // ALL = "ALL",
+  PAST = "PAST",
 }
 
 export enum ViewingMedium {

@@ -161,10 +161,23 @@ export class ApiRequests {
     }
   }
 
+  async fetchCustomerViewingSummary() {
+    const url = "/agent-property-viewing/customer/viewing-list/summary";
+
+    try {
+      const response = await axiosInstance.get(url);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async fetchCustomerViewingSchedule(
     pageNumber = 1,
     pageSize = 10,
-    filter = PropertyViewingFilter.ALL
+    filter = PropertyViewingFilter.TODAY
   ) {
     const url = `/agent-property-viewing/customer/viewing-list/`;
 
@@ -178,6 +191,36 @@ export class ApiRequests {
       });
       if (response.data?.success) {
         return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async rateViewing(viewingId: string, rating: number, comment?: string) {
+    const url = "/agent-property-viewing/rate-viewing";
+    const payload = {
+      rating,
+      ...(comment && { comment }),
+      propertyViewingId: viewingId,
+    };
+    try {
+      const response = await axiosInstance.post(url, payload);
+      if (response.data?.success) {
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async trackViewedProperty(propertyId: string) {
+    const url = `/property/viewed-properties/${propertyId}`;
+
+    try {
+      const result = await axiosInstance.post(url, {});
+      if (result.data.success) {
+        return result.data;
       }
     } catch (error) {
       throw error;

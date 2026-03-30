@@ -51,12 +51,14 @@ import {
   formatPrice,
   pickUserId,
 } from "../../../../utils/helpers";
+import { ApiRequests } from "@/lib/api.request";
+import ReportModal from "./Dialogs/report-property";
+import { axiosInstance } from "@/lib/axios-interceptor";
 import { LoaderViewProperty } from "@/components/shared/loader-cards";
 import { ErrorDialog } from "@/components/shared/error-dialog";
-import { axiosInstance } from "@/lib/axios-interceptor";
 import AgentAvailabilityPicker from "@/components/shared/agent-availability-component";
-import ReportModal from "./Dialogs/report-property";
 import AgencySnippetCard from "@/components/shared/agency-snippet-card";
+
 // just importing the propertyMap component led to window not defined issues because it was running on the server b4 the window was up
 // using use client specified client component not server but importing dynamically and disabling ssr makes the component wait until window is up b4 running
 // voila problem solved
@@ -127,15 +129,16 @@ const PropertyDetails = () => {
     //   toast.info("Only logged-in users who have viewed this apartment can leave comments.");
     //   return;
     // }
+    const viewingId = propertyData.property.id;
+
+    if (!viewingId) return;
+
     setIsLoading(true);
-    axiosInstance
-      .post(`agent-property-viewing/rate-viewing`, {
-        propertyViewingId: propertyData.property.id,
-        rating,
-        comment: data.comment,
-      })
+
+    new ApiRequests()
+      .rateViewing(viewingId, rating, data.comment)
       .then((response) => {
-        if (response?.data?.success) {
+        if (response?.success) {
           toast.success("Thank you for your review!");
         } else {
           setErrorObj({
@@ -280,9 +283,9 @@ const PropertyDetails = () => {
     setPaymentReference(searchParams.get("reference") as string);
     if (slug) {
       if (typeof window !== "undefined") {
-        fetchData(slug, pickUserId()).then((property) => {
+        fetchData(slug, pickUserId()).then(async (property) => {
           if (property?.id) {
-            trackViewedProperty(property.id);
+            await new ApiRequests().trackViewedProperty(property.id);
           }
         });
       }
