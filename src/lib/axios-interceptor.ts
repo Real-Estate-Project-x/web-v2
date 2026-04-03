@@ -38,7 +38,6 @@ export const axiosInstance = axios.create({
 });
 
 // ── Queue of requests waiting for a token refresh ──────────────────────────
-let isRefreshing = false;
 let refreshQueue: Array<{
   resolve: (token: string) => void;
   reject: (error: unknown) => void;

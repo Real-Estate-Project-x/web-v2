@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DropZone } from "./upload-box";
 import { ApiRequests } from "@/lib/api.request";
 import { VideoIcon, ImageIcon, StickyNoteIcon } from "lucide-react";
+import { PropertyUpFor } from "@/lib/constants";
 
 interface Props {
   form: any;
@@ -13,6 +14,7 @@ export const MediaStep = ({ form, update, type }: Props) => {
   const [videos, setVideos] = useState<any[]>([]);
   const [images, setImages] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
+  const [ownershipDocs, setOwnershipDocs] = useState<any[]>([]);
 
   // Images
   const addImages = async (files: File[]) => {
@@ -112,6 +114,39 @@ export const MediaStep = ({ form, update, type }: Props) => {
     await new ApiRequests().deleteFile(id);
   };
 
+  // Ownership docs
+  const addOwnershipDocs = async (files: File[]) => {
+    const uploadedOwnershipDocs: any[] =
+      await new ApiRequests().uploadPropertyImages(files);
+    if (!uploadedOwnershipDocs?.length) return;
+
+    setOwnershipDocs((prev) => {
+      const updated = [...prev, ...uploadedOwnershipDocs];
+
+      update(
+        "ownershipDocIds",
+        updated.map((plan) => plan.id)
+      );
+
+      return updated;
+    });
+  };
+
+  const removeOwnershipDoc = async (id: string) => {
+    setOwnershipDocs((prev) => {
+      const updated = prev.filter((f) => f.id !== id);
+
+      update(
+        "ownershipDocIds",
+        updated.map((plan) => plan.id)
+      );
+
+      return updated;
+    });
+
+    await new ApiRequests().deleteFile(id);
+  };
+
   return (
     <div className="space-y-6">
       {/* Videos */}
@@ -167,6 +202,26 @@ export const MediaStep = ({ form, update, type }: Props) => {
         onAdd={addPlans}
         onRemove={removePlan}
       />
+
+      {/* Ownership docs */}
+      {form && form.upFor === PropertyUpFor.SALE && (
+        <DropZone
+          label="Ownership docs (Optional)"
+          warninglabel={
+            type === "edit"
+              ? "NOTE: This field overwrites all ownership docs"
+              : ""
+          }
+          sublabel="Upload ownership docs I.E C_of_O, Deeds"
+          accept="image/*,application/pdf"
+          multiple={true}
+          icon={<StickyNoteIcon />}
+          hint={"PDF, PNG, JPG up to 10MB each"}
+          files={ownershipDocs}
+          onAdd={addOwnershipDocs}
+          onRemove={removeOwnershipDoc}
+        />
+      )}
     </div>
   );
 };

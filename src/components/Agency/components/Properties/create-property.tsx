@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PropertyUpFor } from "@/lib/constants";
 import { ApiRequests } from "@/lib/api.request";
 import { BasicStep } from "./components/basic-step";
@@ -17,6 +17,10 @@ import {
 const steps = ["Basic", "Details", "Amenities", "Media"];
 
 export const CreateProperty = ({}) => {
+  type StepTarget = number | ((prev: number) => number);
+  const stepBackActions: Record<number, () => void> = {
+    1: () => fetchPropertyTypes(form.upFor),
+  };
   const [step, setStep] = useState(0);
   const [propertyTypes, setPropertyTypes] = useState<any[]>([]);
   const [addressesList, setAddressesList] = useState<any[]>([]);
@@ -60,12 +64,14 @@ export const CreateProperty = ({}) => {
     videoId: "",
     photoIds: [],
     architecturalPlanIds: [],
+    ownershipDocIds: [],
   });
 
-  const fetchPropertyTypes = async () => {
-    const result = await new ApiRequests().fetchPropertyTypes(
-      "success,data(id,name,status,tag)"
-    );
+  const fetchPropertyTypes = async (listingType: PropertyUpFor) => {
+    const result = await new ApiRequests().fetchPropertyTypes({
+      listingType,
+      fields: "success,data(id,name,status,tag,isUnit,listingType)",
+    });
     if (!result) return;
 
     setPropertyTypes(result.data);
@@ -113,12 +119,23 @@ export const CreateProperty = ({}) => {
       videoId: "",
       photoIds: [],
       architecturalPlanIds: [],
+      ownershipDocIds: [],
     });
   };
 
-  useEffect(() => {
-    fetchPropertyTypes();
+  const handleStepChange = useCallback(
+    (target?: StepTarget) => {
+      const newStep = Math.max(
+        typeof target === "function" ? target(step) : target ?? step - 1,
+        0
+      );
+      stepBackActions[newStep]?.();
+      setStep(newStep);
+    },
+    [step, form.upFor]
+  );
 
+  useEffect(() => {
     // Pre_set agencyId into form_data
     update("agencyId", getLocalStorageFieldRaw("agentId"));
   }, []);
@@ -215,7 +232,7 @@ export const CreateProperty = ({}) => {
         {steps.map((s, i) => (
           <button
             key={s}
-            onClick={() => setStep(i)}
+            onClick={() => handleStepChange(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
               step === i ? "bg-white shadow" : "text-gray-500 hover:text-black"
             }`}
@@ -252,7 +269,8 @@ export const CreateProperty = ({}) => {
         {/* Footer */}
         <div className="flex justify-between mt-8">
           <button
-            onClick={() => setStep(0)}
+            type="button"
+            onClick={() => handleStepChange(0)}
             className="cursor-pointer px-4 py-2 border rounded-lg"
           >
             Cancel
@@ -261,7 +279,8 @@ export const CreateProperty = ({}) => {
           <div className="flex gap-2">
             {step > 0 && (
               <button
-                onClick={() => setStep((s) => s - 1)}
+                type="button"
+                onClick={() => handleStepChange((prev) => prev - 1)}
                 className="cursor-pointer px-4 py-2 border rounded-lg"
               >
                 Previous
@@ -270,7 +289,8 @@ export const CreateProperty = ({}) => {
 
             {step < 3 ? (
               <button
-                onClick={() => setStep((s) => s + 1)}
+                type="button"
+                onClick={() => handleStepChange((prev) => prev + 1)}
                 className="cursor-pointer px-4 py-2 bg-black text-white rounded-lg"
               >
                 Next

@@ -2,20 +2,23 @@
 
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ApiRequests } from "@/lib/api.request";
 import { PropertyUpFor } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
-import { Property } from "../../../../../utils/interfaces";
 import { BasicStep } from "./components/basic-step";
+import { MediaStep } from "./components/media-step";
 import { DetailsStep } from "./components/details-step";
 import { AmenitiesStep } from "./components/amenties-step";
-import { MediaStep } from "./components/media-step";
 import { cleanObject } from "../../../../../utils/helpers";
 
 const steps = ["Basic", "Details", "Amenities", "Media"];
 
 export const EditProperty = ({}) => {
+  type StepTarget = number | ((prev: number) => number);
+  const stepBackActions: Record<number, () => void> = {
+    1: () => fetchPropertyTypes(form.upFor),
+  };
   const [step, setStep] = useState(0);
   const searchParams = useSearchParams();
   const [slug, setSlug] = useState<string>("");
@@ -62,6 +65,7 @@ export const EditProperty = ({}) => {
     videoId: "",
     photoIds: [],
     architecturalPlanIds: [],
+    ownershipDocIds: [],
   });
 
   const loadData = async (slug: string) => {
@@ -73,10 +77,11 @@ export const EditProperty = ({}) => {
     presetFormData(result.data);
   };
 
-  const fetchPropertyTypes = async () => {
-    const result = await new ApiRequests().fetchPropertyTypes(
-      "success,data(id,name,status,tag)"
-    );
+  const fetchPropertyTypes = async (listingType: PropertyUpFor) => {
+    const result = await new ApiRequests().fetchPropertyTypes({
+      listingType,
+      fields: "success,data(id,name,status,tag,isUnit,listingType)",
+    });
     if (!result) return;
 
     setPropertyTypes(result.data);
@@ -199,14 +204,25 @@ export const EditProperty = ({}) => {
     }
   };
 
+  const handleStepChange = useCallback(
+    (target?: StepTarget) => {
+      const newStep = Math.max(
+        typeof target === "function" ? target(step) : target ?? step - 1,
+        0
+      );
+      stepBackActions[newStep]?.();
+      setStep(newStep);
+    },
+    [step, form.upFor]
+  );
+
   useEffect(() => {
     const slug = searchParams.get("id");
 
     if (!slug) return;
 
     setSlug(slug);
-
-    Promise.all([loadData(slug), fetchPropertyTypes()]);
+    loadData(slug);
   }, [slug]);
 
   return (
@@ -222,7 +238,7 @@ export const EditProperty = ({}) => {
         {steps.map((s, i) => (
           <button
             key={s}
-            onClick={() => setStep(i)}
+            onClick={() => handleStepChange(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
               step === i ? "bg-white shadow" : "text-gray-500 hover:text-black"
             }`}
@@ -262,7 +278,8 @@ export const EditProperty = ({}) => {
         {/* Footer */}
         <div className="flex justify-between mt-8">
           <button
-            onClick={() => setStep(0)}
+            type="button"
+            onClick={() => handleStepChange(0)}
             className="cursor-pointer px-4 py-2 border rounded-lg"
           >
             Cancel
@@ -271,7 +288,8 @@ export const EditProperty = ({}) => {
           <div className="flex gap-2">
             {step > 0 && (
               <button
-                onClick={() => setStep((s) => s - 1)}
+                type="button"
+                onClick={() => handleStepChange((prev) => prev - 1)}
                 className="cursor-pointer px-4 py-2 border rounded-lg"
               >
                 Previous
@@ -280,7 +298,8 @@ export const EditProperty = ({}) => {
 
             {step < 3 ? (
               <button
-                onClick={() => setStep((s) => s + 1)}
+                type="button"
+                onClick={() => handleStepChange((prev) => prev + 1)}
                 className="cursor-pointer px-4 py-2 bg-black text-white rounded-lg"
               >
                 Next

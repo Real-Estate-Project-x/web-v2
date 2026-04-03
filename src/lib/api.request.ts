@@ -1,6 +1,6 @@
 import axios from "axios";
 import { axiosInstance } from "./axios-interceptor";
-import { PropertyViewingFilter } from "./constants";
+import { PropertyUpFor, PropertyViewingFilter } from "./constants";
 
 export class ApiRequests {
   private BASE_URL: string;
@@ -16,6 +16,26 @@ export class ApiRequests {
 
     try {
       const response = await axios.post(url, payload);
+
+      if (response.data?.success) {
+        return response.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadFiles(files: File[]) {
+    const url = `${this.BASE_URL}upload-files`;
+    const payload = new FormData();
+    files.forEach((file) => {
+      payload.append("files[]", file);
+    });
+
+    try {
+      const response = await axios.post(url, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (response.data?.success) {
         return response.data.data;
@@ -70,11 +90,17 @@ export class ApiRequests {
     }
   }
 
-  async fetchPropertyTypes(fields?: string) {
-    const params = new URLSearchParams({
-      ...(fields && { fields }),
+  async fetchPropertyTypes(query?: Record<string, any>) {
+    const params = new URLSearchParams();
+
+    Object.entries(query || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
     });
+
     const url = `/property-type/?${params.toString()}`;
+
     try {
       const response = await axiosInstance.get(url);
       if (response.data?.success) {

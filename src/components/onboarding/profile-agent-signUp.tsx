@@ -19,6 +19,7 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { axiosInstance } from "@/lib/axios-interceptor";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ApiRequests } from "@/lib/api.request";
 
 const profileSchema = z
   .object({
@@ -94,16 +95,9 @@ export default function ProfileForm() {
       };
       reader.readAsDataURL(file);
       try {
-        const formatData = new FormData();
-        formatData.append("files[]", file);
-
-        const url = "/upload-files";
-        const headers = { "Content-Type": "multipart/form-data" };
-        const responseData = await axiosInstance.post(url, formatData, {
-          headers,
-        });
-        if (responseData?.data?.data?.length > 0) {
-          setLogo(responseData.data.data[0]);
+        const responseData = await new ApiRequests().uploadFiles([file]);
+        if (responseData?.length > 0) {
+          setLogo(responseData[0]);
         }
       } catch (ex) {
         console.error(`Error uploading logo: ${ex}`);
